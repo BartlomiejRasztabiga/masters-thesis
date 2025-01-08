@@ -261,6 +261,9 @@
 \newcommand{\MasterThesis}{
     \newcommand{\@ThesisType}{mgr}
 }
+\newcommand{\PPMGR}{
+    \newcommand{\@ThesisType}{ppmgr}
+}
 \newcommand{\instytut}[1]{
     \newcommand{\@instytut}{#1}
 }
