@@ -1,0 +1,58 @@
+\clearpage % Rozdziały zaczynamy od nowej strony.
+\section{Przegląd narzędzi}
+
+\subsection{Środowisko eksperymentalne}
+
+Do przygotowania i uruchomienia eksperymentów zastosowano język Python w połączeniu z wirtualnym środowiskiem venv oraz środowisko IDE PyCharm, które zapewnia wygodną obsługę kodu i integrację z narzędziami. Kluczowym elementem środowiska eksperymentalnego jest wykorzystanie serwisu OpenRouter — platformy umożliwiającej agregację API różnych dostawców modeli językowych. OpenRouter eliminuje potrzebę samodzielnego integrowania się z różnymi dostawcami, oferując ujednolicony interfejs. Jest to szczególnie przydatne w przypadku dynamicznego rozwoju i częstych zmian w dostępnych modelach. Wadą takiego podejścia są jednak koszty, które mogą być wysokie przy intensywnym korzystaniu z dużych modeli.
+
+Komunikacja z OpenRouter została zrealizowana za pomocą SDK udostępnionego przez firmę OpenAI, twórcę m.in. wykorzystywanych w porównaniu modeli GPT-4o. SDK zapewnia prosty interfejs do przesyłania zapytań oraz odbierania wyników generowanych przez modele.
+
+\subsection{Biblioteki i narzędzia wspomagające}
+
+W celu wsparcia eksperymentów zastosowano kilka bibliotek w języku Python:
+
+\begin{itemize}
+    \item docker — do zarządzania obrazami i kontenerami Docker, co umożliwia budowanie obrazów na podstawie wygenerowanych plików Dockerfile,
+    \item python-dotenv — do obsługi zmiennych środowiskowych przechowywanych w plikach .env, co pozwala na wygodne zarządzanie konfiguracją aplikacji,
+    \item GitPython — do automatyzacji operacji na repozytoriach Git, w tym klonowania wejściowych repozytoriów.
+\end{itemize}
+
+\subsection{Modele LLM}
+
+W eksperymentach wykorzystano różne modele językowe, w tym:
+
+\begin{itemize}
+    \item OpenAI GPT-4o mini,
+    \item Google Gemini 2.0 Flash,
+    \item Anthropic Claude 3.5 Haiku,
+    \item Meta LLAMA 3.1 70B,
+    \item Mistral Small.
+\end{itemize}
+
+Na etapie developmentu korzystano z mniejszych modeli, co pozwalało na szybkie iteracje i testy. Do finalnych analiz i porównań planowane jest użycie ich większych odpowiedników, co zapewni bardziej reprezentatywne wyniki. Wybór modeli jest na bieżąco aktualizowany w odpowiedzi na pojawianie się nowych rozwiązań. Przykładem może być model DeepSeek v3, który pojawił się w trakcie pisania sprawozdania i obiecuje znaczne ulepszenia względem np. modeli OpenAI oraz jest bardziej przystępny cenowo.
+
+\subsection{Infrastruktura kontenerów i ich orkiestracji}
+
+Do zarządzania infrastrukturą kontenerową wykorzystano narzędzia Docker oraz Kubernetes. Autor korzysta z prywatnych klastrów Kubernetes uruchamianych przy pomocy:
+
+\begin{itemize}
+    \item kind — narzędzie do lokalnego tworzenia klastrów Kubernetes w kontenerach Docker,
+    \item microk8s — lekkiej implementacji Kubernetes, zoptymalizowanej do uruchamiania na pojedynczych maszynach.
+\end{itemize}
+
+Klaster kind jest wykorzystywany do testów lokalnych, natomiast microk8s pozwala na uruchomienie klastra na maszynie wirtualnej w chmurze, na której docelowo będą uruchamiane konfiguracje wygenerowane przez modele LLM.
+
+Do zarządzania klastrami Kubernetes używane jest środowisko Lens, które oferuje intuicyjny interfejs graficzny do monitorowania i administracji.
+
+W przyszłości, w celu budowy obrazów Docker w bardziej wydajny sposób, planowane jest użycie narzędzia Kaniko, które umożliwia budowanie obrazów kontenerowych w środowisku Kubernetes.
+
+\subsection{Warstwa aplikacyjna - PaaS}
+
+W warstwie aplikacyjnej, czyli w projektowanej platformie PaaS, rozważane są dwa podejścia:
+
+\begin{itemize}
+    \item Wykorzystanie frameworka FastAPI w języku Python, który zapewnia szybkość developmentu i prostotę rozwiązania,
+    \item Implementacja w języku Kotlin z użyciem frameworków takich jak Ktor, Quarkus lub Micronaut. To podejście pozwoliłoby na integrację z ekosystemem JVM i lepsze wsparcie developmentu dla bardziej rozbudowanych aplikacji.
+\end{itemize}
+
+Całość infrastruktury i wykorzystanych narzędzi może ulec modyfikacji w trakcie realizacji pracy, zależnie od wymagań projektu oraz dostępności nowych technologii.

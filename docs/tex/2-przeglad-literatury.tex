@@ -1,0 +1,25 @@
+\clearpage % Rozdziały zaczynamy od nowej strony.
+\section{Przegląd literatury}
+
+Niedawny rozwój możliwości generowania kodu dzięki zastosowaniu dużych modeli językowych dotyczył głównie języków programowania ogólnego przeznaczenia. Języki specyficzne dla dziedzin, takie jak te wykorzystywane w automatyzacji IT, otrzymały znacznie mniej uwagi, mimo że angażują wielu aktywnych deweloperów i stanowią istotny element współczesnych platform chmurowych. \cite{pujar_invited_2023}
+
+Literatura dotycząca wykorzystania dużych modeli językowych (LLM) do generowania manifestów Docker i Kubernetes jest ograniczona. Istnieją jednak badania, które zajmują się różnymi aspektami tej tematyki, szczególnie w kontekście automatyzacji infrastruktury jako kodu (IaC). Żadna z do tej pory przeanalizowanych, istniejących prac nie koncentruje się jednak na pełnym wykorzystaniu repozytorium aplikacji jako wejścia do modeli LLM, a także na dokładnym analizowaniu problemów bezpieczeństwa takich konfiguracji. W niniejszym przeglądzie przedstawiane są wybrane badania oraz wskazywane są sposoby, w jakie niniejsza praca rozszerza i ulepsza istniejące podejścia.
+
+Praca Malula i in. wprowadza system GenKubeSec \cite{malul_genkubesec_2024}, który wykorzystuje modele LLM do wykrywania i naprawiania błędnych konfiguracji Kubernetes (KCF). System ten jest innowacyjny, ponieważ dostarcza pełne rozwiązanie: od wykrywania problemów, przez ich lokalizację, aż po ich naprawę. Kluczową zaletą GenKubeSec jest minimalizacja ryzyka związanego z bezpieczeństwem poprzez wykorzystanie lokalnych modeli LLM zamiast komercyjnych API. Praca poszerza te badania, badając nie tylko wykrywanie błędnych konfiguracji, ale także aspekt ich deterministyczności i odporności na manipulacje danymi wejściowymi.
+
+Ueno i Uchiumi proponują benchmark oceniający jakość manifestów Kubernetes generowanych przez modele LLM na podstawie specyfikacji Docker Compose \cite{ueno_migrating_2024}. Wyniki pokazują, że generowane manifesty są często poprawne, ale brakuje w nich spójności i komentarzy poprawiających czytelność. W pracy uwzględniana jest ta krytyka, koncentrując się na generowaniu manifestów, które są zarówno funkcjonalne, jak i czytelne dla ludzi.
+
+Kratzke i Drews badali możliwości standardowych modeli LLM w generowaniu manifestów Kubernetes przy użyciu zaawansowanych technik inżynierii promptów \cite{kratzke_dont_2024}. Badanie pokazuje, że efektywne projektowanie promptów może znacząco poprawić jakość generowanych manifestów. Praca rozwija ten kierunek, analizując nie tylko jakość generowanych konfiguracji, ale również ich podatność na ataki.
+
+Pujar i in. skoncentrowali się na generowaniu konfiguracji YAML dla Ansible za pomocą modeli LLM \cite{pujar_invited_2023}. Choć praca skupia się na inżynierii promptów i budowaniu dedykowanych datasetów, brak w niej analizy problemów bezpieczeństwa czy deterministyczności. Niniejsza praca rozszerza ten kontekst na Kubernetes i Docker, uwzględniając dodatkowe aspekty, takie jak jailbreaking modeli.
+
+Lanciano i in. zaproponowali podejście do analizy jakości manifestów Kubernetes z wykorzystaniem LLM \cite{lanciano_analyzing_2023}. System dostarcza rekomendacje dotyczące jakości kodu i pomaga mniej doświadczonym deweloperom w stosowaniu najlepszych praktyk. Praca rozwija tę ideę, koncentrując się na automatyzacji całego procesu, od generowania po wdrażanie.
+
+Podjęte w literaturze próby wykorzystania LLM w kontekście IaC i Kubernetes koncentrują się głównie na generowaniu kodu i podstawowej analizie. Niniejsza praca poszerza ten obszar, skupiając się m.in. na:
+
+\begin{itemize}
+    \item Wykorzystaniu repozytoriów kodu jako źródła wejściowego dla LLM,
+    \item Analizie deterministyczności i bezpieczeństwa generowanych konfiguracji,
+    \item Zastosowaniu metod oceny odporności na manipulacje danymi wejściowymi,
+    \item Porównaniu topowych modeli pod kątem możliwej złożoności generowanych konfiguracji (np. obsługa wielu kontenerów, sieci czy woluminów).
+\end{itemize}

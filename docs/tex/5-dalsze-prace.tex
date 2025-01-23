@@ -1,0 +1,77 @@
+\clearpage % Rozdziały zaczynamy od nowej strony.
+\section{Dalsze prace}
+
+\subsection{Rozwój architektury rozwiązania} 
+
+Jednym z kluczowych etapów dalszych prac będzie opracowanie bardziej zaawansowanej architektury systemu, która umożliwi oddzielenie logiki odpowiedzialnej za generowanie konfiguracji od kodu zajmującego się budowaniem obrazów i ich uruchamianiem. Takie podejście pozwoli na lepsze modularne zarządzanie kodem oraz ułatwi jego dalszy rozwój i testowanie. Ostateczna architektura powinna składać się z następujących modułów:
+
+\begin{itemize}
+    
+    \item Moduł budowania obrazów: zajmujący się budowaniem obrazów Docker na podstawie wygenerowanych plików Dockerfile,
+    \item Moduł wdrażania i uruchamiania aplikacji: zajmujący się uruchamianiem aplikacji w klastrze Kubernetes, oferującym użytkownikowi dostęp do działającej aplikacji.
+\end{itemize}
+
+\subsection{Opracowanie kryteriów oceny modeli}
+
+Należy wyznaczyć metodykę oceny wyników generowanych przez różne modele językowe. Proponowane kryteria oceny obejmują:
+
+\begin{enumerate}
+    \item Szybkość: czas generowania konfiguracji przez model.
+    \item Poprawność: zgodność generowanych plików z wymaganiami technicznymi (np. poprawny Dockerfile i manifest Kubernetes),
+    \item Zwięzłość: minimalizacja zbędnych elementów w generowanych konfiguracjach,
+    \item Odporność na jailbreaking: podatność modelu na manipulacje promptem lub wprowadzanie błędów,
+    \item Bezpieczeństwo: analiza, czy wygenerowana konfiguracja nie wprowadza potencjalnych luk bezpieczeństwa.
+\end{enumerate}
+
+Dodatkowo należy określić scenariusze testowe, które obejmują różne typy aplikacji:
+
+\begin{itemize}
+    \item Aplikacja bezstanowa: np. prosta aplikacja webowa,
+    \item Aplikacja z bazą danych: aplikacja wymagająca komponentu bazy danych lub innej zależności uruchamianej jako osobny kontener,
+    \item System mikroserwisowy: zestaw kilku usług współpracujących ze sobą w ramach jednej aplikacji.
+\end{itemize}
+
+Różne typy aplikacji będą wymagały różnych podejść do generowania konfiguracji, co pozwoli na lepsze zrozumienie możliwości i ograniczeń poszczególnych modeli.
+
+\subsection{Finalizacja promptu}
+
+Kolejnym krokiem będzie dopracowanie ostatecznej wersji promptu używanego do komunikacji z modelami. Celem jest maksymalizacja jakości wyników generowanych przez modele, przy jednoczesnym ograniczeniu liczby tokenów przesyłanych w zapytaniu. Prompt powinien uwzględniać:
+
+\begin{itemize}
+    \item Kontekst repozytorium (struktura plików, zawartość kluczowych plików).
+    \item Wymagania dotyczące bezpieczeństwa.
+    \item Szczegóły dotyczące implementacji, takie jak konieczność generowania poprawnych portów czy definiowania zasobów w Kubernetes.
+\end{itemize}
+
+\subsection{Wyznaczenie modeli do porównań}
+
+Należy określić zestaw modeli, które zostaną poddane porównaniom. Wybrane modele powinny obejmować zarówno mniejsze modele stosowane w trakcie developmentu, jak i większe, bardziej zaawansowane wersje.
+
+\subsection{Porównanie modeli}
+
+Po określeniu kryteriów i wyborze modeli należy przeprowadzić szczegółowe testy, które pozwolą na ich porównanie.
+
+\subsection{Testy bezpieczeństwa}
+
+Ważnym aspektem będzie sprawdzenie odporności modeli na manipulacje polegające na jailbreakingu. W tym celu należy przygotować specjalne repozytorium testowe zawierające:
+
+\begin{itemize}
+    \item Pliki o nietypowych nazwach i zawartości.
+    \item Potencjalnie złośliwe fragmenty kodu.
+    \item Przykłady, które mogą zmylić model podczas generowania konfiguracji.
+\end{itemize}
+
+Ponadto, warto przeprowadzić analizę bezpieczeństwa wygenerowanych konfiguracji, aby upewnić się, że nie wprowadzają one potencjalnych luk bezpieczeństwa do uruchamianej aplikacji.
+
+\subsection{Stworzenie minimalnej platformy PaaS}
+
+Ostatecznym celem dalszych prac jest stworzenie minimalnej wersji platformy PaaS, która umożliwi:
+
+\begin{enumerate}
+    \item Przyjęcie repozytorium jako wejścia.
+    \item Automatyczne wygenerowanie konfiguracji Docker i Kubernetes.
+    \item Zbudowanie i wdrożenie aplikacji na klastrze Kubernetes.
+    \item Dostarczenie użytkownikowi np. linku do działającej aplikacji.
+\end{enumerate}
+
+Platforma powinna być zaimplementowana w sposób umożliwiający dalsze rozszerzanie funkcjonalności, np. dodawanie obsługi bardziej złożonych aplikacji czy zaawansowanych scenariuszy wdrożeniowych.
