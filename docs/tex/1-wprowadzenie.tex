@@ -1,28 +1,39 @@
 \clearpage % Rozdziały zaczynamy od nowej strony.
 \section{Wprowadzenie}
 
-W ciągu ostatnich lat obserwujemy bezprecedensowy rozwój dużych modeli językowych (LLM) oraz równoległy wzrost znaczenia technologii konteneryzacji i orkiestracji. Modele językowe takie jak GPT, LLaMA, Falcon czy Claude wykazują zdolność do generowania złożonego kodu, w tym konfiguracji infrastruktury, podczas gdy Docker i Kubernetes ugruntowały swoją pozycję jako standard w obszarze wdrażania aplikacji. Niniejsza praca bada potencjał automatyzacji generowania konfiguracji Docker i Kubernetes z wykorzystaniem LLM, ze szczególnym uwzględnieniem aspektów poprawności i bezpieczeństwa generowanych plików konfiguracyjnych.
+W ciągu ostatnich lat obserwujemy dynamiczny rozwój dużych modeli językowych (LLM) oraz równoległy wzrost znaczenia technologii konteneryzacji i orkiestracji. Modele językowe takie jak GPT, LLaMA, Falcon czy Claude wykazują zdolność generowania złożonego kodu, w tym konfiguracji infrastruktury \cite{srivatsa_survey_2024}, podczas gdy Docker i Kubernetes ugruntowały swoją pozycję jako standard w obszarze wdrażania aplikacji \cite{kratzke_dont_2024}. Niniejsza praca bada potencjał automatyzacji generowania konfiguracji Docker i Kubernetes z wykorzystaniem LLM, ze szczególnym uwzględnieniem poprawności i bezpieczeństwa generowanych plików konfiguracyjnych.
 
 \subsection{Cel i zakres pracy}
 
-Celem niniejszej pracy magisterskiej jest analiza możliwości zastosowania dużych modeli językowych (LLM) do automatycznego generowania konfiguracji typu Infrastructure as Code (IaC), ze szczególnym uwzględnieniem plików Dockerfile oraz manifestów Kubernetes. Praca skupia się na wykorzystaniu LLM w kontekście platformy jako usługi (PaaS), gdzie efektywne tworzenie i utrzymanie kontenerów oraz ich orkiestracji ma kluczowe znaczenie. Zakres obejmuje zbadanie metod generowania plików Dockerfile definiujących obrazy kontenerów oraz manifestów Kubernetes opisujących wdrożenie tych kontenerów, a także oceny jakości, bezpieczeństwa i zgodności takich wygenerowanych konfiguracji z wymaganiami systemowymi.
+Celem niniejszej pracy magisterskiej jest analiza możliwości zastosowania dużych modeli językowych (LLM) do automatycznego generowania konfiguracji typu Infrastructure as Code (IaC), ze szczególnym uwzględnieniem plików Dockerfile oraz manifestów Kubernetes. Praca skupia się na wykorzystaniu LLM w kontekście platformy jako usługi (PaaS), gdzie efektywne tworzenie i utrzymanie kontenerów oraz ich orkiestracji jest kluczowe. Zakres obejmuje metody generowania plików Dockerfile definiujących obrazy kontenerów oraz manifestów Kubernetes opisujących ich wdrożenie, a także ocenę jakości, bezpieczeństwa i zgodności wygenerowanych konfiguracji z wymaganiami systemowymi.
 
-Głównym celem pracy jest analiza możliwości zastosowania dużych modeli językowych do generowania konfiguracji Dockerfile i Kubernetes w ramach platformy jako usługi (PaaS), która umożliwia budowanie i wdrażanie aplikacji w klastrze Kubernetes. Praca obejmuje następujące zagadnienia:
+Główne zagadnienia pracy obejmują:
+\begin{itemize}
+  \item ocenę zdolności modeli językowych (GPT, LLaMA, Falcon, Claude) do generowania poprawnych i bezpiecznych konfiguracji;
+  \item analizę bezpieczeństwa generowanych konfiguracji, w tym podatności na ataki i możliwości manipulacji ("jailbreakingu") modeli;
+  \item opracowanie metodologii porównawczej dla wybranych modeli;
+  \item przeprowadzenie testów poprawności, wydajności i bezpieczeństwa;
+  \item implementację systemu PaaS, który automatycznie generuje konfiguracje na podstawie repozytorium kodu, a następnie buduje i wdraża aplikacje.
+\end{itemize}
 
 \subsection{Motywacja}
 
-Tematyka pracy jest istotna z uwagi na rosnącą rolę metodyk DevOps i automatyzacji zarządzania infrastrukturą. Infrastructure as Code zyskuje na popularności, ponieważ umożliwia spójną, powtarzalną konfigurację środowisk i redukcję błędów ludzkich. Ręczne tworzenie skryptów IaC, zwłaszcza dla złożonych środowisk chmurowych, bywa jednak czasochłonne i wymaga specjalistycznej wiedzy. Wraz z rozwojem dużych modeli językowych pojawiła się możliwość ich wykorzystania do generowania kodu konfiguracyjnego na podstawie opisu w języku naturalnym. Użycie LLM może obniżyć barierę wejścia dla deweloperów mniej doświadczonych w technologiach chmurowych (np. Kubernetes) poprzez automatyczne tłumaczenie wysokopoziomowych specyfikacji na deklaratywne pliki konfiguracji. Ma to znaczenie praktyczne na platformach PaaS, gdzie skrócenie czasu wdrożenia aplikacji i eliminacja błędów konfiguracji przekładają się na większą wydajność i niezawodność usług. Z drugiej strony, automatyzacja generowania IaC rodzi pytania o poprawność i bezpieczeństwo tych konfiguracji. Modele językowe mogą popełniać błędy lub tzw. halucynacje, generując nieistniejące lub niezalecane elementy konfiguracji. Istotne jest zatem zbadanie, na ile można zaufać LLM w kontekście krytycznych elementów infrastruktury oraz jak zapewnić zgodność wygenerowanych konfiguracji z najlepszymi praktykami bezpieczeństwa (np. czy model nie pominie istotnych zabezpieczeń, jak autoryzacja, czy nie wygeneruje podatnych ustawień). Zainteresowanie połączeniem LLM i DevOps wynika także z potencjału ułatwienia pracy inżynierów – dzięki LLM mogą oni szybciej uzyskiwać wstępne wersje konfiguracji i skupić się na ich dostrojeniu, zamiast pisać je od podstaw.
+Motywacja pracy wynika z kilku kluczowych czynników. Po pierwsze, rośnie rola metodyk DevOps i automatyzacji zarządzania infrastrukturą. Infrastructure as Code umożliwia spójną, powtarzalną konfigurację środowisk i redukcję błędów ludzkich \cite{low_repairing_2024}. Jednak ręczne tworzenie skryptów IaC dla złożonych środowisk chmurowych jest czasochłonne i wymaga specjalistycznej wiedzy. Rozwój dużych modeli językowych stwarza możliwość generowania kodu konfiguracyjnego na podstawie opisów w języku naturalnym, co może obniżyć barierę wejścia dla mniej doświadczonych programistów \cite{hu_repo2run_2025}.
+
+Ponadto, automatyzacja generowania IaC rodzi pytania o poprawność i bezpieczeństwo tych konfiguracji. Modele językowe mogą popełniać błędy lub "halucynować", generując nieistniejące lub niezalecane elementy konfiguracji \cite{malul_genkubesec_2024}. Istotne jest więc zbadanie wiarygodności LLM w kontekście infrastruktury krytycznej oraz zgodności generowanych konfiguracji z najlepszymi praktykami bezpieczeństwa. Automatyzacja generowania konfiguracji ma praktyczne znaczenie na platformach PaaS, gdzie może znacząco skrócić czas wdrażania aplikacji oraz poprawić niezawodność usług.
 
 \subsection{Struktura pracy}
 
-Praca składa się z dziewięciu rozdziałów, które wspólnie odzwierciedlają pełny cykl badawczy — od identyfikacji problemu, przez analizę literatury i technologii, aż po eksperymenty, analizę wyników, bezpieczeństwo i implementację kompletnego systemu.
+Praca składa się z dziewięciu rozdziałów odzwierciedlających pełny cykl badawczy:
+\begin{itemize}
+  \item Rozdział 1 – Wprowadzenie: przedstawienie tematu, celów, motywacji oraz układu pracy.
+  \item Rozdział 2 – Przegląd literatury: analiza aktualnych badań nad wykorzystaniem LLM w generowaniu IaC (Docker, Kubernetes) oraz wskazanie luk w wiedzy.
+  \item Rozdział 3 – Przegląd technologii i narzędzi: opis modeli językowych, narzędzi infrastrukturalnych i porównanie podejść API vs open-source.
+  \item Rozdział 4 – Eksperymenty: opis przypadków testowych, strategii promptowania, procesu generowania i testowania konfiguracji.
+  \item Rozdział 5 – Analiza porównawcza modeli LLM: kryteria oceny, wyniki testów i wnioski dotyczące jakości działania modeli.
+  \item Rozdział 6 – Bezpieczeństwo konfiguracji: analiza zagrożeń, technik ataku na LLM i metody oceny bezpieczeństwa.
+  \item Rozdział 7 – Projekt systemu PaaS: architektura, proces działania od repozytorium do uruchomienia aplikacji w Kubernetes.
+  \item Rozdział 8 – Implementacja i wdrożenie prototypu: opis realizacji systemu PaaS, wykorzystanych technologii oraz przykładowych wdrożeń.
+  \item Rozdział 9 – Wnioski i dalsze kierunki rozwoju: podsumowanie wyników, ocena przydatności LLM w DevOps oraz wskazanie możliwych kierunków dalszych badań.
+\end{itemize}
 
-Rozdział 1 – Wprowadzenie: przedstawia temat pracy, jej cele, motywację oraz układ całej pracy.
-Rozdział 2 – Przegląd literatury: zawiera analizę aktualnych badań nad wykorzystaniem dużych modeli językowych w kontekście generowania Infrastructure as Code (IaC), w tym konfiguracji Docker i Kubernetes. Wskazuje także istniejące luki, np. brak analiz bezpieczeństwa i brak pełnych pipeline’ów DevOps.
-Rozdział 3 – Przegląd technologii i narzędzi: opisuje wykorzystane modele językowe (GPT, Claude, LLaMA, Mistral, DeepSeek) oraz narzędzia infrastrukturalne (Docker, Kubernetes, Lens, kind). Rozdział porównuje też podejścia API vs open-source, opisuje środowisko uruchomieniowe i technologie wspierające (FastAPI, GitPython itp.).
-Rozdział 4 – Eksperymenty: opisuje zaplanowane przypadki testowe (np. aplikacje jedno- i wielosystemowe), strategie promptowania, proces generowania i testowania konfiguracji oraz przykładowe wyniki i napotkane problemy (np. ograniczenia tokenów).
-Rozdział 5 – Analiza porównawcza modeli LLM: przedstawia kryteria oceny (poprawność, bezpieczeństwo, deterministyczność, odporność na manipulacje, wydajność), wyniki testów i wnioski na temat jakości działania poszczególnych modeli.
-Rozdział 6 – Bezpieczeństwo konfiguracji: analizuje zagrożenia związane z automatycznym generowaniem konfiguracji, techniki ataku na LLM (prompt injection, jailbreaking) oraz metody oceny i wzmacniania bezpieczeństwa wygenerowanego kodu.
-Rozdział 7 – Projekt systemu PaaS: prezentuje architekturę zaprojektowanego systemu do automatycznego generowania, budowania i wdrażania aplikacji. Opisuje także problemy projektowe oraz proces działania od repozytorium do uruchomienia aplikacji w Kubernetes.
-Rozdział 8 – Implementacja i wdrożenie prototypu: zawiera szczegółowy opis realizacji systemu PaaS, użytych technologii, przykładowych wdrożeń oraz napotkanych problemów podczas integracji i testów.
-Rozdział 9 – Wnioski i dalsze kierunki rozwoju: podsumowuje uzyskane wyniki, odpowiada na pytania badawcze, ocenia przydatność LLM w środowiskach DevOps oraz wskazuje możliwe ścieżki rozwoju — takie jak wsparcie mikroserwisów, walidacja semantyczna YAML czy integracja z CI/CD.
