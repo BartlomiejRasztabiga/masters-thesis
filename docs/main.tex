@@ -61,18 +61,28 @@
 % English abstract if \langeng is set
 %-------------------------------------
 \cleardoublepage % Zaczynamy od nieparzystej strony
-% TODO uncomment
-\abstract \lipsum[1-3]
-\keywords XXX, XXX, XXX
+\abstract
+Celem niniejszej pracy magisterskiej jest zbadanie możliwości wykorzystania dużych modeli językowych (LLM) do automatycznego generowania konfiguracji infrastruktury jako kodu (IaC), ze szczególnym uwzględnieniem plików Dockerfile oraz manifestów Kubernetes. Przeprowadzono przegląd literatury opisującej aktualne badania w tym obszarze, wskazując zarówno potencjał automatyzacji, jak i liczne wyzwania związane z poprawnością, bezpieczeństwem i niezawodnością wygenerowanego kodu.
+
+Na podstawie analizy literatury zaprojektowano część teoretyczną pracy, obejmującą porównanie wybranych modeli językowych, opracowanie własnego modelu oceny poprawności manifestów Kubernetes oraz analizę zagrożeń bezpieczeństwa związanych z generowaniem IaC. W kolejnych etapach skupiono się na części praktycznej – implementacji systemu typu Platform as a Service (PaaS), który automatycznie generuje konfiguracje na podstawie repozytorium kodu, a następnie buduje i wdraża aplikacje w klastrze Kubernetes.
+
+Przeprowadzono również serię eksperymentów porównawczych dla kilku modeli językowych, oceniając ich skuteczność pod względem poprawności składniowej, zgodności z wymaganiami oraz odporności na błędy i podatności bezpieczeństwa. Dodatkowo zaimplementowano komponenty odpowiedzialne za walidację i automatyczne poprawianie błędnych konfiguracji.
+
+\keywords Infrastructure as Code, LLM, Kubernetes, Docker, automatyzacja, bezpieczeństwo, DevOps, PaaS
 
 %----------------------------------------
 % Streszczenie po angielsku dla \langpol
 % Polish abstract if \langeng is set
 %----------------------------------------
 \clearpage
-% TODO uncomment
-\secondabstract \kant[1-3]
-\secondkeywords XXX, XXX, XXX
+\secondabstract
+The goal of this master’s thesis is to investigate the potential of large language models (LLMs) for automatically generating Infrastructure as Code (IaC), with a particular focus on Dockerfiles and Kubernetes manifests. The study includes a literature review of recent research in the field, identifying both the automation potential and key challenges related to correctness, security, and reliability of LLM-generated infrastructure code.
+
+Based on this review, the theoretical part of the work was developed first, including a comparison of selected LLMs, a custom validation model for Kubernetes manifests, and a security analysis of IaC generation pipelines. Then the attention was turned to the practical implementation phase, which involved building a Platform as a Service (PaaS) prototype that automatically generates configurations from code repositories and deploys them to a Kubernetes cluster.
+
+Additionally, a series of comparative experiments was conducted to evaluate the models’ accuracy, compliance with specifications, and ability to handle misconfigurations and vulnerabilities. Repair mechanisms were also implemented to detect and automatically fix common infrastructure errors.
+
+\secondkeywords Infrastructure as Code, Large Language Models, Kubernetes, Docker, Automation, Security, DevOps, PaaS
 
 \pagestyle{plain}
 
@@ -112,10 +122,18 @@
 % Makro \acronym dodaje skrót/symbol do listy,
 % zapewniając podstawowe formatowanie.
 
-% TODO uncomment
-% \acronymlist
-% \acronym{LLM}{ang. \emph{Large Language Model}}
-% \vspace{0.8cm}
+\acronymlist
+\acronym{LLM}{ang. \emph{Large Language Model}}
+\acronym{IaC}{ang. \emph{Infrastructure as Code} – infrastruktura jako kod}
+\acronym{K8s}{ang. \emph{Kubernetes} – system orkiestracji kontenerów}
+\acronym{PaaS}{ang. \emph{Platform as a Service} – platforma jako usługa}
+\acronym{CI/CD}{ang. \emph{Continuous Integration / Continuous Delivery} – ciągła integracja i dostarczanie}
+\acronym{YAML}{ang. \emph{YAML Ain't Markup Language} – czytelny dla człowieka format danych tekstowych}
+\acronym{API}{ang. \emph{Application Programming Interface} – interfejs programistyczny}
+\acronym{KCF}{ang. \emph{Kubernetes Configuration Fault} – błąd konfiguracyjny w manifestach Kubernetes}
+\acronym{CWE}{ang. \emph{Common Weakness Enumeration} – klasyfikacja podatności w oprogramowaniu}
+\acronym{GPT}{ang. \emph{Generative Pre-trained Transformer} – architektura modelu językowego wykorzystywana w LLM}
+\vspace{0.8cm}
 
 %--------------------------------------
 % Spisy: rysunków, tabel, załączników

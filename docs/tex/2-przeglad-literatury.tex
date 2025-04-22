@@ -11,9 +11,7 @@ Ważnym kierunkiem rozwoju są również benchmarki oceny jakości konfiguracji 
 
 Pujar i in. (2023) zaproponowali natomiast wykorzystanie LLM do generowania konfiguracji IT w języku Ansible YAML, opracowując narzędzie Ansible Wisdom. Ich praca pokazuje, że techniki prompt engineering można z powodzeniem zastosować również do innych języków deklaratywnych, nie tylko Dockerfile czy manifestów Kubernetes \cite{pujar_invited_2023}.
 
-% TODO usunac?
-Poniżej omówiono najważniejsze prace dotyczące wykorzystania LLM do generowania konfiguracji IaC, ze szczególnym naciskiem na praktyczne narzędzia i systemy oraz badania eksperymentalne. Przedstawiono zarówno korzyści automatyzacji (przyspieszenie pracy, odciążenie ekspertów, poprawa produktywności), jak i wyzwania (błędy i halucynacje modeli, aspekty bezpieczeństwa, zgodność z intencjami użytkownika), jakie zidentyfikowano w literaturze \cite{malul_genkubesec_2024, kratzke_dont_2024}.
-%
+Reasumując, liczne prace badawcze wykazały potencjał LLM w automatyzacji tworzenia konfiguracji IaC – zarówno poprzez integrację z narzędziami chmurowymi, jak i dostosowanie technik promptowania do specyfiki deklaratywnych języków konfiguracyjnych. Jednocześnie zauważono szereg wyzwań, takich jak błędne generacje (halucynacje), aspekty bezpieczeństwa czy zgodność z zamierzeniami użytkownika \cite{malul_genkubesec_2024, kratzke_dont_2024}.
 
 \subsection{Generowanie konfiguracji Docker przy użyciu LLM}
 
@@ -96,6 +94,8 @@ spec:
 \end{lstlisting}
 
 Powyższy przykład przedstawia prosty manifest Kubernetes wygenerowany przez LLM, który definiuje deployment aplikacji z trzema replikami, ograniczeniami zasobów i ekspozycją portu.
+
+Po omówieniu możliwości generowania kodu, warto przyjrzeć się kwestiom jego jakości i dalszego utrzymania.
 
 \subsection{Wykrywanie i naprawa błędnych konfiguracji przy użyciu LLM}
 
