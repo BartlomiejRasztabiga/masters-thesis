@@ -28,6 +28,8 @@
 
 \begin{document}
 
+\counterwithin{lstlisting}{section}
+
 %------------------
 % Strona tytułowa
 %------------------
@@ -64,9 +66,9 @@
 \abstract
 Celem niniejszej pracy magisterskiej jest zbadanie możliwości wykorzystania dużych modeli językowych (LLM) do automatycznego generowania konfiguracji infrastruktury jako kodu (IaC), ze szczególnym uwzględnieniem plików Dockerfile oraz manifestów Kubernetes. Przeprowadzono przegląd literatury opisującej aktualne badania w tym obszarze, wskazując zarówno potencjał automatyzacji, jak i liczne wyzwania związane z poprawnością, bezpieczeństwem i niezawodnością wygenerowanego kodu.
 
-Na podstawie analizy literatury zaprojektowano część teoretyczną pracy, obejmującą porównanie wybranych modeli językowych, opracowanie własnego modelu oceny poprawności manifestów Kubernetes oraz analizę zagrożeń bezpieczeństwa związanych z generowaniem IaC. W kolejnych etapach skupiono się na części praktycznej – implementacji systemu typu Platform as a Service (PaaS), który automatycznie generuje konfiguracje na podstawie repozytorium kodu, a następnie buduje i wdraża aplikacje w klastrze Kubernetes.
+W części badawczej pracy przeprowadzono analizę możliwości wybranych modeli językowych, zaprojektowano zestaw eksperymentów porównawczych oraz opracowano własne kryteria oceny poprawności i bezpieczeństwa generowanych manifestów Docker i Kubernetes. Następnie, na podstawie wyników eksperymentów, zaprojektowano i zaimplementowano prototyp systemu typu Platform as a Service (PaaS), który automatycznie generuje konfiguracje na podstawie repozytorium kodu, buduje obrazy Docker oraz wdraża aplikacje w klastrze Kubernetes.
 
-Przeprowadzono również serię eksperymentów porównawczych dla kilku modeli językowych, oceniając ich skuteczność pod względem poprawności składniowej, zgodności z wymaganiami oraz odporności na błędy i podatności bezpieczeństwa. Dodatkowo zaimplementowano komponenty odpowiedzialne za walidację i automatyczne poprawianie błędnych konfiguracji.
+Przeprowadzono serię testów oceniających skuteczność modeli pod względem poprawności składniowej, zgodności z wymaganiami oraz odporności na błędy i podatności bezpieczeństwa. Dodatkowo w systemie zaimplementowano komponenty wspierające walidację i automatyczne wykrywanie potencjalnie niebezpiecznych konfiguracji.
 
 \keywords Infrastructure as Code, LLM, Kubernetes, Docker, automatyzacja, bezpieczeństwo, DevOps, PaaS
 
@@ -76,11 +78,11 @@ Przeprowadzono również serię eksperymentów porównawczych dla kilku modeli j
 %----------------------------------------
 \clearpage
 \secondabstract
-The goal of this master’s thesis is to investigate the potential of large language models (LLMs) for automatically generating Infrastructure as Code (IaC), with a particular focus on Dockerfiles and Kubernetes manifests. The study includes a literature review of recent research in the field, identifying both the automation potential and key challenges related to correctness, security, and reliability of LLM-generated infrastructure code.
+The goal of this master’s thesis is to investigate the potential of large language models (LLMs) for automatically generating Infrastructure as Code (IaC), with a particular focus on Dockerfiles and Kubernetes manifests. The study includes a literature review of recent research in the field, identifying both the automation potential and key challenges related to the correctness, security, and reliability of LLM-generated infrastructure code.
 
-Based on this review, the theoretical part of the work was developed first, including a comparison of selected LLMs, a custom validation model for Kubernetes manifests, and a security analysis of IaC generation pipelines. Then the attention was turned to the practical implementation phase, which involved building a Platform as a Service (PaaS) prototype that automatically generates configurations from code repositories and deploys them to a Kubernetes cluster.
+In the research phase, a comparative analysis of selected language models was conducted, along with the design of experimental test cases and the development of custom evaluation criteria for the correctness and security of generated Docker and Kubernetes manifests. Based on the experimental results, a prototype Platform as a Service (PaaS) system was designed and implemented, capable of automatically generating configurations from code repositories, building Docker images, and deploying applications to a Kubernetes cluster.
 
-Additionally, a series of comparative experiments was conducted to evaluate the models’ accuracy, compliance with specifications, and ability to handle misconfigurations and vulnerabilities. Repair mechanisms were also implemented to detect and automatically fix common infrastructure errors.
+A series of tests was conducted to evaluate the models’ accuracy, compliance with system requirements, and resistance to misconfigurations and security vulnerabilities. In addition, components supporting validation and automatic detection of unsafe configurations were implemented.
 
 \secondkeywords Infrastructure as Code, Large Language Models, Kubernetes, Docker, Automation, Security, DevOps, PaaS
 
@@ -104,9 +106,13 @@ Additionally, a series of comparative experiments was conducted to evaluate the 
 
 \input{tex/1-wprowadzenie}
 \input{tex/2-przeglad-literatury}
-% \input{tex/3-przeglad-narzedzi}
-% \input{tex/4-opis-eksperymentow}
-% \input{tex/5-dalsze-prace}
+% \input{tex/3-przeglad-technologii-i-narzedzi}
+% \input{tex/4-eksperymenty}
+% \input{tex/5-analiza-porownawcza}
+% \input{tex/6-bezpieczenstwo}
+% \input{tex/7-projekt-systemu}
+% \input{tex/8-implementacja}
+% \input{tex/9-wnioski-i-dalsze-kierunki}
 
 %---------------
 % Bibliografia
@@ -123,7 +129,7 @@ Additionally, a series of comparative experiments was conducted to evaluate the 
 % zapewniając podstawowe formatowanie.
 
 \acronymlist
-\acronym{LLM}{ang. \emph{Large Language Model}}
+\acronym{LLM}{ang. \emph{Large Language Model}} - duży model językowy
 \acronym{IaC}{ang. \emph{Infrastructure as Code} – infrastruktura jako kod}
 \acronym{K8s}{ang. \emph{Kubernetes} – system orkiestracji kontenerów}
 \acronym{PaaS}{ang. \emph{Platform as a Service} – platforma jako usługa}
@@ -140,12 +146,13 @@ Additionally, a series of comparative experiments was conducted to evaluate the 
 %--------------------------------------
 \pagestyle{plain}
 
-% TODO uncomment
-% \listoffigurestoc    % Spis rysunków.
-% \vspace{1cm}         % vertical space
-% \listoftablestoc     % Spis tabel.
-% \vspace{1cm}         % vertical space
-% \listofappendicestoc % Spis załączników
+\listoffigurestoc    % Spis rysunków.
+\vspace{1cm}         % vertical space
+\listoftablestoc     % Spis tabel.
+\vspace{1cm}         % vertical space
+\listofappendicestoc % Spis załączników
+\vspace{1cm}         % vertical space
+\listoflistingstoc   % Spis listingów
 
 %-------------
 % Załączniki
