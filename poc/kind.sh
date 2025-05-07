@@ -1,5 +1,3 @@
-# TODO update
-
 #!/bin/sh
 set -o errexit
 
@@ -12,9 +10,13 @@ if [ "$(docker inspect -f '{{.State.Running}}' "${reg_name}" 2>/dev/null || true
     registry:2
 fi
 
+# TODO usunac patch
+
 # 2. Create kind cluster with containerd registry config dir enabled
-# TODO: kind will eventually enable this by default and this patch will
-# be unnecessary.
+#
+# NOTE: the containerd config patch is not necessary with images from kind v0.27.0+
+# It may enable some older images to work similarly.
+# If you're only supporting newer relases, you can just use `kind create cluster` here.
 #
 # See:
 # https://github.com/kubernetes-sigs/kind/issues/2875
@@ -29,12 +31,6 @@ containerdConfigPatches:
     config_path = "/etc/containerd/certs.d"
 nodes:
 - role: control-plane
-  kubeadmConfigPatches:
-  - |
-    kind: InitConfiguration
-    nodeRegistration:
-      kubeletExtraArgs:
-        node-labels: "ingress-ready=true"
   extraPortMappings:
   - containerPort: 80
     hostPort: 80
@@ -80,7 +76,7 @@ data:
     help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
 EOF
 
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+kubectl apply -f https://kind.sigs.k8s.io/examples/ingress/deploy-ingress-nginx.yaml
 
 kubectl wait --namespace ingress-nginx \
   --for=condition=ready pod \
