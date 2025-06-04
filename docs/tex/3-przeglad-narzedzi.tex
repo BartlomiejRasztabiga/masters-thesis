@@ -1,58 +1,152 @@
 \clearpage % Rozdziały zaczynamy od nowej strony.
-\section{Przegląd narzędzi}
+\section{Przegląd technologii i narzędzi}
+
+\subsection{Modele językowe wykorzystywane w badaniu}
+
+TODO opis modeli z ktorych korzystam (TODO a jakie to sa? sprawdzic najpierw co dziala z langchain), ich charakterystyki i architektury
+
+podzial na open source i dostepne przez API?
+
+napisac ze uzywam openrouter np.
+
+roznice w sposobie korzystania z nich
+
+parametry, fine-tuning ? i jak je bede wykorzystywac
+
+w jaki sposob bede dokonywac inferencji (openrouter? bezposrednie api? langchain/langgraph)
+
+w jaki sposob bede z nich korzystac - nie zwykle promptowanie, ale jako agent, opisac jak chce zeby wygladala calosc, jak dziala podejscie agentowe
+
+generalnie moze porownac rozne metody prompotowania (zero shot, few shot, chain of thought, agent based)
+
+ograniczenia (np ze moge tylko kilka modeli), tryb uruchamiania, licencje, kontrola danych
+
+\subsection{Narzędzia DevOps: Docker i Kubernetes}
+
+funkcja i zasady dzialania, krotka charakterystyka, sposob uzycia, przyklady
+
+- Docker i jego rola (do czego konkretnie)
+- Kubernetes – poziom szczegółowości tylko taki, jak potrzebny do oceny konfiguracji
+
+na czym sie skupic? na tym co mozna popsuc przy generowaniu konfiguracji np
+
+jakies przyklady dobrych i zlych praktyk?
+
+\subsection{Narzędzia do oceny jakości IaC}
+
+z jakich bede korzystac i w jaki sposob, ich funkcje i zasady dzialania
+
+checkov, kubelinter, kube-score, kubeval, terrascan, cloudeval-yaml, iac-eval
+
+przykladowe outputy narzedzi, ich interpretacja
 
 \subsection{Środowisko eksperymentalne}
 
-Do przygotowania i uruchomienia eksperymentów zastosowano język Python w połączeniu z wirtualnym środowiskiem venv oraz środowisko IDE PyCharm, które zapewnia wygodną obsługę kodu i integrację z narzędziami. Kluczowym elementem środowiska eksperymentalnego jest wykorzystanie serwisu OpenRouter — platformy umożliwiającej agregację API różnych dostawców modeli językowych. OpenRouter eliminuje potrzebę samodzielnego integrowania się z różnymi dostawcami, oferując ujednolicony interfejs. Jest to szczególnie przydatne w przypadku dynamicznego rozwoju i częstych zmian w dostępnych modelach. Wadą takiego podejścia są jednak koszty, które mogą być wysokie przy intensywnym korzystaniu z dużych modeli.
+opis środowiska eksperymentalnego, w którym będą przeprowadzane testy
 
-Komunikacja z OpenRouter została zrealizowana za pomocą SDK udostępnionego przez firmę OpenAI, twórcę m.in. wykorzystywanych w porównaniu modeli GPT-4o. SDK zapewnia prosty interfejs do przesyłania zapytań oraz odbierania wyników generowanych przez modele.
+lokalnie i dlaczego
 
-\subsection{Biblioteki i narzędzia wspomagające}
+kind, docker desktop, python, langchain, openrouter itd
 
-W celu wsparcia eksperymentów zastosowano kilka bibliotek w języku Python:
+- Parametry techniczne (np. RAM, GPU, lokalność modeli)
+- Zasady testowania przez API (np. limity, wersje)
 
-\begin{itemize}
-    \item docker — do zarządzania obrazami i kontenerami Docker, co umożliwia budowanie obrazów na podstawie wygenerowanych plików Dockerfile,
-    \item python-dotenv — do obsługi zmiennych środowiskowych przechowywanych w plikach .env, co pozwala na wygodne zarządzanie konfiguracją aplikacji,
-    \item GitPython — do automatyzacji operacji na repozytoriach Git, w tym klonowania wejściowych repozytoriów.
-\end{itemize}
+\subsection{Technologie wspierające}
 
-\subsection{Modele LLM}
+TODO a co ja tu w ogole chce opisac i po co?
 
-W eksperymentach wykorzystano różne modele językowe, w tym:
+python? jakies rozne biblioteki? kind? lens? 
 
-\begin{itemize}
-    \item OpenAI GPT-4o mini,
-    \item Google Gemini 2.0 Flash,
-    \item Anthropic Claude 3.5 Haiku,
-    \item Meta LLAMA 3.1 70B,
-    \item Mistral Small.
-\end{itemize}
+a moze ten rozdzial zmergowac z poprzednim?
 
-Na etapie developmentu korzystano z mniejszych modeli, co pozwalało na szybkie iteracje i testy. Do finalnych analiz i porównań planowane jest użycie ich większych odpowiedników, co zapewni bardziej reprezentatywne wyniki. Wybór modeli jest na bieżąco aktualizowany w odpowiedzi na pojawianie się nowych rozwiązań. Przykładem może być model DeepSeek v3, który pojawił się w trakcie pisania sprawozdania i obiecuje znaczne ulepszenia względem np. modeli OpenAI oraz jest bardziej przystępny cenowo.
 
-\subsection{Infrastruktura kontenerów i ich orkiestracji}
+------- (dalej pisal chat)
 
-Do zarządzania infrastrukturą kontenerową wykorzystano narzędzia Docker oraz Kubernetes. Autor korzysta z prywatnych klastrów Kubernetes uruchamianych przy pomocy:
+\section{Przegląd technologii i narzędzi}
 
-\begin{itemize}
-    \item kind — narzędzie do lokalnego tworzenia klastrów Kubernetes w kontenerach Docker,
-    \item microk8s — lekkiej implementacji Kubernetes, zoptymalizowanej do uruchamiania na pojedynczych maszynach.
-\end{itemize}
+\subsection{Modele językowe wykorzystywane w badaniu}
 
-Klaster kind jest wykorzystywany do testów lokalnych, natomiast microk8s pozwala na uruchomienie klastra na maszynie wirtualnej w chmurze, na której docelowo będą uruchamiane konfiguracje wygenerowane przez modele LLM.
+Cel: Przedstawić modele LLM używane w eksperymencie, ich charakterystyki, sposób użycia i ograniczenia.
 
-Do zarządzania klastrami Kubernetes używane jest środowisko Lens, które oferuje intuicyjny interfejs graficzny do monitorowania i administracji.
+Proponowana zawartość:
+	•	Rodzaje modeli:
+	•	    Podział na modele open-source (np. Mistral, LLaMA, Nous Hermes) vs. modele komercyjne dostępne przez API (np. GPT-4, Claude).
+	•	Architektury i charakterystyki:
+	•	    Typowe parametry: liczba parametrów, specjalizacje, wersje, okno kontekstu (dlaczego wazne przy repozytoriach kodu)
+	•	    Informacja, które modele są używane i dlaczego.
+    •   Wybrane modele do badania:
+    •       Krótki opis które i dlaczego z parametrami jakimiś basic
+	•	Sposób użycia:
+	•	    Poprzez OpenRouter, bezpośrednie API, LangChain / LangGraph.
+	•	    Sposób integracji z agentami.
+	•	Tryby promptowania:
+	•	    Zero-shot, few-shot, chain-of-thought, agent-based.
+	•	    Porównanie tych podejść i wybór odpowiednich metod.
+	•	Ograniczenia i praktyczne aspekty:
+	•	    Licencje, limity API, ograniczona liczba modeli.
+	•	    Brak fine-tuningu – tylko inference.
+	•	    Kontrola nad danymi – brak możliwości dostosowania kodu źródłowego w zamkniętych modelach.
 
-W przyszłości, w celu budowy obrazów Docker w bardziej wydajny sposób, planowane jest użycie narzędzia Kaniko, które umożliwia budowanie obrazów kontenerowych w środowisku Kubernetes.
+⸻
 
-\subsection{Warstwa aplikacyjna - PaaS}
+\subsection{Narzędzia DevOps: Docker i Kubernetes}
 
-W warstwie aplikacyjnej, czyli w projektowanej platformie PaaS, rozważane są dwa podejścia:
+Cel: Opisać narzędzia wykorzystywane do zarządzania środowiskiem uruchomieniowym i ich wpływ na eksperymenty.
 
-\begin{itemize}
-    \item Wykorzystanie frameworka FastAPI w języku Python, który zapewnia szybkość developmentu i prostotę rozwiązania,
-    \item Implementacja w języku Kotlin z użyciem frameworków takich jak Ktor, Quarkus lub Micronaut. To podejście pozwoliłoby na integrację z ekosystemem JVM i lepsze wsparcie developmentu dla bardziej rozbudowanych aplikacji.
-\end{itemize}
+Proponowana zawartość:
+	•	Docker:
+	•	    Do czego jest wykorzystywany: uruchamianie lokalnych usług, środowiska testowe, konteneryzacja narzędzi.
+	•	Kubernetes:
+	•	    Używany z minimalnym zakresem (np. przez Kind).
+	•	    Rola w testowaniu konfiguracji i IaC.
+	•	    Jak można popełnić błędy przy generowaniu YAML (niedopasowane zasoby, problemy z dostępnością, błędne konfiguracje).
+	•	Dobre i złe praktyki:
+	•	    Przykłady z testów (np. źle ustawione limity zasobów, niepoprawne labele).
 
-Całość infrastruktury i wykorzystanych narzędzi może ulec modyfikacji w trakcie realizacji pracy, zależnie od wymagań projektu oraz dostępności nowych technologii.
+⸻
+
+\subsection{Narzędzia do oceny jakości IaC}
+
+Cel: Pokazać narzędzia do analizy i walidacji konfiguracji IaC oraz ich funkcjonalności.
+
+Proponowana zawartość:
+	•	Lista narzędzi:
+	•	    checkov, kube-linter, kube-score, kubeval, terrascan, cloudeval-yaml, iac-eval.
+	•	Opis funkcji i zasad działania:
+	•	    Statyczna analiza, reguły zgodności, walidacja schematów.
+	•	Przykłady outputów:
+	•	    Co zgłaszają narzędzia, jak to interpretować.
+	•	    Zestawienie wyników na tych samych plikach (jeśli masz dane).
+
+⸻
+
+\subsection{Środowisko eksperymentalne}
+
+Cel: Przedstawić infrastrukturę testową i środowisko, w którym uruchamiane są eksperymenty.
+
+Proponowana zawartość:
+	•	Charakterystyka środowiska:
+	•	    Lokalna maszyna, Docker Desktop, Kind, Python, LangChain, OpenRouter.
+	•	Parametry techniczne:
+	•	    RAM, CPU, ewentualna obecność GPU, ograniczenia związane z lokalnością.
+	•	Zasady testowania:
+	•	    Jak wygląda testowanie przez API: limity żądań, obsługa błędów, wersje modeli.
+	•	    Korzystanie z narzędzi CLI lub SDK.
+
+⸻
+
+\subsection{Technologie wspierające (do rozważenia jako część środowiska eksperymentalnego)}
+
+Alternatywa 1: Zostawić jako osobny rozdział z wyraźnym celem: technologie pomocnicze ułatwiające pracę.
+
+Alternatywa 2: Zmergować z poprzednim podrozdziałem jako „środowisko eksperymentalne i wspierające technologie”.
+
+Zawartość:
+	•	Język Python:
+	•	    Używane biblioteki (np. requests, openai, langchain, pydantic, docker-py itd.).
+	•	Narzędzia pomocnicze:
+	•	    Kind, Lens, VSCode, Docker CLI, kubectl, LangSmith, LangFuse, Promptfoo, Kaniko.
+	•	Rola:
+	•	    Obsługa eksperymentów, monitorowanie, automatyzacja.
+
+⸻
