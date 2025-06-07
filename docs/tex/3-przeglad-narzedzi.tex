@@ -8,16 +8,16 @@ Celem tego rozdziału jest przedstawienie najważniejszych technologii i narzęd
 
 Duże modele językowe (LLM) pełnią istotną rolę w prezentowanych eksperymentach, służąc jako generatory konfiguracji IaC. Ich zdolność do przetwarzania języka naturalnego oraz generowania poprawnego kodu czyni je ważnym elementem automatyzacji procesów DevOps. W tym podrozdziale przedstawiono charakterystykę wybranych modeli, opis ich architektur oraz praktyczne aspekty związane z ich wykorzystaniem.
 
-Rynek dużych modeli językowych rozwija się dynamicznie, oferując zarówno modele komercyjne, dostępne przez API, jak i modele open-source, możliwe do uruchomienia lokalnie lub na własnej infrastrukturze. Decyzja o wyborze konkretnego rodzaju modelu często zależy od dostępności zasobów sprzętowych (zwłaszcza GPU), wymagań licencyjnych, kwestii związanych z prywatnością danych oraz możliwości dostosowania modeli do specyficznych zastosowań.
+Rynek dużych modeli językowych rozwija się dynamicznie, oferując zarówno modele komercyjne, dostępne przez API, jak i modele open-source, możliwe do uruchomienia lokalnie lub na własnej infrastrukturze. Decyzja o wyborze konkretnego rodzaju modelu często zależy od dostępności zasobów sprzętowych (zwłaszcza GPU), wymagań dotyczących licencji, kwestii związanych z prywatnością danych oraz możliwości dostosowania modeli do specyficznych zastosowań.
 
 Modele komercyjne dostępne przez API zazwyczaj cechują się wysoką wydajnością, zaawansowanymi możliwościami oraz niezawodnością, dzięki wsparciu dużych firm technologicznych takich jak OpenAI, Anthropic czy Google. Modele te trenowane są na szerokich i zróżnicowanych zbiorach danych, co przekłada się na ich zdolność generowania wysokiej jakości tekstu oraz kodu. Ich użytkowanie wiąże się z kosztami dostępu do API oraz koniecznością przesyłania danych do zewnętrznych serwisów, co może być problematyczne w przypadku danych wrażliwych.
 
 Wybrane do badania modele komercyjne to:
 
 \begin{itemize}
-	\item \textbf{OpenAI GPT-4.1}, \textbf{GPT-4o} oraz \textbf{O3}: Najnowsze flagowe modele OpenAI. GPT-4.1 charakteryzuje się udoskonalonymi możliwościami generowania i rozumienia złożonego kodu oraz zoptymalizowanymi funkcjami integracji z narzędziami (tool calling). GPT-4o, model multimodalny, oferuje wysoką wydajność, elastyczność oraz wszechstronne możliwości interakcji. O3 zapewnia optymalne połączenie wydajności, szybkości oraz efektywności kosztowej.
-	\item \textbf{Anthropic Claude Opus 4}, \textbf{Sonnet 4} oraz \textbf{Haiku 3.5}: Zaawansowane modele Anthropic, cenione za bezpieczeństwo, zgodność z najlepszymi praktykami AI Safety oraz obsługę długich kontekstów i precyzyjnych instrukcji. Opus 4 to najbardziej zaawansowana wersja, Sonnet 4 równoważy wydajność z szybkością, a Haiku 3.5 skupia się na efektywności kosztowej i szybkości działania.
-	\item \textbf{Google Gemini 2.5 Pro} i \textbf{2.5 Flash}: Modele Google z rozszerzonym oknem kontekstu, dedykowane do analizy obszernych repozytoriów kodu i dokumentacji. Wersja Pro oferuje wyjątkową pojemność kontekstu i wysoką wydajność, podczas gdy wersja Flash jest zoptymalizowana pod kątem szybszego działania przy niższych kosztach operacyjnych.
+    \item \textbf{OpenAI GPT-4.1}, \textbf{GPT-4o} oraz \textbf{O3}: Najnowsze flagowe modele OpenAI. GPT-4.1 charakteryzuje się udoskonalonymi możliwościami generowania i rozumienia złożonego kodu oraz zoptymalizowanymi funkcjami integracji z narzędziami (tool calling). GPT-4o, model multimodalny, oferuje wysoką wydajność, elastyczność oraz wszechstronne możliwości interakcji. O3 zapewnia optymalne połączenie wydajności, szybkości oraz efektywności kosztowej.
+    \item \textbf{Anthropic Claude Opus 4}, \textbf{Sonnet 4} oraz \textbf{Haiku 3.5}: Zaawansowane modele Anthropic, cenione za bezpieczeństwo, zgodność z najlepszymi praktykami AI Safety oraz obsługę długich kontekstów i precyzyjnych instrukcji. Opus 4 to najbardziej zaawansowana wersja, Sonnet 4 równoważy wydajność z szybkością, a Haiku 3.5 skupia się na efektywności kosztowej i szybkości działania.
+    \item \textbf{Google Gemini 2.5 Pro} i \textbf{2.5 Flash}: Modele Google z rozszerzonym oknem kontekstu, dedykowane do analizy obszernych repozytoriów kodu i dokumentacji. Wersja Pro oferuje wyjątkową pojemność kontekstu i wysoką wydajność, podczas gdy wersja Flash jest zoptymalizowana pod kątem szybszego działania przy niższych kosztach operacyjnych.
 \end{itemize}
 
 Modele open-source stanowią atrakcyjną alternatywę, oferując pełną kontrolę, możliwość uruchomienia na własnej infrastrukturze oraz brak dodatkowych opłat za każde zapytanie. Ich wydajność zależy przede wszystkim od dostępności zasobów sprzętowych, a aktywny rozwój społeczności przyczynia się do ciągłej optymalizacji i pojawiania się coraz bardziej zaawansowanych wersji.
@@ -25,9 +25,9 @@ Modele open-source stanowią atrakcyjną alternatywę, oferując pełną kontrol
 Wybrane do badania modele open-source to:
 
 \begin{itemize}
-	\item \textbf{Mistral Medium} oraz \textbf{Codestral}: Modele od firmy Mistral AI, zoptymalizowane pod kątem efektywnego generowania kodu i ogólnego rozumienia kontekstu technicznego. Codestral specjalizuje się w obsłudze złożonych zadań programistycznych, oferując wysoką efektywność przy umiarkowanych wymaganiach sprzętowych.
-	\item \textbf{Meta Llama 4 Maverick} oraz \textbf{Llama 4 Scout}: Najnowsze modele open-source od Meta, które stanowią istotny punkt odniesienia w dziedzinie rozwoju sztucznej inteligencji. Maverick wyróżnia się wysokimi osiągami i zaawansowanymi funkcjami, natomiast Scout zapewnia dobrą wydajność przy bardziej ograniczonych zasobach sprzętowych, umożliwiając łatwiejsze wdrożenie w praktycznych zastosowaniach.
-	\item \textbf{DeepSeek V3}: Model typu Mixture-of-Experts (MoE), łączący wysoką jakość generowania kodu z dużą efektywnością obliczeniową. DeepSeek V3 wyróżnia się zdolnością do dynamicznego aktywowania tylko części parametrów modelu przy każdym zapytaniu, co pozwala osiągnąć korzystny kompromis między jakością a kosztami obliczeń.
+    \item \textbf{Mistral Medium} oraz \textbf{Codestral}: Modele od firmy Mistral AI, zoptymalizowane pod kątem efektywnego generowania kodu i ogólnego rozumienia kontekstu technicznego. Codestral specjalizuje się w obsłudze złożonych zadań programistycznych, oferując wysoką efektywność przy umiarkowanych wymaganiach sprzętowych.
+    \item \textbf{Meta Llama 4 Maverick} oraz \textbf{Llama 4 Scout}: Najnowsze modele open-source od Meta, które stanowią istotny punkt odniesienia w dziedzinie rozwoju sztucznej inteligencji. Maverick wyróżnia się wysokimi osiągami i zaawansowanymi funkcjami, natomiast Scout zapewnia dobrą wydajność przy bardziej ograniczonych zasobach sprzętowych, umożliwiając łatwiejsze wdrożenie w praktycznych zastosowaniach.
+    \item \textbf{DeepSeek V3}: Model typu Mixture-of-Experts (MoE), łączący wysoką jakość generowania kodu z dużą efektywnością obliczeniową. DeepSeek V3 wyróżnia się zdolnością do dynamicznego aktywowania tylko części parametrów modelu przy każdym zapytaniu, co pozwala osiągnąć korzystny kompromis między jakością a kosztami obliczeń.
 \end{itemize}
 
 Wszystkie wymienione modele reprezentują aktualny szczyt osiągnięć w dziedzinie dużych modeli językowych (LLM). Wybrane zostały przede wszystkim ze względu na ich potwierdzone zdolności do generowania wysokiej jakości kodu oraz wsparcie dla funkcji „tool calling”, które umożliwiają bezpośrednią integrację modeli z zewnętrznymi narzędziami lub usługami poprzez dedykowane mechanizmy API bądź platformy integracyjne, takie jak LangChain czy LangGraph. Funkcje te będą odgrywać znaczącą rolę w proponowanym w tej pracy podejściu opartym na pętli sprzężenia zwrotnego w procesie generowania konfiguracji Infrastructure as Code (IaC).
@@ -37,12 +37,12 @@ Wszystkie wymienione modele reprezentują aktualny szczyt osiągnięć w dziedzi
 Większość współczesnych dużych modeli językowych bazuje na architekturze transformera \cite{vaswani_attention_2023}, wykorzystując mechanizm uwagi (attention mechanism) do efektywnego przetwarzania sekwencji danych. Architektury te, pomimo wspólnych założeń, różnią się między sobą liczbą parametrów, rozmiarem okna kontekstowego oraz specyficznymi optymalizacjami, które wpływają na ich zdolność do generowania kodu i rozumienia złożonych instrukcji. Coraz większe znaczenie zyskują również alternatywne podejścia architektoniczne, takie jak Mixture-of-Experts (MoE), w których przy każdym zapytaniu aktywowane są tylko wybrane części modelu, co pozwala na zwiększenie efektywności obliczeniowej bez pogarszania jakości generowanych wyników.
 
 \begin{itemize}
-	\item \textbf{Liczba parametrów:} Liczba parametrów (często liczona w miliardach) jest wskaźnikiem skali modelu i jego zdolności do uczenia się złożonych wzorców z danych. Modele z większą liczbą parametrów zazwyczaj wykazują lepszą wydajność w szerokim zakresie zadań, jednak ich uruchomienie i obsługa wymagają znacznie większych zasobów obliczeniowych. Należy jednak zaznaczyć, że sama liczba parametrów nie jest jedynym wyznacznikiem jakości; kluczowe znaczenie ma również jakość danych treningowych, architektura (np. Mixture-of-Experts) oraz proces dostrajania modelu.
-	\item \textbf{Okno kontekstowe:} Okno kontekstowe odnosi się do maksymalnej długości sekwencji tokenów (słów, znaków, fragmentów kodu), którą model może przetworzyć i wykorzystać do wygenerowania odpowiedzi. Jest to szczególnie istotne w kontekście generowania konfiguracji IaC z repozytoriów kodu. Duże okno kontekstowe pozwala na dostarczenie modelowi całych plików źródłowych aplikacji, fragmentów dokumentacji, wielu powiązanych ze sobą promptów, a nawet wyników walidacji z zewnętrznych narzędzi. To umożliwia agentowi LLM holistyczne zrozumienie projektu i kontekstu, co przekłada się na wyższą jakość i trafność generowanych konfiguracji. Modele takie jak Google Gemini 2.5 Pro wyróżniają się wyjątkowo dużym oknem kontekstowym (do miliona tokenów), co jest znaczącą przewagą w zadaniach wymagających głębokiej analizy kodu i dokumentacji.
-	\item \textbf{Specjalizacje i optymalizacje:} Niektóre modele, takie jak Mistral Codestral, są specjalizowane lub fine-tuninguowane w kierunku generowania kodu. Oznacza to, że są one trenowane na dużych zbiorach danych zawierających kod programistyczny, co poprawia ich zdolność do generowania syntaktycznie poprawnego i semantycznie trafnego kodu. Architektury takie jak Mixture-of-Experts (MoE) stosowane w Mixtral 8x7B pozwalają na efektywne skalowanie modeli, aktywując tylko część ekspertów dla danego zapytania, co optymalizuje zużycie zasobów przy zachowaniu wysokiej jakości odpowiedzi.
+    \item \textbf{Liczba parametrów:} Liczba parametrów (często liczona w miliardach) jest wskaźnikiem skali modelu i jego zdolności do uczenia się złożonych wzorców z danych. Modele z większą liczbą parametrów zazwyczaj wykazują lepszą wydajność w szerokim zakresie zadań, jednak ich uruchomienie i obsługa wymagają znacznie większych zasobów obliczeniowych. Należy jednak zaznaczyć, że sama liczba parametrów nie jest jedynym wyznacznikiem jakości; znaczenie ma również jakość danych treningowych, architektura (np. Mixture-of-Experts) oraz proces dostrajania modelu.
+    \item \textbf{Okno kontekstowe:} Okno kontekstowe odnosi się do maksymalnej długości sekwencji tokenów (słów, znaków, fragmentów kodu), którą model może przetworzyć i wykorzystać do wygenerowania odpowiedzi. Jest to szczególnie istotne w kontekście generowania konfiguracji IaC z repozytoriów kodu. Duże okno kontekstowe pozwala na dostarczenie modelowi całych plików źródłowych aplikacji, fragmentów dokumentacji, wielu powiązanych ze sobą promptów, a nawet wyników walidacji z zewnętrznych narzędzi. To umożliwia agentowi LLM holistyczne zrozumienie projektu i kontekstu, co przekłada się na wyższą jakość i trafność generowanych konfiguracji. Modele takie jak Google Gemini 2.5 Pro wyróżniają się wyjątkowo dużym oknem kontekstowym (do miliona tokenów), co jest znaczącą przewagą w zadaniach wymagających głębokiej analizy kodu i dokumentacji.
+    \item \textbf{Specjalizacje i optymalizacje:} Niektóre modele, takie jak Mistral Codestral, są specjalizowane lub fine-tuninguowane w kierunku generowania kodu. Oznacza to, że są one trenowane na dużych zbiorach danych zawierających kod programistyczny, co poprawia ich zdolność do generowania syntaktycznie poprawnego i semantycznie trafnego kodu. Architektury takie jak Mixture-of-Experts (MoE) stosowane w Mixtral 8x7B (oraz DeepSeek V3) pozwalają na efektywne skalowanie modeli, aktywując tylko część ekspertów dla danego zapytania, co optymalizuje zużycie zasobów przy zachowaniu wysokiej jakości odpowiedzi.
 \end{itemize}
 
-Poniższa tabela \ref{tab:llm-characteristics} przedstawia ogólne charakterystyki wybranych modeli LLM, które będą wykorzystywane w badaniu. Okno kontekstu podano w liczbie tokenów, a liczba parametrów — w miliardach, jeśli została opublikowana.
+Poniższa tabela \ref{tab:llm-characteristic} przedstawia ogólne charakterystyki wybranych modeli LLM, które będą wykorzystywane w badaniu. Okno kontekstu podano w liczbie tokenów, a liczba parametrów — w miliardach, jeśli została opublikowana.
 
 \begin{table}[!h] \centering
 \caption{Charakterystyka wybranych modeli LLM}
@@ -57,13 +57,21 @@ Anthropic & Claude Sonnet 4 & - & 200k \\ \hline
 Anthropic & Claude Haiku 3.5 & - & 200k \\ \hline
 Google & Gemini 2.5 Pro & - & 1M \\ \hline
 Google & Gemini 2.5 Flash & - & 1M \\ \hline
-Mistral AI & Mistral Medium & 12–20 & 32k \\ \hline
+Mistral AI & Mistral Medium & 7 & 32k \\ \hline
 Mistral AI & Codestral & 22 & 32k–64k \\ \hline
 Meta & Llama 4 Maverick & 70 & 128k \\ \hline
 Meta & Llama 4 Scout & 8 & 128k \\ \hline
 DeepSeek & DeepSeek V3 & 236 & 128k \\ \hline
 \end{tabular}
 \end{table}
+
+---
+
+
+
+**Zatem proszę, kontynuuj w tym stylu z następującym punktem:**
+
+\subsubsection{Uzasadnienie wyboru modeli i sposób ich integracji}
 
 TODO tu skonczylem
 
