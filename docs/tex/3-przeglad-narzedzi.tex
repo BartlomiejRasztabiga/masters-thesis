@@ -32,7 +32,7 @@ Wybrane do badania modele open-source to:
 
 Wszystkie wymienione modele reprezentują aktualny szczyt osiągnięć w dziedzinie dużych modeli językowych (LLM). Wybrane zostały przede wszystkim ze względu na ich potwierdzone zdolności do generowania wysokiej jakości kodu oraz wsparcie dla funkcji „tool calling”, które umożliwiają bezpośrednią integrację modeli z zewnętrznymi narzędziami lub usługami poprzez dedykowane mechanizmy API bądź platformy integracyjne, takie jak LangChain czy LangGraph. Funkcje te będą odgrywać znaczącą rolę w proponowanym w tej pracy podejściu opartym na pętli sprzężenia zwrotnego w procesie generowania konfiguracji Infrastructure as Code (IaC).
 
-\subsubsection{Architektury i charakterystyka}
+\subsection{Architektury i charakterystyka}
 
 Większość współczesnych dużych modeli językowych bazuje na architekturze transformera \cite{vaswani_attention_2023}, wykorzystując mechanizm uwagi (attention mechanism) do efektywnego przetwarzania sekwencji danych. Architektury te, pomimo wspólnych założeń, różnią się między sobą liczbą parametrów, rozmiarem okna kontekstowego oraz specyficznymi optymalizacjami, które wpływają na ich zdolność do generowania kodu i rozumienia złożonych instrukcji. Coraz większe znaczenie zyskują również alternatywne podejścia architektoniczne, takie jak Mixture-of-Experts (MoE), w których przy każdym zapytaniu aktywowane są tylko wybrane części modelu, co pozwala na zwiększenie efektywności obliczeniowej bez pogarszania jakości generowanych wyników.
 
@@ -43,6 +43,8 @@ Większość współczesnych dużych modeli językowych bazuje na architekturze 
 \end{itemize}
 
 Poniższa tabela \ref{tab:llm-characteristic} przedstawia ogólne charakterystyki wybranych modeli LLM, które będą wykorzystywane w badaniu. Okno kontekstu podano w liczbie tokenów, a liczba parametrów — w miliardach, jeśli została opublikowana.
+
+\newpage % zeby wymusic tabelke
 
 \begin{table}[!h] \centering
 \caption{Charakterystyka wybranych modeli LLM}
@@ -65,20 +67,35 @@ DeepSeek & DeepSeek V3 & 236 & 128k \\ \hline
 \end{tabular}
 \end{table}
 
----
+\subsection{Sposoby wykorzystania modeli}
 
+W ramach niniejszego badania modele językowe są wykorzystywane w trybie inferencji (wnioskowania), bez dodatkowego etapu ich dostrajania (fine-tuningu) na specyficznym zbiorze danych IaC. Oznacza to, że modele wykorzystują swoją ogólną wiedzę, nabytą podczas szerokiego treningu, do generowania konfiguracji na podstawie dostarczonego kontekstu i promptów. Taki sposób podejścia jest zgodny z koncepcją "Don't Train, Just Prompt" \cite{kratzke_dont_2024}, co pozwala na szybką iterację i wykorzystanie najnowszych, potężnych modeli bez konieczności kosztownego i czasochłonnego procesu retrenowania.
 
+Integracja z wybranymi modelami LLM odbywa się głównie za pośrednictwem ich bezpośrednich interfejsów programistycznych (API). Takie podejście gwarantuje dostęp do najnowszych wersji modeli, pełną kontrolę nad parametrami zapytania oraz optymalne czasy odpowiedzi. W przypadku modeli open-source, które nie oferują własnego API, wykorzystana została platforma OpenRouter, która agreguje dostęp do wielu modeli od różnych dostawców, oferując ujednolicony interfejs.
 
-**Zatem proszę, kontynuuj w tym stylu z następującym punktem:**
+TODO troche krotko
 
-\subsubsection{Uzasadnienie wyboru modeli i sposób ich integracji}
+\subsection{Tryby promptowania}
+
+Efektywność wykorzystania dużych modeli językowych w dużej mierze zależy od sposobu formułowania zapytań (promptów) \cite{kratzke_dont_2024}. Istnieje kilka podstawowych strategii promptowania, które mogą być stosowane w zależności od złożoności zadania i dostępności przykładów:
+
+\begin{itemize}
+	\item \textbf{Zero-shot prompting:} Jest to najprostsza forma promptowania, gdzie model otrzymuje zadanie lub pytanie bez żadnych wcześniejszych przykładów. Oczekuje się, że model, bazując na swojej wiedzy ogólnej, wygeneruje odpowiedź. W kontekście generowania IaC, model otrzymałby instrukcję typu "Wygeneruj Dockerfile dla aplikacji Node.js", bez dodatkowych danych kontekstowych poza samym opisem zadania. Jest to podejście szybkie, ale jego skuteczność jest często ograniczona, zwłaszcza w przypadku złożonych lub bardzo specyficznych wymagań.
+	\item \textbf{Few-shot prompting:} Ta strategia polega na dostarczeniu modelowi kilku przykładów par (zapytanie, oczekiwana odpowiedź) przed właściwym zadaniem \cite{brown_language_2020} Przykłady te służą jako demonstracja pożądanego formatu i stylu odpowiedzi, pomagając modelowi zrozumieć intencję użytkownika i dostosować swoje generacje. W przypadku IaC, można by podać kilka par "opis aplikacji \textrightarrow{} przykładowy Dockerfile/manifest Kubernetes", aby model nauczył się wzorca i preferowanych praktyk. Zastosowanie tej metody często zwiększa jakość generacji w porównaniu do zero-shot.
+	\item \textbf{Chain-of-Thought (CoT) prompting:} Jest to technika, w której prompt instruuje model, aby przed podaniem ostatecznej odpowiedzi, wygenerował sekwencję pośrednich kroków rozumowania. Model "myśli na głos", co często prowadzi do bardziej precyzyjnych i trafnych wyników, szczególnie w zadaniach wymagających złożonych rozumowań lub wieloetapowych rozwiązań. W początkowej fazie rozwoju LLM technika CoT często wymagała dedykowanych instrukcji w prompcie, aby model wygenerował te kroki. Obecnie wiele zaawansowanych modeli językowych, dzięki swoim architekturze i procesom treningowym, potrafi wykazywać tego typu "rozumowanie" w sposób bardziej intuicyjny, często nawet bez wyraźnego polecenia, jeśli kontekst zadania na to wskazuje. W kontekście IaC, model mógłby najpierw "zastanowić się" nad zależnościami aplikacji, potem nad wymaganiami środowiskowymi i optymalizacjami, a dopiero potem wygenerować kod konfiguracji. CoT poprawia transparentność i debugowalność procesu generowania, a także może zwiększyć poprawność odpowiedzi.
+	\item \textbf{Agent-based prompting:} Ten tryb wykracza poza jednorazowe generowanie odpowiedzi. Model, działając jako "agent", otrzymuje zadanie i może iteracyjnie wykonywać szereg akcji: planować, używać zewnętrznych narzędzi (tzw. "tool calling"), analizować ich wyniki i modyfikować swój plan działania w celu osiągnięcia celu. Podejście agentowe można postrzegać jako ewolucję i rozszerzenie idei Chain-of-Thought, gdzie "myślenie" modelu jest przekształcane w sekwencję interakcji ze światem zewnętrznym i pętle sprzężenia zwrotnego. Agent nie tylko generuje wewnętrzne kroki rozumowania, ale także aktywnie wykorzystuje narzędzia do zbierania danych, weryfikacji hipotez i korygowania swojego działania na podstawie rzeczywistych wyników. Jest to podejście szczególnie efektywne w przypadku złożonych problemów wymagających interakcji ze środowiskiem zewnętrznym oraz adaptacji.
+\end{itemize}
+
+W kontekście generowania konfiguracji Infrastructure as Code (IaC), zastosowanie podejścia agentowego jest szczególnie uzasadnione z powodu możliwości zastosowania pętli sprzężenia zwrotnego. Generowanie IaC często wymaga wielu prób i korekt, zwłaszcza gdy dąży się do uzyskania poprawnych i bezpiecznych konfiguracji, które są zgodne z rzeczywistym środowiskiem i przestrzegają standardów. W przeciwieństwie do jednorazowych generacji (jak w zero-shot czy few-shot), agent może, na podstawie dostarczonego mu opisu docelowej infrastruktury, wygenerować wstępną wersję konfiguracji (np. Dockerfile). Następnie, kluczowym elementem jest możliwość wykorzystania zewnętrznych narzędzi i interakcji z kontekstem. Agent może na przykład czytać wybrane pliki z repozytorium kodu, aby lepiej zrozumieć strukturę projektu i zależności. Może również sterować swoim wewnętrznym przepływem rozumowania i zakresem czytanego kontekstu. Ponadto, agent jest w stanie próbować budować obraz Docker na podstawie wygenerowanej konfiguracji Dockerfile i sprawdzać, czy proces ten zakończy się powodzeniem. Wyniki tych interakcji – czy to błędy podczas budowania, czy niespójności z oczekiwaniami – są z powrotem przekazywane agentowi. Na podstawie tych informacji, agent może dynamicznie modyfikować swój pierwotny plan lub formułować nowe zapytania do modelu LLM, prosząc o konkretne korekty. Ten cykl generowania, walidacji i korekty może być powtarzany aż do momentu, gdy wygenerowana konfiguracja spełni określone kryteria poprawności i bezpieczeństwa, bądź do wyczerpania ustalonej liczby iteracji. Takie podejście znacząco zwiększa jakość i niezawodność finalnie otrzymanych konfiguracji IaC.
+
+W niniejszej pracy magisterskiej zastosowana zostanie właśnie metoda agentowa. Podejście agentowe może być realizowane na różne sposoby, zarówno poprzez bezpośrednie wykorzystanie dedykowanych interfejsów API udostępnianych przez niektóre modele (np. poprzez \textit{tool calling} czy \textit{function calling}), jak i poprzez zastosowanie specjalizowanych frameworków orkiestracyjnych, takich jak \textbf{AutoGen} czy \textbf{LangChain/LangGraph}. W tym badaniu, do implementacji agentów i zarządzania złożonymi przepływami pracy z wykorzystaniem funkcji \textit{tool calling} wybrana została biblioteka LangGraph w języku Python, uzupełniona o funkcjonalności LangChain.
 
 TODO tu skonczylem
 
 Cel: Przedstawić modele LLM używane w eksperymencie, ich charakterystyki, sposób użycia i ograniczenia.
 
 Proponowana zawartość:
-	•	Rodzaje modeli:
+	•	Rodzaje modeli:W
 	•	    Podział na modele open-source (np. Mistral, LLaMA, Nous Hermes) vs. modele komercyjne dostępne przez API (np. GPT-4, Claude).
 	•		Warto podkreślić, że wybór między open-source a komercyjnymi często zależy od dostępności zasobów (GPU), wymagań licencyjnych i elastyczności.
 	•	Architektury i charakterystyki:
