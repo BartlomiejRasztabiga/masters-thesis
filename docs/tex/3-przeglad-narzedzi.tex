@@ -71,9 +71,9 @@ DeepSeek & DeepSeek V3 & 236 & 128k \\ \hline
 
 W ramach niniejszego badania modele językowe są wykorzystywane w trybie inferencji (wnioskowania), bez dodatkowego etapu ich dostrajania (fine-tuningu) na specyficznym zbiorze danych IaC. Oznacza to, że modele wykorzystują swoją ogólną wiedzę, nabytą podczas szerokiego treningu, do generowania konfiguracji na podstawie dostarczonego kontekstu i promptów. Taki sposób podejścia jest zgodny z koncepcją "Don't Train, Just Prompt" \cite{kratzke_dont_2024}, co pozwala na szybką iterację i wykorzystanie najnowszych, potężnych modeli bez konieczności kosztownego i czasochłonnego procesu retrenowania.
 
-Integracja z wybranymi modelami LLM odbywa się głównie za pośrednictwem ich bezpośrednich interfejsów programistycznych (API). Takie podejście gwarantuje dostęp do najnowszych wersji modeli, pełną kontrolę nad parametrami zapytania oraz optymalne czasy odpowiedzi. W przypadku modeli open-source, które nie oferują własnego API, wykorzystana została platforma OpenRouter, która agreguje dostęp do wielu modeli od różnych dostawców, oferując ujednolicony interfejs.
+Integracja z wybranymi modelami LLM odbywa się głównie za pośrednictwem ich bezpośrednich interfejsów programistycznych (API). Takie podejście gwarantuje dostęp do najnowszych wersji modeli, pełną kontrolę nad parametrami zapytania oraz optymalne czasy odpowiedzi. Należy jednak pamiętać o potencjalnych ograniczeniach wynikających z limitów API oraz braku możliwości bezpośredniej modyfikacji wewnętrznej architektury lub kodu źródłowego w przypadku zamkniętych modeli komercyjnych. W przypadku modeli open-source, które nie oferują własnego API, wykorzystana została platforma OpenRouter, która agreguje dostęp do wielu modeli od różnych dostawców, oferując ujednolicony interfejs.
 
-TODO troche krotko
+TODO troche krotko?
 
 \subsection{Tryby promptowania}
 
@@ -89,36 +89,6 @@ Efektywność wykorzystania dużych modeli językowych w dużej mierze zależy o
 W kontekście generowania konfiguracji Infrastructure as Code (IaC), zastosowanie podejścia agentowego jest szczególnie uzasadnione z powodu możliwości zastosowania pętli sprzężenia zwrotnego. Generowanie IaC często wymaga wielu prób i korekt, zwłaszcza gdy dąży się do uzyskania poprawnych i bezpiecznych konfiguracji, które są zgodne z rzeczywistym środowiskiem i przestrzegają standardów. W przeciwieństwie do jednorazowych generacji (jak w zero-shot czy few-shot), agent może, na podstawie dostarczonego mu opisu docelowej infrastruktury, wygenerować wstępną wersję konfiguracji (np. Dockerfile). Następnie, kluczowym elementem jest możliwość wykorzystania zewnętrznych narzędzi i interakcji z kontekstem. Agent może na przykład czytać wybrane pliki z repozytorium kodu, aby lepiej zrozumieć strukturę projektu i zależności. Może również sterować swoim wewnętrznym przepływem rozumowania i zakresem czytanego kontekstu. Ponadto, agent jest w stanie próbować budować obraz Docker na podstawie wygenerowanej konfiguracji Dockerfile i sprawdzać, czy proces ten zakończy się powodzeniem. Wyniki tych interakcji – czy to błędy podczas budowania, czy niespójności z oczekiwaniami – są z powrotem przekazywane agentowi. Na podstawie tych informacji, agent może dynamicznie modyfikować swój pierwotny plan lub formułować nowe zapytania do modelu LLM, prosząc o konkretne korekty. Ten cykl generowania, walidacji i korekty może być powtarzany aż do momentu, gdy wygenerowana konfiguracja spełni określone kryteria poprawności i bezpieczeństwa, bądź do wyczerpania ustalonej liczby iteracji. Takie podejście znacząco zwiększa jakość i niezawodność finalnie otrzymanych konfiguracji IaC.
 
 W niniejszej pracy magisterskiej zastosowana zostanie właśnie metoda agentowa. Podejście agentowe może być realizowane na różne sposoby, zarówno poprzez bezpośrednie wykorzystanie dedykowanych interfejsów API udostępnianych przez niektóre modele (np. poprzez \textit{tool calling} czy \textit{function calling}), jak i poprzez zastosowanie specjalizowanych frameworków orkiestracyjnych, takich jak \textbf{AutoGen} czy \textbf{LangChain/LangGraph}. W tym badaniu, do implementacji agentów i zarządzania złożonymi przepływami pracy z wykorzystaniem funkcji \textit{tool calling} wybrana została biblioteka LangGraph w języku Python, uzupełniona o funkcjonalności LangChain.
-
-TODO tu skonczylem
-
-Cel: Przedstawić modele LLM używane w eksperymencie, ich charakterystyki, sposób użycia i ograniczenia.
-
-Proponowana zawartość:
-	•	Rodzaje modeli:W
-	•	    Podział na modele open-source (np. Mistral, LLaMA, Nous Hermes) vs. modele komercyjne dostępne przez API (np. GPT-4, Claude).
-	•		Warto podkreślić, że wybór między open-source a komercyjnymi często zależy od dostępności zasobów (GPU), wymagań licencyjnych i elastyczności.
-	•	Architektury i charakterystyki:
-	•	    Typowe parametry: liczba parametrów, specjalizacje, wersje, okno kontekstu (dlaczego wazne przy repozytoriach kodu)
-	•		Warto dodać, że "liczba parametrów" nie zawsze jest jedynym wyznacznikiem jakości, ale jest istotnym parametrem. "Okna kontekstu" – jak najbardziej warto wyjaśnić, dlaczego jest ważne przy repozytoriach kodu (np. umożliwia dostarczanie całych plików, fragmentów dokumentacji, wielu powiązanych promptów jednocześnie).
-    •   Wybrane modele do badania:
-    •       Krótki opis które i dlaczego z parametrami jakimiś basic
-	• 		Informacja, które modele są używane w badaniu i dlaczego (ograniczenia przez tool calling w langgraph).
-	•		To jest bardzo ważna informacja! Musisz to jasno przedstawić. Jeśli LangGraph narzuca ograniczenia na wybór modeli (np. tylko te z dobrze zaimplementowanym tool calling), to jest to istotny czynnik wpływający na zakres badań.
-	•	Sposób użycia:
-	•	    Poprzez OpenRouter, bezpośrednie API, LangChain / LangGraph.
-	•	    Sposób integracji z agentami.
-	•	Tryby promptowania:
-	•	    Zero-shot, few-shot, chain-of-thought, agent-based.
-	•	    Porównanie tych podejść i wybór odpowiednich metod do problemu.
-	•		Warto wyjaśnić, dlaczego wybrane metody (np. agent-based) są najbardziej odpowiednie dla generowania konfiguracji IaC.
-	•	Ograniczenia i praktyczne aspekty:
-	•	    Licencje, limity API, ograniczona liczba modeli.
-	•	    Context window – jak wpływa na eksperymenty z kodem.
-	•	    Brak fine-tuningu – tylko inference.
-	•	    Kontrola nad danymi – brak możliwości dostosowania kodu źródłowego w zamkniętych modelach.
-
-
 
 \subsection{Narzędzia DevOps: Docker i Kubernetes}
 
