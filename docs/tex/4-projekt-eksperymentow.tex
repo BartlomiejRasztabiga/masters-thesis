@@ -6,3 +6,26 @@ TODO
 kryteria oceny tutaj czy w nastepnym?
 
 tu chyba napisac w jaki sposob to odpalam, ze agent, ze langsmith itd
+
+
+
+TODO to tylko fragment o closed feedback loopie z static analyzerami:
+
+4.X. Podejście agentowe z pętlą sprzężenia zwrotnego (Feedback Loop)
+
+W celu maksymalizacji jakości i bezpieczeństwa generowanych konfiguracji, w badaniu zostanie zaimplementowane podejście agentowe wykorzystujące mechanizm zamkniętej pętli sprzężenia zwrotnego. Koncepcja ta zakłada iteracyjne udoskonalanie wygenerowanego kodu na podstawie automatycznie pozyskiwanego feedbacku z narzędzi do statycznej analizy i walidacji IaC.
+
+Proces będzie przebiegał następująco:
+
+Generacja początkowa: Wybrany model LLM (wykorzystując techniki promptowania takie jak zero-shot lub few-shot) wygeneruje wstępną konfigurację Dockerfile lub manifestu Kubernetes na podstawie zadanego promptu.
+Walidacja i analiza: Wygenerowany kod zostanie automatycznie przekazany do zestawu narzędzi walidacyjnych i analitycznych, takich jak Checkov, Kube-score i Kube-linter. Narzędzia te ocenią kod pod kątem poprawności składniowej, zgodności z najlepszymi praktykami oraz potencjalnych luk bezpieczeństwa i niezoptymalizowanych ustawień.
+Pozyskiwanie feedbacku: Wyniki analizy (np. lista wykrytych "violations" lub zaleceń) zostaną przetworzone i sformatowane w sposób zrozumiały dla LLM.
+Iteracyjna korekta: Przetworzony feedback zostanie przekazany z powrotem do LLM jako rozbudowany prompt, instruujący model do dokonania korekt w początkowej konfiguracji. Proces ten będzie powtarzany w celu zmniejszenia liczby wykrytych problemów lub osiągnięcia zdefiniowanego progu jakości.
+Kryteria zatrzymania: Pętla sprzężenia zwrotnego zostanie przerwana po osiągnięciu maksymalnej liczby iteracji (np. 3-5 iteracji) lub gdy liczba wykrytych naruszeń spadnie poniżej ustalonego poziomu (np. brak krytycznych błędów bezpieczeństwa).
+W ramach eksperymentów, kluczowe będzie zmierzenie początkowej liczby naruszeń (violations) generowanych przez LLM bez feedbacku oraz dynamiki ich redukcji w kolejnych iteracjach z wykorzystaniem pętli sprzężenia zwrotnego. Pozwoli to na ocenę efektywności podejścia agentowego i zdolności LLM do samodzielnej korekty kodu na podstawie zewnętrznych walidatorów. Badanie to pozwoli również zidentyfikować typy błędów, które są najłatwiejsze i najtrudniejsze do skorygowania automatycznie.
+
+Uzasadnienie umieszczenia tu:
+
+Projektowanie: Opisujesz, jak zaprojektujesz swoje eksperymenty, w tym innowacyjną metodę z feedback loop.
+Klarowność: Oddzielenie tego w osobnym podrozdziale w "Projekcie eksperymentów" podkreśla jego znaczenie i pozwala na szczegółowe omówienie.
+Wprowadzenie metryk: Już na etapie projektu eksperymentów określasz, co będziesz mierzyć (początkowe violations, redukcja, liczba iteracji), co jest spójne z metodologią naukową.

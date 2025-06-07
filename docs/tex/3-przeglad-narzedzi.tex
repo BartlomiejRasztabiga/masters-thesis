@@ -1,66 +1,4 @@
 \clearpage % Rozdziały zaczynamy od nowej strony.
-\section{Przegląd technologii i narzędzi}
-
-\subsection{Modele językowe wykorzystywane w badaniu}
-
-TODO opis modeli z ktorych korzystam (TODO a jakie to sa? sprawdzic najpierw co dziala z langchain), ich charakterystyki i architektury
-
-podzial na open source i dostepne przez API?
-
-napisac ze uzywam openrouter np.
-
-roznice w sposobie korzystania z nich
-
-parametry, fine-tuning ? i jak je bede wykorzystywac
-
-w jaki sposob bede dokonywac inferencji (openrouter? bezposrednie api? langchain/langgraph)
-
-w jaki sposob bede z nich korzystac - nie zwykle promptowanie, ale jako agent, opisac jak chce zeby wygladala calosc, jak dziala podejscie agentowe
-
-generalnie moze porownac rozne metody prompotowania (zero shot, few shot, chain of thought, agent based)
-
-ograniczenia (np ze moge tylko kilka modeli), tryb uruchamiania, licencje, kontrola danych
-
-\subsection{Narzędzia DevOps: Docker i Kubernetes}
-
-funkcja i zasady dzialania, krotka charakterystyka, sposob uzycia, przyklady
-
-- Docker i jego rola (do czego konkretnie)
-- Kubernetes – poziom szczegółowości tylko taki, jak potrzebny do oceny konfiguracji
-
-na czym sie skupic? na tym co mozna popsuc przy generowaniu konfiguracji np
-
-jakies przyklady dobrych i zlych praktyk?
-
-\subsection{Narzędzia do oceny jakości IaC}
-
-z jakich bede korzystac i w jaki sposob, ich funkcje i zasady dzialania
-
-checkov, kubelinter, kube-score, kubeval, terrascan, cloudeval-yaml, iac-eval
-
-przykladowe outputy narzedzi, ich interpretacja
-
-\subsection{Środowisko eksperymentalne}
-
-opis środowiska eksperymentalnego, w którym będą przeprowadzane testy
-
-lokalnie i dlaczego
-
-kind, docker desktop, python, langchain, openrouter itd
-
-- Parametry techniczne (np. RAM, GPU, lokalność modeli)
-- Zasady testowania przez API (np. limity, wersje)
-
-\subsection{Technologie wspierające}
-
-TODO a co ja tu w ogole chce opisac i po co?
-
-python? jakies rozne biblioteki? kind? lens? 
-
-a moze ten rozdzial zmergowac z poprzednim?
-
-
-------- (dalej pisal chat)
 
 \section{Przegląd technologii i narzędzi}
 
@@ -71,23 +9,28 @@ Cel: Przedstawić modele LLM używane w eksperymencie, ich charakterystyki, spos
 Proponowana zawartość:
 	•	Rodzaje modeli:
 	•	    Podział na modele open-source (np. Mistral, LLaMA, Nous Hermes) vs. modele komercyjne dostępne przez API (np. GPT-4, Claude).
+	•		Warto podkreślić, że wybór między open-source a komercyjnymi często zależy od dostępności zasobów (GPU), wymagań licencyjnych i elastyczności.
 	•	Architektury i charakterystyki:
 	•	    Typowe parametry: liczba parametrów, specjalizacje, wersje, okno kontekstu (dlaczego wazne przy repozytoriach kodu)
-	•	    Informacja, które modele są używane i dlaczego.
+	•		Warto dodać, że "liczba parametrów" nie zawsze jest jedynym wyznacznikiem jakości, ale jest istotnym parametrem. "Okna kontekstu" – jak najbardziej warto wyjaśnić, dlaczego jest ważne przy repozytoriach kodu (np. umożliwia dostarczanie całych plików, fragmentów dokumentacji, wielu powiązanych promptów jednocześnie).
     •   Wybrane modele do badania:
     •       Krótki opis które i dlaczego z parametrami jakimiś basic
+	• 		Informacja, które modele są używane w badaniu i dlaczego (ograniczenia przez tool calling w langgraph).
+	•		To jest bardzo ważna informacja! Musisz to jasno przedstawić. Jeśli LangGraph narzuca ograniczenia na wybór modeli (np. tylko te z dobrze zaimplementowanym tool calling), to jest to istotny czynnik wpływający na zakres badań.
 	•	Sposób użycia:
 	•	    Poprzez OpenRouter, bezpośrednie API, LangChain / LangGraph.
 	•	    Sposób integracji z agentami.
 	•	Tryby promptowania:
 	•	    Zero-shot, few-shot, chain-of-thought, agent-based.
-	•	    Porównanie tych podejść i wybór odpowiednich metod.
+	•	    Porównanie tych podejść i wybór odpowiednich metod do problemu.
+	•		Warto wyjaśnić, dlaczego wybrane metody (np. agent-based) są najbardziej odpowiednie dla generowania konfiguracji IaC.
 	•	Ograniczenia i praktyczne aspekty:
 	•	    Licencje, limity API, ograniczona liczba modeli.
+	•	    Context window – jak wpływa na eksperymenty z kodem.
 	•	    Brak fine-tuningu – tylko inference.
 	•	    Kontrola nad danymi – brak możliwości dostosowania kodu źródłowego w zamkniętych modelach.
 
-⸻
+
 
 \subsection{Narzędzia DevOps: Docker i Kubernetes}
 
@@ -95,15 +38,21 @@ Cel: Opisać narzędzia wykorzystywane do zarządzania środowiskiem uruchomieni
 
 Proponowana zawartość:
 	•	Docker:
-	•	    Do czego jest wykorzystywany: uruchamianie lokalnych usług, środowiska testowe, konteneryzacja narzędzi.
+	•	    Do czego jest wykorzystywany: uruchamianie lokalnych usług, środowiska testowe i deweloperskie, konteneryzacja narzędzi, konteneryzacja produkcyjnych aplikacji.
+	•	    Jak mozna popelnic bledy
+	•		Warto pokazać typowe błędy, które LLM może popełnić (np. użycie ADD zamiast COPY, brak WORKDIR, użycie latest tagu, brak usuwania zależności po buildzie). To od razu pokazuje, dlaczego ocena bezpieczeństwa i optymalizacji jest tak ważna.
 	•	Kubernetes:
-	•	    Używany z minimalnym zakresem (np. przez Kind).
+	•	    Używany z minimalnym zakresem (np. przez Kind, K3s, minikube).
 	•	    Rola w testowaniu konfiguracji i IaC.
+	•		Warto podkreślić, że Kubernetes służy jako środowisko do walidacji runtime wygenerowanych konfiguracji, a nie tylko do ich tworzenia.
 	•	    Jak można popełnić błędy przy generowaniu YAML (niedopasowane zasoby, problemy z dostępnością, błędne konfiguracje).
+	•		Dodaj przykłady: brak liveness/readiness probes, źle skonfigurowane serwisy (np. ClusterIP zamiast NodePort/LoadBalancer), brak PersistentVolumeClaim dla baz danych, zbyt wysokie/niskie limity zasobów, brak kontekstu bezpieczeństwa.
 	•	Dobre i złe praktyki:
 	•	    Przykłady z testów (np. źle ustawione limity zasobów, niepoprawne labele).
+	•   Dodac tu Kaniko czy w technologiach wspierajacych?
+	•	Chyba nie bedzie wykorzystywane jeszcze tutaj, a jedynie w systemie PaaS
 
-⸻
+
 
 \subsection{Narzędzia do oceny jakości IaC}
 
@@ -117,23 +66,25 @@ Proponowana zawartość:
 	•	Przykłady outputów:
 	•	    Co zgłaszają narzędzia, jak to interpretować.
 	•	    Zestawienie wyników na tych samych plikach (jeśli masz dane).
+	•		Pokazać kilka błędów mniejszych i większych, podatności itd
 
-⸻
+
 
 \subsection{Środowisko eksperymentalne}
 
-Cel: Przedstawić infrastrukturę testową i środowisko, w którym uruchamiane są eksperymenty.
+Cel: Przedstawić infrastrukturę testową i środowisko, w którym uruchamiane będą eksperymenty.
 
 Proponowana zawartość:
 	•	Charakterystyka środowiska:
-	•	    Lokalna maszyna, Docker Desktop, Kind, Python, LangChain, OpenRouter.
+	•	    Lokalna maszyna, Docker Desktop, Kubectl, Kind, Python, LangChain, LangGraph, OpenRouter?.
+	•		Jasno określ, co jest na maszynie lokalnej, a co jest usługą zewnętrzną (OpenRouter to API gateway).
 	•	Parametry techniczne:
-	•	    RAM, CPU, ewentualna obecność GPU, ograniczenia związane z lokalnością.
+	•	    RAM, CPU, ewentualna obecność GPU, ograniczenia związane z lokalnością - dlaczego lokalnie?
 	•	Zasady testowania:
 	•	    Jak wygląda testowanie przez API: limity żądań, obsługa błędów, wersje modeli.
 	•	    Korzystanie z narzędzi CLI lub SDK.
 
-⸻
+
 
 \subsection{Technologie wspierające (do rozważenia jako część środowiska eksperymentalnego)}
 
@@ -143,10 +94,11 @@ Alternatywa 2: Zmergować z poprzednim podrozdziałem jako „środowisko eksper
 
 Zawartość:
 	•	Język Python:
-	•	    Używane biblioteki (np. requests, openai, langchain, pydantic, docker-py itd.).
+	•	    Używane biblioteki (np. requests, openai, langchain, pydantic, git, docker-py itd.).
 	•	Narzędzia pomocnicze:
 	•	    Kind, Lens, VSCode, Docker CLI, kubectl, LangSmith, LangFuse, Promptfoo, Kaniko.
+	•		LangSmith, LangFuse, Promptfoo: To jest bardzo ważne! Są to narzędzia do ewaluacji i zarządzania promptami/LLM. Koniecznie je opisz krótko i wyjaśnij, jak pomogły w Twoich badaniach (np. do monitorowania interakcji z LLM, testowania promptów, porównywania ich skuteczności). To pokazuje zaawansowane podejście do inżynierii promptów.
 	•	Rola:
 	•	    Obsługa eksperymentów, monitorowanie, automatyzacja.
 
-⸻
+
