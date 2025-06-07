@@ -2,7 +2,36 @@
 
 \section{Przegląd technologii i narzędzi}
 
+Celem tego rozdziału jest przedstawienie najważniejszych technologii i narzędzi, stanowiących podstawę niniejszego badania. Szczególny nacisk położony zostanie na duże modele językowe (LLM), opis ich architektur oraz ich zastosowanie w generowaniu konfiguracji Infrastructure as Code (IaC). Ponadto, omówione zostaną kluczowe narzędzia DevOps, takie jak Docker i Kubernetes, niezbędne w zarządzaniu środowiskami uruchomieniowymi, oraz narzędzia służące do walidacji i oceny jakości generowanego kodu IaC. Rozdział zawiera także opis środowiska eksperymentalnego oraz wykorzystywanych technologii wspierających automatyzację i monitorowanie eksperymentów.
+
 \subsection{Modele językowe wykorzystywane w badaniu}
+
+Duże modele językowe (LLM) pełnią istotną rolę w prezentowanych eksperymentach, służąc jako generatory konfiguracji IaC. Ich zdolność do przetwarzania języka naturalnego oraz generowania poprawnego kodu czyni je istotnym elementem automatyzacji procesów DevOps. W tym podrozdziale przedstawiono charakterystykę wybranych modeli, opis ich architektur oraz praktyczne aspekty związane z ich wykorzystaniem.
+
+Rynek dużych modeli językowych rozwija się dynamicznie, oferując zarówno modele komercyjne, dostępne przez API, jak i modele open-source, możliwe do uruchomienia lokalnie lub na własnej infrastrukturze. Decyzja o wyborze konkretnego rodzaju modelu często zależy od dostępności zasobów sprzętowych (zwłaszcza GPU), wymagań dotyczących licencji, kwestii związanych z prywatnością danych oraz możliwości dostosowania modeli do specyficznych zastosowań.
+
+Modele komercyjne dostępne przez API zazwyczaj cechują się wysoką wydajnością, zaawansowanymi możliwościami oraz niezawodnością, dzięki wsparciu dużych firm technologicznych takich jak OpenAI, Anthropic czy Google. Modele te trenowane są na szerokich i zróżnicowanych zbiorach danych, co przekłada się na ich zdolność generowania wysokiej jakości tekstu oraz kodu. Ich użytkowanie wiąże się z kosztami związanymi z opłatami za dostęp do API oraz koniecznością przesyłania danych do zewnętrznych serwisów, co może być problematyczne w przypadku danych wrażliwych.
+
+Wybrane do badania modele komercyjne to:
+
+\begin{itemize}
+	\item \textbf{OpenAI GPT-4.1}, \textbf{GPT-4o} oraz \textbf{O3}: Najnowsze flagowe modele OpenAI. GPT-4.1 charakteryzuje się udoskonalonymi możliwościami generowania i rozumienia złożonego kodu oraz zoptymalizowanymi funkcjami integracji z narzędziami (tool calling). GPT-4o, model multimodalny, oferuje najwyższą wydajność, elastyczność oraz wszechstronne możliwości interakcji. O3 zapewnia optymalne połączenie wydajności, szybkości oraz efektywności kosztowej.
+	\item \textbf{Anthropic Claude Opus 4}, \textbf{Sonnet 4}, oraz \textbf{Haiku 3.5}: Zaawansowane modele Anthropic, cenione za bezpieczeństwo, zgodność z najlepszymi praktykami AI Safety oraz obsługę długich kontekstów i precyzyjnych instrukcji. Opus 4 to najbardziej zaawansowana wersja, Sonnet 4 równoważy wydajność z szybkością, a Haiku 3.5 skupia się na efektywności kosztowej i szybkości działania.
+	\item \textbf{Google Gemini 2.5 Pro} i \textbf{2.5 Flash}: Modele Google z rozszerzonym oknem kontekstu, dedykowane do analizy obszernych repozytoriów kodu i dokumentacji. Wersja Pro oferuje wyjątkową pojemność kontekstu i najwyższą wydajność, podczas gdy wersja Flash jest zoptymalizowana pod kątem szybszego działania przy niższych kosztach operacyjnych.
+\end{itemize}
+
+Modele open-source stanowią atrakcyjną alternatywę, oferując pełną kontrolę, możliwość uruchomienia na własnej infrastrukturze oraz brak dodatkowych opłat za każde zapytanie. Ich wydajność zależy przede wszystkim od dostępności zasobów sprzętowych, a aktywny rozwój społeczności przyczynia się do ciągłej optymalizacji i pojawiania się coraz bardziej zaawansowanych wersji.
+
+Wybrane do badania modele open-source to:
+
+\begin{itemize}
+	\item \textbf{Mistral Medium} oraz \textbf{Codestral}: Modele od firmy Mistral AI, zoptymalizowane pod kątem efektywnego generowania kodu i ogólnego rozumienia kontekstu technicznego. Codestral specjalizuje się szczególnie w obsłudze złożonych zadań programistycznych, oferując wysoką efektywność przy umiarkowanych wymaganiach sprzętowych.
+	\item \textbf{Meta Llama 4 Maverick} oraz \textbf{Llama 4 Scout}: Najnowsze modele open-source od Meta, które stanowią znaczący punkt odniesienia w dziedzinie rozwoju sztucznej inteligencji. Maverick wyróżnia się najwyższymi osiągami i zaawansowanymi funkcjami, natomiast Scout zapewnia dobrą wydajność przy bardziej ograniczonych zasobach sprzętowych, umożliwiając łatwiejsze wdrożenie w praktycznych zastosowaniach.
+\end{itemize}
+
+Wszystkie wymienione modele reprezentują aktualny szczyt osiągnięć w dziedzinie dużych modeli językowych (LLM). Wybrane zostały przede wszystkim ze względu na ich potwierdzone zdolności do generowania wysokiej jakości kodu oraz wsparcie dla funkcji „tool calling”, które umożliwiają bezpośrednią integrację modeli z zewnętrznymi narzędziami lub usługami poprzez dedykowane mechanizmy API bądź platformy integracyjne, takie jak LangChain czy LangGraph. Funkcje te będą odgrywać istotną rolę w proponowanym w tej pracy podejściu opartym na pętli sprzężenia zwrotnego w procesie generowania konfiguracji Infrastructure as Code (IaC).
+
+TODO tu skonczylem
 
 Cel: Przedstawić modele LLM używane w eksperymencie, ich charakterystyki, sposób użycia i ograniczenia.
 
