@@ -30,7 +30,7 @@ Wybrane do badania modele open-source to:
     \item \textbf{DeepSeek V3}: Model typu Mixture-of-Experts (MoE), łączący wysoką jakość generowania kodu z dużą efektywnością obliczeniową. DeepSeek V3 wyróżnia się zdolnością do dynamicznego aktywowania tylko części parametrów modelu przy każdym zapytaniu, co pozwala osiągnąć korzystny kompromis między jakością a kosztami obliczeń.
 \end{itemize}
 
-Wszystkie wymienione modele reprezentują aktualny szczyt osiągnięć w dziedzinie dużych modeli językowych (LLM). Wybrane zostały przede wszystkim ze względu na ich potwierdzone zdolności do generowania wysokiej jakości kodu oraz wsparcie dla funkcji „tool calling”, które umożliwiają bezpośrednią integrację modeli z zewnętrznymi narzędziami lub usługami poprzez dedykowane mechanizmy API bądź platformy integracyjne, takie jak LangChain czy LangGraph. Funkcje te będą odgrywać znaczącą rolę w proponowanym w tej pracy podejściu opartym na pętli sprzężenia zwrotnego w procesie generowania konfiguracji Infrastructure as Code (IaC).
+Wszystkie wymienione modele reprezentują aktualny szczyt osiągnięć w dziedzinie dużych modeli językowych (LLM). Wybrane zostały przede wszystkim ze względu na ich potwierdzone zdolności do generowania wysokiej jakości kodu oraz wsparcie dla funkcji \textit{tool calling}. Funkcje te umożliwiają bezpośrednią integrację modeli z zewnętrznymi narzędziami lub usługami poprzez dedykowane mechanizmy API bądź platformy orkiestracyjne, takie jak LangChain czy LangGraph. W proponowanym w tej pracy podejściu, funkcje \textit{tool calling} będą odgrywać znaczącą rolę w zarządzaniu kontekstem i procesie generowania konfiguracji Infrastructure as Code (IaC).
 
 \subsection{Architektury i charakterystyka}
 
@@ -39,12 +39,12 @@ Większość współczesnych dużych modeli językowych bazuje na architekturze 
 \begin{itemize}
     \item \textbf{Liczba parametrów:} Liczba parametrów (często liczona w miliardach) jest wskaźnikiem skali modelu i jego zdolności do uczenia się złożonych wzorców z danych. Modele z większą liczbą parametrów zazwyczaj wykazują lepszą wydajność w szerokim zakresie zadań, jednak ich uruchomienie i obsługa wymagają znacznie większych zasobów obliczeniowych. Należy jednak zaznaczyć, że sama liczba parametrów nie jest jedynym wyznacznikiem jakości; znaczenie ma również jakość danych treningowych, architektura (np. Mixture-of-Experts) oraz proces dostrajania modelu.
     \item \textbf{Okno kontekstowe:} Okno kontekstowe odnosi się do maksymalnej długości sekwencji tokenów (słów, znaków, fragmentów kodu), którą model może przetworzyć i wykorzystać do wygenerowania odpowiedzi. Jest to szczególnie istotne w kontekście generowania konfiguracji IaC z repozytoriów kodu. Duże okno kontekstowe pozwala na dostarczenie modelowi całych plików źródłowych aplikacji, fragmentów dokumentacji, wielu powiązanych ze sobą promptów, a nawet wyników walidacji z zewnętrznych narzędzi. To umożliwia agentowi LLM holistyczne zrozumienie projektu i kontekstu, co przekłada się na wyższą jakość i trafność generowanych konfiguracji. Modele takie jak Google Gemini 2.5 Pro wyróżniają się wyjątkowo dużym oknem kontekstowym (do miliona tokenów), co jest znaczącą przewagą w zadaniach wymagających głębokiej analizy kodu i dokumentacji.
-    \item \textbf{Specjalizacje i optymalizacje:} Niektóre modele, takie jak Mistral Codestral, są specjalizowane lub fine-tuninguowane w kierunku generowania kodu. Oznacza to, że są one trenowane na dużych zbiorach danych zawierających kod programistyczny, co poprawia ich zdolność do generowania syntaktycznie poprawnego i semantycznie trafnego kodu. Architektury takie jak Mixture-of-Experts (MoE) stosowane w Mixtral 8x7B (oraz DeepSeek V3) pozwalają na efektywne skalowanie modeli, aktywując tylko część ekspertów dla danego zapytania, co optymalizuje zużycie zasobów przy zachowaniu wysokiej jakości odpowiedzi.
+    \item \textbf{Specjalizacje i optymalizacje:} Niektóre modele, takie jak Mistral Codestral, są specjalizowane lub fine-tuninguowane w kierunku generowania kodu. Oznacza to, że są one trenowane na dużych zbiorach danych zawierających kod programistyczny, co poprawia ich zdolność do generowania syntaktycznie poprawnego i semantycznie trafnego kodu. Architektury takie jak Mixture-of-Experts (MoE) stosowane np. w DeepSeek V3 pozwalają na efektywne skalowanie modeli, aktywując tylko część ekspertów dla danego zapytania, co optymalizuje zużycie zasobów przy zachowaniu wysokiej jakości odpowiedzi.
 \end{itemize}
 
 Poniższa tabela \ref{tab:llm-characteristic} przedstawia ogólne charakterystyki wybranych modeli LLM, które będą wykorzystywane w badaniu. Okno kontekstu podano w liczbie tokenów, a liczba parametrów — w miliardach, jeśli została opublikowana.
 
-\newpage % zeby wymusic tabelke
+\newpage
 
 \begin{table}[!h] \centering
 \caption{Charakterystyka wybranych modeli LLM}
@@ -71,9 +71,9 @@ DeepSeek & DeepSeek V3 & 236 & 128k \\ \hline
 
 W ramach niniejszego badania modele językowe są wykorzystywane w trybie inferencji (wnioskowania), bez dodatkowego etapu ich dostrajania (fine-tuningu) na specyficznym zbiorze danych IaC. Oznacza to, że modele wykorzystują swoją ogólną wiedzę, nabytą podczas szerokiego treningu, do generowania konfiguracji na podstawie dostarczonego kontekstu i promptów. Taki sposób podejścia jest zgodny z koncepcją "Don't Train, Just Prompt" \cite{kratzke_dont_2024}, co pozwala na szybką iterację i wykorzystanie najnowszych, potężnych modeli bez konieczności kosztownego i czasochłonnego procesu retrenowania.
 
-Integracja z wybranymi modelami LLM odbywa się głównie za pośrednictwem ich bezpośrednich interfejsów programistycznych (API). Takie podejście gwarantuje dostęp do najnowszych wersji modeli, pełną kontrolę nad parametrami zapytania oraz optymalne czasy odpowiedzi. Należy jednak pamiętać o potencjalnych ograniczeniach wynikających z limitów API oraz braku możliwości bezpośredniej modyfikacji wewnętrznej architektury lub kodu źródłowego w przypadku zamkniętych modeli komercyjnych. W przypadku modeli open-source, które nie oferują własnego API, wykorzystana została platforma OpenRouter, która agreguje dostęp do wielu modeli od różnych dostawców, oferując ujednolicony interfejs.
+Integracja z wybranymi modelami LLM odbywa się głównie za pośrednictwem ich bezpośrednich interfejsów programistycznych (API). Takie podejście gwarantuje dostęp do najnowszych wersji modeli, pełną kontrolę nad parametrami zapytania oraz optymalne czasy odpowiedzi. Należy jednak pamiętać o potencjalnych ograniczeniach wynikających z limitów API oraz braku możliwości bezpośredniej modyfikacji wewnętrznej architektury lub kodu źródłowego w przypadku zamkniętych modeli komercyjnych.
 
-TODO troche krotko?
+Warto zaznaczyć, że chociaż inferencję dla wielu modeli open-source (takich jak te z serii LLaMA czy Mistral) można przeprowadzać lokalnie, wymaga to znacznych zasobów sprzętowych (zwłaszcza mocnego procesora graficznego - GPU). Ze względu na ograniczenia sprzętowe środowiska eksperymentalnego, w niniejszej pracy nie zastosowano lokalnej inferencji. Zamiast tego, dla modeli komercyjnych korzystano z ich dedykowanych API, natomiast dla modeli open-source, które nie oferują własnego API, wykorzystana została platforma OpenRouter, która agreguje dostęp do wielu modeli od różnych dostawców, oferując ujednolicony interfejs.
 
 \subsection{Tryby promptowania}
 
@@ -83,80 +83,106 @@ Efektywność wykorzystania dużych modeli językowych w dużej mierze zależy o
 	\item \textbf{Zero-shot prompting:} Jest to najprostsza forma promptowania, gdzie model otrzymuje zadanie lub pytanie bez żadnych wcześniejszych przykładów. Oczekuje się, że model, bazując na swojej wiedzy ogólnej, wygeneruje odpowiedź. W kontekście generowania IaC, model otrzymałby instrukcję typu "Wygeneruj Dockerfile dla aplikacji Node.js", bez dodatkowych danych kontekstowych poza samym opisem zadania. Jest to podejście szybkie, ale jego skuteczność jest często ograniczona, zwłaszcza w przypadku złożonych lub bardzo specyficznych wymagań.
 	\item \textbf{Few-shot prompting:} Ta strategia polega na dostarczeniu modelowi kilku przykładów par (zapytanie, oczekiwana odpowiedź) przed właściwym zadaniem \cite{brown_language_2020} Przykłady te służą jako demonstracja pożądanego formatu i stylu odpowiedzi, pomagając modelowi zrozumieć intencję użytkownika i dostosować swoje generacje. W przypadku IaC, można by podać kilka par "opis aplikacji \textrightarrow{} przykładowy Dockerfile/manifest Kubernetes", aby model nauczył się wzorca i preferowanych praktyk. Zastosowanie tej metody często zwiększa jakość generacji w porównaniu do zero-shot.
 	\item \textbf{Chain-of-Thought (CoT) prompting:} Jest to technika, w której prompt instruuje model, aby przed podaniem ostatecznej odpowiedzi, wygenerował sekwencję pośrednich kroków rozumowania. Model "myśli na głos", co często prowadzi do bardziej precyzyjnych i trafnych wyników, szczególnie w zadaniach wymagających złożonych rozumowań lub wieloetapowych rozwiązań. W początkowej fazie rozwoju LLM technika CoT często wymagała dedykowanych instrukcji w prompcie, aby model wygenerował te kroki. Obecnie wiele zaawansowanych modeli językowych, dzięki swoim architekturze i procesom treningowym, potrafi wykazywać tego typu "rozumowanie" w sposób bardziej intuicyjny, często nawet bez wyraźnego polecenia, jeśli kontekst zadania na to wskazuje. W kontekście IaC, model mógłby najpierw "zastanowić się" nad zależnościami aplikacji, potem nad wymaganiami środowiskowymi i optymalizacjami, a dopiero potem wygenerować kod konfiguracji. CoT poprawia transparentność i debugowalność procesu generowania, a także może zwiększyć poprawność odpowiedzi.
-	\item \textbf{Agent-based prompting:} Ten tryb wykracza poza jednorazowe generowanie odpowiedzi. Model, działając jako "agent", otrzymuje zadanie i może iteracyjnie wykonywać szereg akcji: planować, używać zewnętrznych narzędzi (tzw. "tool calling"), analizować ich wyniki i modyfikować swój plan działania w celu osiągnięcia celu. Podejście agentowe można postrzegać jako ewolucję i rozszerzenie idei Chain-of-Thought, gdzie "myślenie" modelu jest przekształcane w sekwencję interakcji ze światem zewnętrznym i pętle sprzężenia zwrotnego. Agent nie tylko generuje wewnętrzne kroki rozumowania, ale także aktywnie wykorzystuje narzędzia do zbierania danych, weryfikacji hipotez i korygowania swojego działania na podstawie rzeczywistych wyników. Jest to podejście szczególnie efektywne w przypadku złożonych problemów wymagających interakcji ze środowiskiem zewnętrznym oraz adaptacji.
+	\item \textbf{Agent-based prompting:} Ten tryb wykracza poza jednorazowe generowanie odpowiedzi. Model, działając jako "agent", otrzymuje zadanie i może iteracyjnie wykonywać szereg akcji: planować, używać zewnętrznych narzędzi (tzw. "tool calling"), analizować ich wyniki i modyfikować swój plan działania w celu osiągnięcia celu. Podejście agentowe można postrzegać jako ewolucję i rozszerzenie idei Chain-of-Thought, gdzie "myślenie" modelu jest przekształcane w sekwencję interakcji ze światem zewnętrznym i refleksji. Agent nie tylko generuje wewnętrzne kroki rozumowania, ale także aktywnie wykorzystuje narzędzia do zbierania danych, weryfikacji hipotez i korygowania swojego działania na podstawie rzeczywistych wyników. Jest to podejście szczególnie efektywne w przypadku złożonych problemów wymagających interakcji ze środowiskiem zewnętrznym oraz adaptacji.
 \end{itemize}
 
-W kontekście generowania konfiguracji Infrastructure as Code (IaC), zastosowanie podejścia agentowego jest szczególnie uzasadnione z powodu możliwości zastosowania pętli sprzężenia zwrotnego. Generowanie IaC często wymaga wielu prób i korekt, zwłaszcza gdy dąży się do uzyskania poprawnych i bezpiecznych konfiguracji, które są zgodne z rzeczywistym środowiskiem i przestrzegają standardów. W przeciwieństwie do jednorazowych generacji (jak w zero-shot czy few-shot), agent może, na podstawie dostarczonego mu opisu docelowej infrastruktury, wygenerować wstępną wersję konfiguracji (np. Dockerfile). Następnie, kluczowym elementem jest możliwość wykorzystania zewnętrznych narzędzi i interakcji z kontekstem. Agent może na przykład czytać wybrane pliki z repozytorium kodu, aby lepiej zrozumieć strukturę projektu i zależności. Może również sterować swoim wewnętrznym przepływem rozumowania i zakresem czytanego kontekstu. Ponadto, agent jest w stanie próbować budować obraz Docker na podstawie wygenerowanej konfiguracji Dockerfile i sprawdzać, czy proces ten zakończy się powodzeniem. Wyniki tych interakcji – czy to błędy podczas budowania, czy niespójności z oczekiwaniami – są z powrotem przekazywane agentowi. Na podstawie tych informacji, agent może dynamicznie modyfikować swój pierwotny plan lub formułować nowe zapytania do modelu LLM, prosząc o konkretne korekty. Ten cykl generowania, walidacji i korekty może być powtarzany aż do momentu, gdy wygenerowana konfiguracja spełni określone kryteria poprawności i bezpieczeństwa, bądź do wyczerpania ustalonej liczby iteracji. Takie podejście znacząco zwiększa jakość i niezawodność finalnie otrzymanych konfiguracji IaC.
+W kontekście generowania konfiguracji Infrastructure as Code (IaC), zastosowanie podejścia agentowego jest uzasadnione ze względu na możliwość kompleksowego zarządzania kontekstem i procesem generacji. Generowanie IaC często wymaga dostępu do wielu źródeł informacji i precyzyjnego umieszczenia danych w konfiguracji. W przeciwieństwie do jednorazowych generacji (jak w zero-shot czy few-shot), agent może, na podstawie dostarczonego mu opisu docelowej infrastruktury, wygenerować wstępną wersję konfiguracji (np. Dockerfile). Następnie, istotnym elementem jest możliwość wykorzystania zewnętrznych narzędzi do interakcji z kontekstem. Agent może na przykład czytać wybrane pliki z repozytorium kodu, aby lepiej zrozumieć strukturę projektu i zależności. Może również sterować swoim wewnętrznym przepływem rozumowania i zakresem czytanego kontekstu.
 
-W niniejszej pracy magisterskiej zastosowana zostanie właśnie metoda agentowa. Podejście agentowe może być realizowane na różne sposoby, zarówno poprzez bezpośrednie wykorzystanie dedykowanych interfejsów API udostępnianych przez niektóre modele (np. poprzez \textit{tool calling} czy \textit{function calling}), jak i poprzez zastosowanie specjalizowanych frameworków orkiestracyjnych, takich jak \textbf{AutoGen} czy \textbf{LangChain/LangGraph}. W tym badaniu, do implementacji agentów i zarządzania złożonymi przepływami pracy z wykorzystaniem funkcji \textit{tool calling} wybrana została biblioteka LangGraph w języku Python, uzupełniona o funkcjonalności LangChain.
+W niniejszej pracy magisterskiej zastosowana zostanie właśnie metoda agentowa. Podejście agentowe może być realizowane na różne sposoby, zarówno poprzez bezpośrednie wykorzystanie dedykowanych interfejsów API udostępnianych przez niektóre modele (np. poprzez \textit{tool calling} czy \textit{function calling}), jak i poprzez zastosowanie specjalizowanych frameworków orkiestracyjnych, takich jak \textbf{AutoGen} czy \textbf{LangChain/LangGraph}. W tym badaniu, do implementacji agentów i zarządzania złożonymi przepływami pracy z wykorzystaniem funkcji \textit{tool calling} wybrana została biblioteka LangGraph w języku Python, uzupełniona o funkcjonalności LangChain. Rola agenta koncentruje się na efektywnym dostarczaniu kontekstu i zarządzaniu procesem generacji konfiguracji IaC.
 
 \subsection{Narzędzia DevOps: Docker i Kubernetes}
 
-Cel: Opisać narzędzia wykorzystywane do zarządzania środowiskiem uruchomieniowym i ich wpływ na eksperymenty.
+Zarządzanie środowiskami uruchomieniowymi i wdrażanie aplikacji w chmurze opiera się współcześnie na narzędziach takich jak Docker i Kubernetes. Niniejszy podrozdział opisuje te technologie, ich rolę w cyklu DevOps oraz potencjalne pułapki konfiguracyjne, które mogą być generowane przez Large Language Models (LLM). Zrozumienie ich funkcjonalności i typowych błędów jest istotne dla oceny jakości generowanych przez LLM konfiguracji IaC.
 
-Proponowana zawartość:
-	•	Docker:
-	•	    Do czego jest wykorzystywany: uruchamianie lokalnych usług, środowiska testowe i deweloperskie, konteneryzacja narzędzi, konteneryzacja produkcyjnych aplikacji.
-	•	    Jak mozna popelnic bledy
-	•		Warto pokazać typowe błędy, które LLM może popełnić (np. użycie ADD zamiast COPY, brak WORKDIR, użycie latest tagu, brak usuwania zależności po buildzie). To od razu pokazuje, dlaczego ocena bezpieczeństwa i optymalizacji jest tak ważna.
-	•	Kubernetes:
-	•	    Używany z minimalnym zakresem (np. przez Kind, K3s, minikube).
-	•	    Rola w testowaniu konfiguracji i IaC.
-	•		Warto podkreślić, że Kubernetes służy jako środowisko do walidacji runtime wygenerowanych konfiguracji, a nie tylko do ich tworzenia.
-	•	    Jak można popełnić błędy przy generowaniu YAML (niedopasowane zasoby, problemy z dostępnością, błędne konfiguracje).
-	•		Dodaj przykłady: brak liveness/readiness probes, źle skonfigurowane serwisy (np. ClusterIP zamiast NodePort/LoadBalancer), brak PersistentVolumeClaim dla baz danych, zbyt wysokie/niskie limity zasobów, brak kontekstu bezpieczeństwa.
-	•	Dobre i złe praktyki:
-	•	    Przykłady z testów (np. źle ustawione limity zasobów, niepoprawne labele).
-	•   Dodac tu Kaniko czy w technologiach wspierajacych?
-	•	Chyba nie bedzie wykorzystywane jeszcze tutaj, a jedynie w systemie PaaS
+\textbf{Docker} to platforma do tworzenia, wdrażania i uruchamiania aplikacji w kontenerach. Konteneryzacja pozwala na pakowanie aplikacji wraz z jej zależnościami i bibliotekami w izolowane środowiska, co zapewnia spójność działania niezależnie od środowiska docelowego. Docker jest wykorzystywany w wielu obszarach: od uruchamiania lokalnych usług deweloperskich i testowych, przez konteneryzację narzędzi, aż po konteneryzację produkcyjnych aplikacji w złożonych architekturach mikroserwisowych.
+
+Tworzenie plików Dockerfile – deklaratywnych instrukcji do budowania obrazów Docker – wymaga precyzji i znajomości najlepszych praktyk. Modele LLM, generując Dockerfile, mogą popełnić szereg błędów, które wpływają na bezpieczeństwo, wydajność lub poprawne działanie kontenera. Przykłady takich błędów to:
+\begin{itemize}
+\item \textbf{Użycie ADD zamiast COPY:} ADD automatycznie rozpakowuje archiwa i może pobierać pliki z URL, co jest mniej transparentne i może wprowadzać nieoczekiwane zależności lub luki bezpieczeństwa. Preferowane jest jawne COPY dla lokalnych plików.
+\item \textbf{Brak WORKDIR lub jego nieoptymalne użycie:} Nieokreślenie katalogu roboczego lub jego wielokrotne zmienianie może prowadzić do nieczytelnych i nieefektywnych Dockerfile.
+\item \textbf{Użycie tagu latest dla obrazów bazowych:} Obrazy z tagiem latest są zmienne, co prowadzi do braku determinizmu w budowaniu aplikacji. Powoduje to, że ta sama aplikacja może nie budować się w przyszłości w ten sam sposób lub z tym samym obrazem bazowym. Zalecane jest używanie konkretnych wersji obrazów (np. node:20.10-slim).
+\item \textbf{Brak usuwania zbędnych zależności i plików po instalacji:} Pozostawianie pakietów użytych tylko do budowy lub tymczasowych plików zwiększa rozmiar obrazu i powierzchnię ataku (ang. attack surface).
+\item \textbf{Uruchamianie aplikacji jako root:} Domyślne uruchamianie procesów w kontenerze z uprawnieniami roota jest poważną luką bezpieczeństwa.
+\item \textbf{Niewystarczające buforowanie warstw:} Nieoptymalna kolejność instrukcji w Dockerfile może prowadzić do częstego przebudowywania warstw i wydłużenia czasu budowania obrazów.
+\end{itemize}
+
+\textbf{Kubernetes (K8s)} jest systemem do automatyzacji wdrażania, skalowania i zarządzania aplikacjami kontenerowymi. Dzięki deklaratywnemu podejściu, użytkownicy definiują pożądany stan systemu (poprzez manifesty YAML), a Kubernetes dąży do jego utrzymania. W niniejszym badaniu Kubernetes służy przede wszystkim jako środowisko do \textbf{walidacji poprzez uruchomienie} wygenerowanych konfiguracji IaC. Pozwala to na weryfikację, czy manifesty Kubernetes, wygenerowane przez LLM, faktycznie prowadzą do uruchomienia działających aplikacji i czy zachowują się zgodnie z oczekiwaniami, a nie tylko są syntaktycznie poprawne.
+
+Podobnie jak w przypadku Dockerfile, generowanie manifestów Kubernetes przez LLM może prowadzić do szeregu błędów i nieoptymalnych konfiguracji, które mogą wpłynąć na dostępność, bezpieczeństwo lub wydajność aplikacji:
+\begin{itemize}
+\item \textbf{Brak liveness i readiness probes:} Te sondy są kluczowe dla monitorowania stanu kontenerów i zapewnienia wysokiej dostępności. Ich brak może prowadzić do wdrażania niedziałających aplikacji lub błędnego zarządzania cyklem życia poda.
+\item \textbf{Niedopasowane lub błędne zasoby (CPU/Memory limits and requests):} Niewłaściwe ustawienie limitów lub żądań zasobów może prowadzić do problemów z wydajnością aplikacji (throttling), niestabilności klastra (OOMKilled) lub nieefektywnego wykorzystania infrastruktury.
+\item \textbf{Błędne konfiguracje serwisów:} Niepoprawne typy serwisów (np. użycie ClusterIP zamiast NodePort lub LoadBalancer gdy wymagany jest dostęp zewnętrzny) lub brak poprawnej konfiguracji portów może uniemożliwić dostęp do aplikacji.
+\item \textbf{Brak PersistentVolumeClaim (PVC) dla aplikacji stanowych:} Aplikacje wymagające trwałego przechowywania danych (np. bazy danych) bez zdefiniowanego PVC utracą dane po restarcie poda.
+\item \textbf{Niepoprawne użycie ConfigMap i Secret:} Twarde zakodowanie wrażliwych danych bezpośrednio w manifeście zamiast użycia Secret lub nieprawidłowe zamontowanie ConfigMap/Secret.
+\item \textbf{Brak kontekstu bezpieczeństwa (Security Context):} Brak definicji securityContext dla poda lub kontenera, co może prowadzić do uruchamiania aplikacji z niepotrzebnie wysokimi uprawnieniami (np. jako root, z otwartymi portami lub zbyt szerokim dostępem do systemu plików).
+\item \textbf{Niepoprawne etykiety (labels) i selektory (selectors):} Błędy w etykietach mogą uniemożliwić serwisom odnalezienie odpowiednich podów, co prowadzi do niedostępności aplikacji.
+\end{itemize}
+
+Analiza zdolności LLM do unikania wymienionych błędów oraz do generowania efektywnych, bezpiecznych i zoptymalizowanych konfiguracji Dockerfile i manifestów Kubernetes stanowi jeden z głównych obszarów oceny w niniejszej pracy.
 
 
 
 \subsection{Narzędzia do oceny jakości IaC}
 
-Cel: Pokazać narzędzia do analizy i walidacji konfiguracji IaC oraz ich funkcjonalności.
+W kontekście automatycznego generowania konfiguracji Infrastructure as Code (IaC) przez modele językowe (LLM), ważne jest zapewnienie, że wygenerowane konfiguracje są nie tylko poprawne składniowo, ale również bezpieczne, zgodne z najlepszymi praktykami i efektywne. Do tego celu służą wyspecjalizowane narzędzia do analizy i walidacji kodu IaC. Wyniki uzyskane z tych narzędzi będą stanowić podstawę do obiektywnej oceny jakości konfiguracji generowanych przez LLM w dalszej części niniejszej pracy. W niniejszym podrozdziale opisane zostaną dwa wybrane narzędzia, które zostaną użyte w badaniu: Hadolint (dla Dockerfile) i Kube-linter (dla manifestów Kubernetes).
 
-Proponowana zawartość:
-	•	Lista narzędzi:
-	•	    checkov, kube-linter, kube-score, kubeval, terrascan, cloudeval-yaml, iac-eval.
-	•	Opis funkcji i zasad działania:
-	•	    Statyczna analiza, reguły zgodności, walidacja schematów.
-	•	Przykłady outputów:
-	•	    Co zgłaszają narzędzia, jak to interpretować.
-	•	    Zestawienie wyników na tych samych plikach (jeśli masz dane).
-	•		Pokazać kilka błędów mniejszych i większych, podatności itd
+Oba narzędzia działają na zasadzie statycznej analizy kodu, co oznacza, że analizują pliki konfiguracyjne bez konieczności ich uruchamiania lub wdrażania.
 
+Hadolint to narzędzie do lintingu i statycznej analizy plików Dockerfile. Sprawdza zgodność z najlepszymi praktykami, wykrywa potencjalne błędy i luki bezpieczeństwa. Analizuje pliki Dockerfile, stosując zestaw wbudowanych reguł (bazujących na najlepszych praktykach Docker) oraz konfigurowalnych reguł. Wykrywa takie problemy jak błędy składniowe w Dockerfile, użycie przestarzałych lub niebezpiecznych instrukcji, brak optymalizacji warstw, czy potencjalne luki bezpieczeństwa (np. uruchamianie procesów jako root).
 
+Kube-linter to narzędzie do analizy manifestów Kubernetes, wykrywające błędy konfiguracyjne, problemy z bezpieczeństwem i niezgodności z najlepszymi praktykami. Analizuje manifesty Kubernetes (pliki YAML), sprawdzając je pod kątem zgodności z najlepszymi praktykami Kubernetes oraz potencjalnych błędów konfiguracyjnych. Wykrywa takie problemy jak brak liveness i readiness probes, nieprawidłowe limity zasobów, problemy z konfiguracją serwisów, czy potencjalne luki bezpieczeństwa (np. brak securityContext).
 
-\subsection{Środowisko eksperymentalne}
+Poniżej przedstawiono przykładowe fragmenty wyjścia z Hadolint i Kube-linter, ilustrujące typowe problemy wykrywane przez te narzędzia:
 
-Cel: Przedstawić infrastrukturę testową i środowisko, w którym uruchamiane będą eksperymenty.
+\begin{lstlisting}[caption={Przykład wyników Hadolint},label={lst:example-hadolint},captionpos=b,columns=fullflexible, breaklines=true]
+Dockerfile:3 DL3003 Use WORKDIR to set the working directory for subsequent instructions.
+Dockerfile:5 DL3018 Pin versions in apk add. Instead of `apk add <package>` use
+`apk add <package>=<version>`.
+Dockerfile:12 DL3005 Do not use apt-get upgrade
+\end{lstlisting}
 
-Proponowana zawartość:
-	•	Charakterystyka środowiska:
-	•	    Lokalna maszyna, Docker Desktop, Kubectl, Kind, Python, LangChain, LangGraph, OpenRouter?.
-	•		Jasno określ, co jest na maszynie lokalnej, a co jest usługą zewnętrzną (OpenRouter to API gateway).
-	•	Parametry techniczne:
-	•	    RAM, CPU, ewentualna obecność GPU, ograniczenia związane z lokalnością - dlaczego lokalnie?
-	•	Zasady testowania:
-	•	    Jak wygląda testowanie przez API: limity żądań, obsługa błędów, wersje modeli.
-	•	    Korzystanie z narzędzi CLI lub SDK.
+W powyższym przykładzie, przedstawionym w wycinku \ref{lst:example-hadolint}, Hadolint zgłasza brak instrukcji WORKDIR, brak przypiętych wersji pakietów w apk add oraz użycie apt-get upgrade.
 
+\begin{lstlisting}[caption={Przykład wyników Kube-linter},label={lst:example-kubelinter},captionpos=b,columns=fullflexible, breaklines=true]
+[ERROR] Pod: hello-pod, object name hello-pod: container "hello" has no livenessProbe.
+[ERROR] Pod: hello-pod, object name hello-pod: container "hello" has no readinessProbe.
+[WARNING] Service: hello-service, object name hello-service: service "hello-service" should
+set spec.type to "ClusterIP"
+\end{lstlisting}
 
+W tym przykładzie, zaprezentowanym w wycinku \ref{lst:example-kubelinter}, Kube-linter zgłasza brak livenessProbe i readinessProbe w definicji Poda oraz sugeruje zmianę typu Serwisu na ClusterIP.
 
-\subsection{Technologie wspierające (do rozważenia jako część środowiska eksperymentalnego)}
+Interpretacja wyników z obu narzędzi wymaga zrozumienia specyfiki Dockerfile i manifestów Kubernetes. Ważne jest, aby skupić się na błędach o wysokim poziomie ważności (np. problemy z bezpieczeństwem, brak sond) oraz na ostrzeżeniach, które mogą prowadzić do problemów z wydajnością lub stabilnością aplikacji. Wyjścia z tych narzędzi zostaną wykorzystane w dalszej części pracy do obiektywnej oceny jakości generowanych konfiguracji IaC.
 
-Alternatywa 1: Zostawić jako osobny rozdział z wyraźnym celem: technologie pomocnicze ułatwiające pracę.
+\subsection{Środowisko eksperymentalne i technologie wspierające}
 
-Alternatywa 2: Zmergować z poprzednim podrozdziałem jako „środowisko eksperymentalne i wspierające technologie”.
+Eksperymenty zostały przeprowadzone na lokalnej stacji roboczej, którą stanowi komputer MacBook Air 13" z procesorem Apple M4 i 16 GB pamięci RAM. Ważne jest, że w środowisku tym nie wykorzystywano lokalnie żadnych kart graficznych (GPU) do inferencji modeli językowych. Wszystkie interakcje z modelami LLM odbywały się wyłącznie za pośrednictwem zewnętrznych interfejsów API.
 
-Zawartość:
-	•	Język Python:
-	•	    Używane biblioteki (np. requests, openai, langchain, pydantic, git, docker-py itd.).
-	•	Narzędzia pomocnicze:
-	•	    Kind, Lens, VSCode, Docker CLI, kubectl, LangSmith, LangFuse, Promptfoo, Kaniko.
-	•		LangSmith, LangFuse, Promptfoo: To jest bardzo ważne! Są to narzędzia do ewaluacji i zarządzania promptami/LLM. Koniecznie je opisz krótko i wyjaśnij, jak pomogły w Twoich badaniach (np. do monitorowania interakcji z LLM, testowania promptów, porównywania ich skuteczności). To pokazuje zaawansowane podejście do inżynierii promptów.
-	•	Rola:
-	•	    Obsługa eksperymentów, monitorowanie, automatyzacja.
+Do zarządzania kontenerami i środowiskami uruchomieniowymi wykorzystano następujące narzędzia:
+\begin{itemize}
+	\item \textbf{Docker Desktop:} Używany do uruchamiania kontenerów oraz do budowania obrazów Docker na podstawie generowanych plików Dockerfile. Docker Desktop służył jako podstawowe środowisko konteneryzacji.
+	\item \textbf{Kind (Kubernetes in Docker):} Lekki klaster Kubernetes uruchamiany w kontenerach Docker. Kind posłużył jako środowisko do walidacji wygenerowanych manifestów Kubernetes. Pozwoliło to na weryfikację, czy aplikacje faktycznie uruchamiają się i działają poprawnie w środowisku Kubernetes.
+\end{itemize}
 
+Cała logika sterowania eksperymentami, w tym implementacja agentów, wywoływanie narzędzi, walidacja i zbieranie wyników, została zrealizowana przy użyciu języka \textbf{Python w wersji 3.12}. Wykorzystane biblioteki Python obejmowały:
+\begin{itemize}
+	\item \textbf{LangChain i LangGraph:} Te frameworki stanowiły podstawę do budowy architektury agentowej, zarządzania przepływami konwersacji z LLM oraz integrowania wywołań narzędzi (tool calling).
+	\item \textbf{Docker SDK for Python (docker):} Umożliwiała programistyczną interakcję z Docker Daemon, w tym budowanie obrazów i zarządzanie kontenerami.
+	\item \textbf{Kubernetes Python Client (kubernetes):} Służyła do programistycznej interakcji z API Kubernetes, umożliwiając wdrażanie manifestów i sprawdzanie stanu zasobów.
+	\item \textbf{Pydantic:} Wykorzystywana do walidacji danych i definiowania schematów wejścia/wyjścia dla funkcji i narzędzi używanych przez agentów, co zwiększyło niezawodność i bezpieczeństwo interakcji.
+	\item Inne standardowe biblioteki Python do obsługi danych, operacji na plikach oraz generowania raportów.
+\end{itemize}
 
+Interakcje z modelami LLM odbywały się za pośrednictwem dwóch głównych ścieżek:
+\begin{itemize}
+	\item \textbf{Bezpośrednie API:} W przypadku modeli komercyjnych, które oferują własne dedykowane API (np. OpenAI GPT-4, Google Gemini Pro, Anthropic Claude), korzystano z ich natywnych interfejsów programistycznych.
+	\item \textbf{OpenRouter:} Dla modeli open-source (np. Mistral, Meta Llama, DeepSeek), które często nie posiadają własnych komercyjnych API lub ich infrastruktura do hostingu jest zbyt kosztowna dla pojedynczego badacza, wykorzystano platformę \textbf{OpenRouter}. OpenRouter działa jako brama API (API Gateway), agregująca dostęp do wielu modeli od różnych dostawców za pośrednictwem ujednoliconego interfejsu API, co znacząco ułatwiało testowanie różnorodnych modeli bez konieczności integracji z wieloma odrębnymi API.
+\end{itemize}
+
+W trakcie prowadzenia badań i eksperymentów wykorzystano również szereg narzędzi wspomagających, które były cenne dla efektywnego zarządzania procesem badawczym i analizą wyników:
+\begin{itemize}
+	\item \textbf{LangSmith:} Niezwykle cenne narzędzie do monitorowania, debugowania i ewaluacji łańcuchów agentów zbudowanych w LangChain/LangGraph. LangSmith pozwalał na wizualizację poszczególnych kroków rozumowania agenta, jego interakcji z narzędziami oraz wywołań API do LLM. Było to kluczowe do analizy, dlaczego agent podjął taką, a nie inną decyzję, i gdzie popełnił błąd, co znacząco przyspieszyło proces optymalizacji promptów i logiki agenta.
+	\item \textbf{Lens IDE:} Graficzne narzędzie (IDE) do zarządzania klastrami Kubernetes, ułatwiające monitorowanie stanu podów, serwisów i innych zasobów w trakcie walidacji.
+\end{itemize}
+Wspomniane narzędzia pomocnicze były integralną częścią środowiska badawczego, umożliwiając nie tylko uruchamianie eksperymentów, ale przede wszystkim ich efektywne monitorowanie, analizę i optymalizację.
