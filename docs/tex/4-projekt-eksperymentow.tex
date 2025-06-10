@@ -73,7 +73,7 @@ W szczególności, prompt opisuje:
     \item ogólny kontekst działania — agent specjalizuje się w pracy z repozytoriami Git oraz w generowaniu plików konfiguracyjnych dla Docker i Kubernetes,
     \item zestaw dostępnych narzędzi (clone\_repo, ls, get\_file\_content, write\_file, prepare\_repo\_tree), wraz z instrukcją, kiedy i jak należy z nich korzystać,
     \item reguły nazewnictwa, np. sposób generowania nazw hostów w manifestach Ingress na podstawie nazw repozytoriów (\texttt{<repo-name>.rasztabiga.me}),
-    \item dobre praktyki DevOps, których należy przestrzegać przy tworzeniu Dockerfile (np. nieuruchamianie kontenerów jako root, odpowiedni base image) oraz manifestów Kubernetes (np. liveness/readiness probes, podział na StatefulSets i Deployments, unikanie deklaracji namespace),
+    \item dobre praktyki DevOps, których należy przestrzegać przy tworzeniu Dockerfile (np. nieuruchamianie kontenerów jako root, odpowiedni obraz bazowy) oraz manifestów Kubernetes (np. liveness/readiness probes, podział na StatefulSets i Deployments, unikanie deklaracji namespace),
     \item sposób zakończenia pracy — model powinien zakończyć generację komunikatem zawierającym słowo \texttt{DONE}.
 \end{itemize}
 
