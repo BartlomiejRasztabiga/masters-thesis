@@ -2,7 +2,7 @@
 
 \section{Przegląd technologii i narzędzi}
 
-Celem tego rozdziału jest przedstawienie najważniejszych technologii i narzędzi, stanowiących podstawę niniejszego badania. Szczególny nacisk położony zostanie na duże modele językowe (LLM), opis ich architektur oraz ich zastosowanie w generowaniu konfiguracji Infrastructure as Code (IaC). Ponadto, omówione zostaną istotne narzędzia DevOps, takie jak Docker i Kubernetes, niezbędne w zarządzaniu środowiskami uruchomieniowymi, oraz narzędzia służące do walidacji i oceny jakości generowanego kodu IaC. Rozdział zawiera także opis środowiska eksperymentalnego oraz wykorzystywanych technologii wspierających automatyzację i monitorowanie eksperymentów.
+Celem tego rozdziału jest przedstawienie najważniejszych technologii i narzędzi, stanowiących podstawę niniejszego badania. Szczególny nacisk położony zostanie na duże modele językowe (LLM), opis ich architektur oraz ich zastosowanie w generowaniu konfiguracji wdrożeniowej. Ponadto, omówione zostaną istotne narzędzia DevOps, takie jak Docker i Kubernetes, niezbędne w zarządzaniu środowiskami uruchomieniowymi, oraz narzędzia służące do walidacji i oceny jakości generowanego kodu IaC. Rozdział zawiera także opis środowiska eksperymentalnego oraz wykorzystywanych technologii wspierających automatyzację i monitorowanie eksperymentów.
 
 \subsection{Modele językowe wykorzystywane w badaniu}
 
@@ -15,9 +15,11 @@ Modele komercyjne dostępne przez API zazwyczaj cechują się wysoką wydajnośc
 Wybrane do badania modele komercyjne to:
 
 \begin{itemize}
-    \item \textbf{OpenAI GPT-4.1}, \textbf{GPT-4o} oraz \textbf{O3}: Najnowsze flagowe modele OpenAI. GPT-4.1 charakteryzuje się udoskonalonymi możliwościami generowania i rozumienia złożonego kodu oraz zoptymalizowanymi funkcjami integracji z narzędziami (tool calling). GPT-4o, model multimodalny, oferuje wysoką wydajność, elastyczność oraz wszechstronne możliwości interakcji. O3 zapewnia optymalne połączenie wydajności, szybkości oraz efektywności kosztowej.
-    \item \textbf{Anthropic Claude Opus 4}, \textbf{Sonnet 4} oraz \textbf{Haiku 3.5}: Zaawansowane modele Anthropic, cenione za bezpieczeństwo, zgodność z najlepszymi praktykami AI Safety oraz obsługę długich kontekstów i precyzyjnych instrukcji. Opus 4 to najbardziej zaawansowana wersja, Sonnet 4 równoważy wydajność z szybkością, a Haiku 3.5 skupia się na efektywności kosztowej i szybkości działania.
-    \item \textbf{Google Gemini 2.5 Pro} i \textbf{2.5 Flash}: Modele Google z rozszerzonym oknem kontekstu, dedykowane do analizy obszernych repozytoriów kodu i dokumentacji. Wersja Pro oferuje wyjątkową pojemność kontekstu i wysoką wydajność, podczas gdy wersja Flash jest zoptymalizowana pod kątem szybszego działania przy niższych kosztach operacyjnych.
+    \item \textbf{OpenAI GPT‑4.1} \cite{gpt41} oraz \textbf{o3} \cite{o3}: Modele OpenAI z 2025 roku. GPT‑4.1 (wprowadzony 14 kwietnia 2025) to model zoptymalizowany pod kątem kodowania, obsługi długiego kontekstu (do 1 miliona tokenów), z szybszym działaniem i niższymi kosztami w porównaniu do GPT‑4o . Rodzina \textbf{o3}, w tym o3 mini, prezentuje głębokie możliwości logicznego rozumowania – stosowane razem w narzędziach takich jak CodeRabbit dla szybszego i bardziej niezawodnego sprawdzania kodu.
+    
+    \item \textbf{Anthropic Claude Opus 4} \cite{claude_opus4} oraz \textbf{Sonnet 4} \cite{claude_sonnet4}: Modele z rodziny Claude 4, opublikowane w maju 2025 roku. Opus 4 to najbardziej zaawansowana wersja, oferująca tryb \textit{extended thinking} i kontekst do 200 tys. tokenów. Sonnet 4 stanowi kompromis między mocą obliczeniową a szybkością i kosztami, również obsługuje rozszerzony kontekst i precyzyjne instrukcje.
+
+    \item \textbf{Google Gemini 2.5 Pro} \cite{gemini25_pro} i \textbf{2.5 Flash} \cite{gemini25_flash}: Modele wprowadzone w marcu i czerwcu 2025 roku. Gemini 2.5 Pro cechuje się wyjątkowo dużym kontekstem (do 1 miliona tokenów), zoptymalizowanym do złożonych zadań, takich jak analiza kodu i dokumentacji. Wersja 2.5 Flash to lżejszy wariant, skoncentrowany na szybszym działaniu i niższych kosztach operacyjnych.
 \end{itemize}
 
 Modele open-source stanowią atrakcyjną alternatywę, oferując pełną kontrolę, możliwość uruchomienia na własnej infrastrukturze oraz brak dodatkowych opłat za każde zapytanie. Ich wydajność zależy przede wszystkim od dostępności zasobów sprzętowych, a aktywny rozwój społeczności przyczynia się do ciągłej optymalizacji i pojawiania się coraz bardziej zaawansowanych wersji.
@@ -25,12 +27,14 @@ Modele open-source stanowią atrakcyjną alternatywę, oferując pełną kontrol
 Wybrane do badania modele open-source to:
 
 \begin{itemize}
-    \item \textbf{Mistral Medium} oraz \textbf{Codestral}: Modele od firmy Mistral AI, zoptymalizowane pod kątem efektywnego generowania kodu i ogólnego rozumienia kontekstu technicznego. Codestral specjalizuje się w obsłudze złożonych zadań programistycznych, oferując wysoką efektywność przy umiarkowanych wymaganiach sprzętowych.
-    \item \textbf{Meta Llama 4 Maverick} oraz \textbf{Llama 4 Scout}: Najnowsze modele open-source od Meta, które stanowią istotny punkt odniesienia w dziedzinie rozwoju sztucznej inteligencji. Maverick wyróżnia się wysokimi osiągami i zaawansowanymi funkcjami, natomiast Scout zapewnia dobrą wydajność przy bardziej ograniczonych zasobach sprzętowych, umożliwiając łatwiejsze wdrożenie w praktycznych zastosowaniach.
-    \item \textbf{DeepSeek V3}: Model typu Mixture-of-Experts (MoE), łączący wysoką jakość generowania kodu z dużą efektywnością obliczeniową. DeepSeek V3 wyróżnia się zdolnością do dynamicznego aktywowania tylko części parametrów modelu przy każdym zapytaniu, co pozwala osiągnąć korzystny kompromis między jakością a kosztami obliczeń.
+    \item \textbf{Mistral Medium} \cite{mistral_medium_3} oraz \textbf{Codestral} \cite{codestral}: Modele opracowane przez firmę Mistral AI. Mistral Medium 3 (maj 2025) to ogólnego przeznaczenia model o wysokiej wydajności, zoptymalizowany do pracy zarówno w chmurze, jak i lokalnie (on-premise). Charakteryzuje się bardzo korzystnym stosunkiem jakości do kosztów, osiągając wyniki porównywalne z modelami komercyjnymi przy niższych wymaganiach infrastrukturalnych. Codestral (maj 2024) to 22-miliardowy model open-weight, wyspecjalizowany w generowaniu i uzupełnianiu kodu źródłowego w ponad 80 językach programowania, wspierający m.in. kontekst 32k tokenów.
+
+    \item \textbf{Meta Llama 4 Scout} oraz \textbf{Llama 4 Maverick} \cite{llama4}: Oficjalne modele typu Mixture-of-Experts (MoE) \cite{masoudnia_mixture_2014} udostępnione przez firmę Meta w kwietniu 2025 roku. Llama 4 Scout to model z aktywacją 17 miliardów parametrów i maksymalnym kontekstem 10 milionów tokenów. Llama 4 Maverick to większy wariant, w którym aktywowanych jest również 17 miliardów parametrów, ale model korzysta z architektury 128 ekspertów i posiada łącznie około 400 miliardów parametrów, przy oknie kontekstu rzędu 1 miliona tokenów. Oba modele zostały wydane na otwartej licencji, wspierają zarówno zadania językowe, jak i multimodalne.
+
+    \item \textbf{DeepSeek V3} \cite{deepseek_v3}: Model zaprezentowany przez DeepSeek AI w grudniu 2024 roku. DeepSeek V3 to otwarty model typu MoE o łącznej liczbie 670 miliardów parametrów, z których 37 miliardów jest aktywowanych przy każdym zapytaniu. Model osiąga wysoką przepustowość (do 60 tokenów na sekundę) i został wytrenowany na 14,8 bilionach tokenów. W benchmarkach przewyższa m.in. GPT-4 Turbo i Claude 3.5 w zadaniach kodowych, matematycznych i językowych. Obsługuje kontekst 32k tokenów i został udostępniony na licencji OpenRAIL.
 \end{itemize}
 
-Wszystkie wymienione modele reprezentują aktualny szczyt osiągnięć w dziedzinie dużych modeli językowych (LLM). Wybrane zostały przede wszystkim ze względu na ich potwierdzone zdolności do generowania wysokiej jakości kodu oraz wsparcie dla funkcji \textit{tool calling}. Funkcje te umożliwiają bezpośrednią integrację modeli z zewnętrznymi narzędziami lub usługami poprzez dedykowane mechanizmy API bądź platformy orkiestracyjne, takie jak LangChain czy LangGraph. W proponowanym w tej pracy podejściu, funkcje \textit{tool calling} będą odgrywać znaczącą rolę w zarządzaniu kontekstem i procesie generowania konfiguracji Infrastructure as Code (IaC).
+Wszystkie wymienione modele reprezentują aktualny szczyt osiągnięć w dziedzinie dużych modeli językowych (LLM). Wybrane zostały przede wszystkim ze względu na ich potwierdzone zdolności do generowania wysokiej jakości kodu oraz wsparcie dla funkcji \textit{tool calling}. Funkcje te umożliwiają bezpośrednią integrację modeli z zewnętrznymi narzędziami lub usługami poprzez dedykowane mechanizmy API bądź platformy agentowe, takie jak LangChain czy LangGraph. W proponowanym w tej pracy podejściu, funkcje \textit{tool calling} będą odgrywać znaczącą rolę w zarządzaniu kontekstem i procesie generowania konfiguracji.
 
 \subsection{Architektury i charakterystyka}
 
@@ -52,18 +56,16 @@ Poniższa tabela \ref{tab:llm-characteristic} przedstawia ogólne charakterystyk
 \begin{tabular}{| c | c | c | c |} \hline
 \textbf{Dostawca} & \textbf{Model} & \textbf{Parametry (mld)} & \textbf{Okno kontekstu (tokeny)} \\ \hline\hline
 OpenAI & GPT-4.1 & - & 1M \\ \hline
-OpenAI & GPT-4o & - & 128k \\ \hline
 OpenAI & O3 & - & 200k \\ \hline
 Anthropic & Claude Opus 4 & - & 200k \\ \hline
 Anthropic & Claude Sonnet 4 & - & 200k \\ \hline
-Anthropic & Claude Haiku 3.5 & - & 200k \\ \hline
 Google & Gemini 2.5 Pro & - & 1M \\ \hline
 Google & Gemini 2.5 Flash & - & 1M \\ \hline
-Mistral AI & Mistral Medium & 7 & 32k \\ \hline
-Mistral AI & Codestral & 22 & 32k–64k \\ \hline
-Meta & Llama 4 Maverick & 70 & 128k \\ \hline
-Meta & Llama 4 Scout & 8 & 128k \\ \hline
-DeepSeek & DeepSeek V3 & 236 & 128k \\ \hline
+Mistral AI & Mistral Medium & 12.9 & 32k \\ \hline
+Mistral AI & Codestral & 22 & 32k \\ \hline
+Meta & Llama 4 Maverick & ~400 & 1M \\ \hline
+Meta & Llama 4 Scout & 17 & 10M \\ \hline
+DeepSeek & DeepSeek V3 & 671 & 128k \\ \hline
 \end{tabular}
 \end{table}
 
@@ -73,7 +75,7 @@ W ramach niniejszego badania modele językowe są wykorzystywane w trybie infere
 
 Integracja z wybranymi modelami LLM odbywa się głównie za pośrednictwem ich bezpośrednich interfejsów programistycznych (API). Takie podejście gwarantuje dostęp do najnowszych wersji modeli, pełną kontrolę nad parametrami zapytania oraz optymalne czasy odpowiedzi. Należy jednak pamiętać o potencjalnych ograniczeniach wynikających z limitów API oraz braku możliwości bezpośredniej modyfikacji wewnętrznej architektury lub kodu źródłowego w przypadku zamkniętych modeli komercyjnych.
 
-Warto zaznaczyć, że chociaż inferencję dla wielu modeli open-source (takich jak te z serii LLaMA czy Mistral) można przeprowadzać lokalnie, wymaga to znacznych zasobów sprzętowych (zwłaszcza mocnego procesora graficznego - GPU). Ze względu na ograniczenia sprzętowe środowiska eksperymentalnego, w niniejszej pracy nie zastosowano lokalnej inferencji. Zamiast tego, dla modeli komercyjnych korzystano z ich dedykowanych API, natomiast dla modeli open-source, które nie oferują własnego API, wykorzystana została platforma OpenRouter, która agreguje dostęp do wielu modeli od różnych dostawców, oferując ujednolicony interfejs.
+Warto zaznaczyć, że chociaż inferencję dla wielu modeli open-source (takich jak te z serii LLaMA czy Mistral) można przeprowadzać lokalnie, wymaga to znacznych zasobów sprzętowych (zwłaszcza mocnego procesora graficznego - GPU). Ze względu na ograniczenia sprzętowe środowiska eksperymentalnego, w niniejszej pracy nie zastosowano lokalnej inferencji. Zamiast tego, dla modeli komercyjnych korzystano z ich dedykowanych API, natomiast dla modeli open-source, które nie oferują własnego API, wykorzystana została platforma OpenRouter \cite{openrouter}, która agreguje dostęp do wielu modeli od różnych dostawców, oferując ujednolicony interfejs.
 
 \subsection{Tryby promptowania}
 
@@ -86,13 +88,13 @@ Efektywność wykorzystania dużych modeli językowych w dużej mierze zależy o
 	\item \textbf{Agent-based prompting:} Ten tryb wykracza poza jednorazowe generowanie odpowiedzi. Model, działając jako "agent", otrzymuje zadanie i może iteracyjnie wykonywać szereg akcji: planować, używać zewnętrznych narzędzi (tzw. "tool calling"), analizować ich wyniki i modyfikować swój plan działania w celu osiągnięcia celu. Podejście agentowe można postrzegać jako ewolucję i rozszerzenie idei Chain-of-Thought, gdzie "myślenie" modelu jest przekształcane w sekwencję interakcji ze światem zewnętrznym i refleksji. Agent nie tylko generuje wewnętrzne kroki rozumowania, ale także aktywnie wykorzystuje narzędzia do zbierania danych, weryfikacji hipotez i korygowania swojego działania na podstawie rzeczywistych wyników. Jest to podejście szczególnie efektywne w przypadku złożonych problemów wymagających interakcji ze środowiskiem zewnętrznym oraz adaptacji.
 \end{itemize}
 
-W kontekście generowania konfiguracji Infrastructure as Code (IaC), zastosowanie podejścia agentowego jest uzasadnione ze względu na możliwość kompleksowego zarządzania kontekstem i procesem generacji. Generowanie IaC często wymaga dostępu do wielu źródeł informacji i precyzyjnego umieszczenia danych w konfiguracji. W przeciwieństwie do jednorazowych generacji (jak w zero-shot czy few-shot), agent może, na podstawie dostarczonego mu opisu docelowej infrastruktury, wygenerować wstępną wersję konfiguracji (np. Dockerfile). Następnie, istotnym elementem jest możliwość wykorzystania zewnętrznych narzędzi do interakcji z kontekstem. Agent może na przykład czytać wybrane pliki z repozytorium kodu, aby lepiej zrozumieć strukturę projektu i zależności. Może również sterować swoim wewnętrznym przepływem rozumowania i zakresem czytanego kontekstu.
+W kontekście generowania konfiguracji wdrożeniowej, zastosowanie podejścia agentowego jest uzasadnione ze względu na możliwość kompleksowego zarządzania kontekstem i procesem generacji. Generowanie IaC często wymaga dostępu do wielu źródeł informacji i precyzyjnego umieszczenia danych w konfiguracji. W przeciwieństwie do jednorazowych generacji (jak w zero-shot czy few-shot), agent może, na podstawie dostarczonego mu opisu docelowej infrastruktury, wygenerować wstępną wersję konfiguracji (np. Dockerfile). Następnie, istotnym elementem jest możliwość wykorzystania zewnętrznych narzędzi do interakcji z kontekstem. Agent może na przykład czytać wybrane pliki z repozytorium kodu, aby lepiej zrozumieć strukturę projektu i zależności. Może również sterować swoim wewnętrznym przepływem rozumowania i zakresem czytanego kontekstu.
 
 W niniejszej pracy magisterskiej zastosowana zostanie właśnie metoda agentowa. Podejście agentowe może być realizowane na różne sposoby, zarówno poprzez bezpośrednie wykorzystanie dedykowanych interfejsów API udostępnianych przez niektóre modele (np. poprzez \textit{tool calling} czy \textit{function calling}), jak i poprzez zastosowanie specjalizowanych frameworków orkiestracyjnych, takich jak \textbf{AutoGen} czy \textbf{LangChain/LangGraph}. W tym badaniu, do implementacji agentów i zarządzania złożonymi przepływami pracy z wykorzystaniem funkcji \textit{tool calling} wybrana została biblioteka LangGraph w języku Python, uzupełniona o funkcjonalności LangChain. Rola agenta koncentruje się na efektywnym dostarczaniu kontekstu i zarządzaniu procesem generacji konfiguracji IaC.
 
 \subsection{Narzędzia DevOps: Docker i Kubernetes}
 
-Zarządzanie środowiskami uruchomieniowymi i wdrażanie aplikacji w chmurze opiera się współcześnie na narzędziach takich jak Docker i Kubernetes. Niniejszy podrozdział opisuje te technologie, ich rolę w cyklu DevOps oraz potencjalne pułapki konfiguracyjne, które mogą być generowane przez Large Language Models (LLM). Zrozumienie ich funkcjonalności i typowych błędów jest istotne dla oceny jakości generowanych przez LLM konfiguracji IaC.
+Zarządzanie środowiskami uruchomieniowymi i wdrażanie aplikacji w chmurze opiera się współcześnie na narzędziach takich jak Docker i Kubernetes. Niniejszy podrozdział opisuje te technologie, ich rolę w cyklu DevOps oraz potencjalne pułapki konfiguracyjne, które mogą być generowane przez duże modele językowe (LLM). Zrozumienie ich funkcjonalności i typowych błędów jest istotne dla oceny jakości generowanych przez LLM konfiguracji IaC.
 
 \textbf{Docker} to platforma do tworzenia, wdrażania i uruchamiania aplikacji w kontenerach. Konteneryzacja pozwala na pakowanie aplikacji wraz z jej zależnościami i bibliotekami w izolowane środowiska, co zapewnia spójność działania niezależnie od środowiska docelowego. Docker jest wykorzystywany w wielu obszarach: od uruchamiania lokalnych usług deweloperskich i testowych, przez konteneryzację narzędzi, aż po konteneryzację produkcyjnych aplikacji w złożonych architekturach mikroserwisowych.
 
@@ -125,7 +127,7 @@ Analiza zdolności LLM do unikania wymienionych błędów oraz do generowania ef
 
 \subsection{Narzędzia do oceny jakości IaC}
 
-W kontekście automatycznego generowania konfiguracji Infrastructure as Code (IaC) przez modele językowe (LLM), ważne jest zapewnienie, że wygenerowane konfiguracje są nie tylko poprawne składniowo, ale również bezpieczne, zgodne z najlepszymi praktykami i efektywne. Do tego celu służą wyspecjalizowane narzędzia do analizy i walidacji kodu IaC. Wyniki uzyskane z tych narzędzi będą stanowić podstawę do obiektywnej oceny jakości konfiguracji generowanych przez LLM w dalszej części niniejszej pracy. W niniejszym podrozdziale opisane zostaną dwa wybrane narzędzia, które zostaną użyte w badaniu: Hadolint (dla Dockerfile) i Kube-linter (dla manifestów Kubernetes).
+W kontekście automatycznego generowania konfiguracji Infrastructure as Code (IaC) przez modele językowe (LLM), ważne jest zapewnienie, że wygenerowane konfiguracje są nie tylko poprawne składniowo, ale również bezpieczne, zgodne z najlepszymi praktykami i efektywne. Do tego celu służą wyspecjalizowane narzędzia do analizy i walidacji kodu IaC. Wyniki uzyskane z tych narzędzi będą stanowić podstawę do obiektywnej oceny jakości konfiguracji generowanych przez LLM w dalszej części niniejszej pracy. W niniejszym podrozdziale opisane zostaną dwa wybrane narzędzia, które zostaną użyte w badaniu: Hadolint \cite{hadolint} (dla Dockerfile) i Kube-linter \cite{kubelinter} (dla manifestów Kubernetes).
 
 Oba narzędzia działają na zasadzie statycznej analizy kodu, co oznacza, że analizują pliki konfiguracyjne bez konieczności ich uruchamiania lub wdrażania.
 
@@ -161,16 +163,16 @@ Eksperymenty zostały przeprowadzone na lokalnej stacji roboczej, którą stanow
 
 Do zarządzania kontenerami i środowiskami uruchomieniowymi wykorzystano następujące narzędzia:
 \begin{itemize}
-	\item \textbf{Docker Desktop:} Używany do uruchamiania kontenerów oraz do budowania obrazów Docker na podstawie generowanych plików Dockerfile. Docker Desktop służył jako podstawowe środowisko konteneryzacji.
-	\item \textbf{Kind (Kubernetes in Docker):} Lekki klaster Kubernetes uruchamiany w kontenerach Docker. Kind posłużył jako środowisko do walidacji wygenerowanych manifestów Kubernetes. Pozwoliło to na weryfikację, czy aplikacje faktycznie uruchamiają się i działają poprawnie w środowisku Kubernetes.
+	\item \textbf{Docker Desktop:} \cite{docker_desktop} Używany do uruchamiania kontenerów oraz do budowania obrazów Docker na podstawie generowanych plików Dockerfile. Docker Desktop służył jako podstawowe środowisko konteneryzacji.
+	\item \textbf{Kind (Kubernetes in Docker):} \cite{kind} Lekki klaster Kubernetes uruchamiany w kontenerach Docker. Kind posłużył jako środowisko do walidacji wygenerowanych manifestów Kubernetes. Pozwoliło to na weryfikację, czy aplikacje faktycznie uruchamiają się i działają poprawnie w środowisku Kubernetes.
 \end{itemize}
 
 Cała logika sterowania eksperymentami, w tym implementacja agentów, wywoływanie narzędzi, walidacja i zbieranie wyników, została zrealizowana przy użyciu języka \textbf{Python w wersji 3.12}. Wykorzystane biblioteki Python obejmowały:
 \begin{itemize}
-	\item \textbf{LangChain i LangGraph:} Te frameworki stanowiły podstawę do budowy architektury agentowej, zarządzania przepływami konwersacji z LLM oraz integrowania wywołań narzędzi (tool calling).
-	\item \textbf{Docker SDK for Python (docker):} Umożliwiała programistyczną interakcję z Docker Daemon, w tym budowanie obrazów i zarządzanie kontenerami.
-	\item \textbf{Kubernetes Python Client (kubernetes):} Służyła do programistycznej interakcji z API Kubernetes, umożliwiając wdrażanie manifestów i sprawdzanie stanu zasobów.
-	\item \textbf{Pydantic:} Wykorzystywana do walidacji danych i definiowania schematów wejścia/wyjścia dla funkcji i narzędzi używanych przez agentów, co zwiększyło niezawodność i bezpieczeństwo interakcji.
+	\item \textbf{LangChain i LangGraph:} \cite{langchain} \cite{langgraph} Te frameworki stanowiły podstawę do budowy architektury agentowej, zarządzania przepływami konwersacji z LLM oraz integrowania wywołań narzędzi (tool calling).
+	\item \textbf{Docker SDK for Python (docker):} \cite{docker_sdk_python} Umożliwiała programistyczną interakcję z Docker Daemon, w tym budowanie obrazów i zarządzanie kontenerami.
+	\item \textbf{Kubernetes Python Client (kubernetes):} \cite{kubernetes_sdk_python} Służyła do programistycznej interakcji z API Kubernetes, umożliwiając wdrażanie manifestów i sprawdzanie stanu zasobów.
+	\item \textbf{Pydantic:} \cite{pydantic} Wykorzystywana do walidacji danych i definiowania schematów wejścia/wyjścia dla funkcji i narzędzi używanych przez agentów, co zwiększyło niezawodność i bezpieczeństwo interakcji.
 	\item Inne standardowe biblioteki Python do obsługi danych, operacji na plikach oraz generowania raportów.
 \end{itemize}
 
@@ -182,7 +184,7 @@ Interakcje z modelami LLM odbywały się za pośrednictwem dwóch głównych śc
 
 W trakcie prowadzenia badań i eksperymentów wykorzystano również szereg narzędzi wspomagających, które były cenne dla efektywnego zarządzania procesem badawczym i analizą wyników:
 \begin{itemize}
-	\item \textbf{LangSmith:} Niezwykle cenne narzędzie do monitorowania, debugowania i ewaluacji łańcuchów agentów zbudowanych w LangChain/LangGraph. LangSmith pozwalał na wizualizację poszczególnych kroków rozumowania agenta, jego interakcji z narzędziami oraz wywołań API do LLM. Było to kluczowe do analizy, dlaczego agent podjął taką, a nie inną decyzję, i gdzie popełnił błąd, co znacząco przyspieszyło proces optymalizacji promptów i logiki agenta.
-	\item \textbf{Lens IDE:} Graficzne narzędzie (IDE) do zarządzania klastrami Kubernetes, ułatwiające monitorowanie stanu podów, serwisów i innych zasobów w trakcie walidacji.
+	\item \textbf{LangSmith:} \cite{langsmith} Niezwykle cenne narzędzie do monitorowania, debugowania i ewaluacji łańcuchów agentów zbudowanych w LangChain/LangGraph. LangSmith pozwalał na wizualizację poszczególnych kroków rozumowania agenta, jego interakcji z narzędziami oraz wywołań API do LLM. Było to kluczowe do analizy, dlaczego agent podjął taką, a nie inną decyzję, i gdzie popełnił błąd, co znacząco przyspieszyło proces optymalizacji promptów i logiki agenta.
+	\item \textbf{Lens IDE:} \cite{lens_ide} Graficzne narzędzie (IDE) do zarządzania klastrami Kubernetes, ułatwiające monitorowanie stanu podów, serwisów i innych zasobów w trakcie walidacji.
 \end{itemize}
 Wspomniane narzędzia pomocnicze były integralną częścią środowiska badawczego, umożliwiając nie tylko uruchamianie eksperymentów, ale przede wszystkim ich efektywne monitorowanie, analizę i optymalizację.
