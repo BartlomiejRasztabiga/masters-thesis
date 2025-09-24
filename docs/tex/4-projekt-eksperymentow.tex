@@ -3,7 +3,7 @@
 
 \subsection{Cel i hipotezy badawcze}
 
-Celem eksperymentu jest ocena zdolności wybranych dużych modeli językowych (LLM) do automatycznego generowania poprawnych i funkcjonalnych konfiguracji wdrożeniowych — plików \texttt{Dockerfile} oraz manifestów Kubernetes — na podstawie zawartości repozytorium aplikacji. Eksperyment ma na celu sprawdzenie, czy nowoczesne modele językowe są w stanie zastąpić lub wspomóc inżyniera DevOps w zadaniach konfiguracyjnych, działając wyłącznie na podstawie struktury i zawartości kodu źródłowego.
+Celem eksperymentów jest ocena zdolności wybranych dużych modeli językowych (LLM) do automatycznego generowania poprawnych i funkcjonalnych konfiguracji wdrożeniowych — plików \texttt{Dockerfile} oraz manifestów Kubernetes — na podstawie zawartości repozytorium aplikacji. Eksperymenty mają na celu sprawdzenie, czy nowoczesne modele językowe są w stanie zastąpić lub wspomóc inżyniera DevOps w zadaniach konfiguracyjnych, działając wyłącznie na podstawie struktury i zawartości kodu źródłowego.
 
 W ramach eksperymentu porównywane będą odpowiedzi różnych modeli LLM w tych samych warunkach — przy identycznych promptach, na tych samych repozytoriach testowych, z zachowaniem stałych parametrów decyzyjnych (takich jak \texttt{temperature = 0}) — co pozwoli na rzetelną ocenę ich jakości oraz przydatności w kontekście automatyzacji procesów DevOps.
 
@@ -29,7 +29,7 @@ W dalszej częsci pracy szczegółowo opisano przypadki testowe, metodykę przep
 
 \subsection{Zestawienie przypadków testowych}
 
-W celu przeprowadzenia rzetelnych i porównywalnych eksperymentów przygotowano cztery spreparowane repozytoria aplikacji, reprezentujące zróżnicowane scenariusze wdrożeniowe spotykane w praktyce DevOps. Każde z nich zostało opracowane w taki sposób, aby oddzielnie uwidocznić konkretne aspekty i wyzwania związane z generowaniem konfiguracji. Dla zachowania spójności środowiskowej, wszystkie aplikacje zostały napisane w języku Python z wykorzystaniem frameworka FastAPI.
+W celu przeprowadzenia rzetelnych i porównywalnych eksperymentów przygotowano cztery spreparowane repozytoria aplikacji, reprezentujące zróżnicowane scenariusze wdrożeniowe spotykane w praktyce DevOps. Każde z nich zostało opracowane w taki sposób, aby oddzielnie uwidocznić konkretne aspekty i wyzwania związane z generowaniem konfiguracji. Dla zachowania spójności środowiskowej, wszystkie aplikacje zostały napisane w języku Python z wykorzystaniem frameworka FastAPI \cite{fastapi}.
 
 \begin{itemize}
     \item \textbf{Repozytorium 1: Aplikacja bezstanowa bez zależności}\\
@@ -37,7 +37,7 @@ W celu przeprowadzenia rzetelnych i porównywalnych eksperymentów przygotowano 
     \textit{Repozytorium:} \url{https://github.com/run-rasztabiga-me/poc1-fastapi}
 
     \item \textbf{Repozytorium 2: Aplikacja ze stanową bazą danych}\\
-    Drugi przypadek rozszerza pierwszy o lokalną bazę danych PostgreSQL, którą należy skonfigurować w środowisku uruchomieniowym. Testuje on zdolność modelu do rozpoznania zależności między usługami i poprawnego zdefiniowania ich konfiguracji oraz połączeń sieciowych. Ze względu na obecność komponentu stanowego, model powinien wygenerować dodatkowe zasoby Kubernetes, takie jak \texttt{StatefulSet} dla bazy danych, \texttt{PersistentVolumeClaim} dla przechowywania danych oraz dedykowany \texttt{Service} zapewniający stabilną komunikację z backendem.\\
+    Drugi przypadek rozszerza pierwszy o lokalną bazę danych PostgreSQL, którą należy skonfigurować w środowisku uruchomieniowym. Testuje on zdolność modelu do rozpoznania zależności między usługami i poprawnego zdefiniowania ich konfiguracji oraz połączeń sieciowych. Ze względu na obecność komponentu stanowego, model powinien wygenerować dodatkowe zasoby Kubernetes, takie jak \texttt{StatefulSet} dla bazy danych, \texttt{PersistentVolumeClaim} dla przechowywania danych oraz dedykowany \texttt{Service} zapewniający komunikację z serwerem.\\
     \textit{Repozytorium:} \url{https://github.com/run-rasztabiga-me/poc2-fastapi}
 
     \item \textbf{Repozytorium 3: Aplikacja typu frontend + backend + baza danych}\\
@@ -45,19 +45,21 @@ W celu przeprowadzenia rzetelnych i porównywalnych eksperymentów przygotowano 
     \textit{Repozytorium (w przygotowaniu):} \url{https://github.com/run-rasztabiga-me/poc3-fastapi}
 
     \item \textbf{Repozytorium 4: Prosty system mikroserwisowy}\\
-    Najbardziej złożony przypadek spośród spreparowanych — system składający się z kilku niezależnych usług (np. dwie mikrousługi + bazy danych + API gateway + kolejka komunikatów). Pozwala przetestować zdolność modelu do tworzenia manifestów Kubernetes z wykorzystaniem wielu zasobów (Deployment, Service, Ingress, itd.).\\
+    Najbardziej złożony przypadek spośród spreparowanych — system składający się z kilku niezależnych usług (np. trzy mikroserwisy + bazy danych + API gateway + kolejka komunikatów). Pozwala on przetestować zdolność modelu do tworzenia manifestów Kubernetes z wykorzystaniem wielu zasobów oraz relacji między nimi.\\
     \textit{Repozytorium (w przygotowaniu):} \url{https://github.com/run-rasztabiga-me/poc4-fastapi}
 \end{itemize}
 
+
+\bigskip
 Chociaż głównym celem jest przetestowanie modeli na spreparowanych repozytoriach o znanej strukturze, rozważane jest także rozszerzenie eksperymentu o zestaw rzeczywistych, publicznie dostępnych projektów z serwisu GitHub. Wykorzystanie niekontrolowanych repozytoriów pozwoliłoby ocenić skuteczność agentów LLM w mniej kontrolowanych, realistycznych warunkach — np. w obecności niekompletnej dokumentacji, niespójnej struktury katalogów czy niestandardowych zależności. Tego typu testy zwiększyłyby reprezentatywność eksperymentu oraz umożliwiłyby uogólnienie wyników na szerszą klasę projektów spotykanych w praktyce.
 
 \subsection{Metodyka generacji i promptowania}
 
 Proces generowania konfiguracji został oparty na architekturze agenta zbudowanego przy użyciu biblioteki LangGraph. Agent ten pełni rolę autonomicznego wykonawcy zadania – analizuje zawartość repozytorium, buduje plan działania, a następnie generuje pliki \texttt{Dockerfile} oraz manifesty Kubernetes zgodnie z ustalonym schematem.
 
-Wszystkie testowane modele językowe (LLM) otrzymują ten sam zestaw danych wejściowych, tj. identyczny prompt oraz to samo repozytorium testowe. Zapewnia to warunki umożliwiające rzetelne porównanie jakości generowanych rezultatów pomiędzy modelami. Dodatkowo, w celu zwiększenia deterministyczności wyników, generacja odbywa się przy użyciu stałych parametrów wywołania, w szczególności:
+Wszystkie testowane modele językowe otrzymują ten sam zestaw danych wejściowych, tj. identyczny prompt oraz to samo repozytorium testowe. Zapewnia to warunki umożliwiające rzetelne porównanie jakości generowanych rezultatów pomiędzy modelami. Dodatkowo, w celu zwiększenia deterministyczności wyników, generacja odbywa się przy użyciu stałych parametrów wywołania, w szczególności:
 \begin{itemize}
-    \item \texttt{temperature = 0},
+    \item \texttt{temperature = 0} (model zawsze wybiera najbardziej prawdopodobne słowo, co skutkuje powtarzalnymi wynikami),
     \item \texttt{n = 1} (pojedyncza próba generacji).
 \end{itemize}
 
@@ -73,21 +75,21 @@ W szczególności, prompt opisuje:
     \item ogólny kontekst działania — agent specjalizuje się w pracy z repozytoriami Git oraz w generowaniu plików konfiguracyjnych dla Docker i Kubernetes,
     \item zestaw dostępnych narzędzi (clone\_repo, ls, get\_file\_content, write\_file, prepare\_repo\_tree), wraz z instrukcją, kiedy i jak należy z nich korzystać,
     \item reguły nazewnictwa, np. sposób generowania nazw hostów w manifestach Ingress na podstawie nazw repozytoriów (\texttt{<repo-name>.rasztabiga.me}),
-    \item dobre praktyki DevOps, których należy przestrzegać przy tworzeniu Dockerfile (np. nieuruchamianie kontenerów jako root, odpowiedni obraz bazowy) oraz manifestów Kubernetes (np. liveness/readiness probes, podział na StatefulSets i Deployments, unikanie deklaracji namespace),
+    \item dobre praktyki DevOps, których należy przestrzegać przy tworzeniu Dockerfile (np. nieuruchamianie kontenerów jako root, odpowiedni obraz bazowy) oraz manifestów Kubernetes (np. sondy liveness/readiness, podział na StatefulSets i Deployments, używanie ConfigMaps i Secrets do przechowywania konfiguracji),
     \item sposób zakończenia pracy — model powinien zakończyć generację komunikatem zawierającym słowo \texttt{DONE}.
 \end{itemize}
 
-Prompt ma formę deklaratywną i został tak sformułowany, aby maksymalnie zredukować niejednoznaczność interpretacyjną oraz zwiększyć powtarzalność wyników. Uwzględniono także konkretne przykłady, jak np. schemat tworzenia nazw hostów czy oczekiwane struktury plików. Dzięki temu możliwe jest zbadanie, czy model potrafi stosować się do wytycznych nawet bez dodatkowych przykładów few-shot.
+Prompt ma formę deklaratywną i został tak sformułowany, aby maksymalnie zredukować niejednoznaczność interpretacyjną oraz zwiększyć powtarzalność wyników. Uwzględniono także konkretne przykłady, jak np. schemat tworzenia nazw hostów czy oczekiwane struktury plików. Dzięki temu możliwe jest zbadanie, czy model potrafi stosować się do wytycznych nawet bez dodatkowych przykładów "few-shot".
 
 \bigskip
 \noindent
 \textbf{Funkcje i narzędzia dostępne dla agenta:}  
-Agent LLM korzysta z zestawu funkcji (tooli) umożliwiających interakcję z zawartością repozytorium oraz generowanie nowych plików konfiguracyjnych. Zostały one zaimplementowane jako funkcje w języku Python i zarejestrowane w architekturze LangGraph za pomocą dekoratora \texttt{@tool}. Udostępniane narzędzia to:
+Agent LLM korzysta z zestawu funkcji (narzędzi) umożliwiających interakcję z zawartością repozytorium oraz generowanie nowych plików konfiguracyjnych. Zostały one zaimplementowane jako funkcje w języku Python i zarejestrowane w architekturze LangGraph za pomocą dekoratora \texttt{@tool}. Udostępniane narzędzia to:
 
 \begin{itemize}
     \item \texttt{clone\_repo(repo\_url)} – klonuje wskazane repozytorium Git i usuwa zbędne pliki oraz katalogi (np. \texttt{.git}, \texttt{README.md}, pliki CI/CD itp.),
     
-    \item \texttt{prepare\_repo\_tree()} – przygotowuje tekstowy widok struktury repozytorium z rozmiarem plików (na podstawie przejścia po katalogach i analizie zawartości),
+    \item \texttt{prepare\_repo\_tree()} – przygotowuje tekstowy widok struktury repozytorium z rozmiarem plików (na podstawie przejścia po katalogach i analizie zawartości; podobnie do UNIXowego narzędzia \texttt{tree}),
     
     \item \texttt{get\_file\_content(file\_path)} – odczytuje treść wskazanego pliku, podanego względem katalogu głównego repozytorium,
     
@@ -98,21 +100,26 @@ Agent LLM korzysta z zestawu funkcji (tooli) umożliwiających interakcję z zaw
 
 Wszystkie narzędzia operują na lokalnej kopii repozytorium sklonowanej do katalogu roboczego. Agent nie ma dostępu do żadnych narzędzi wykonawczych (jak budowanie obrazów Docker czy uruchamianie klastrów), a jego zadaniem jest jedynie wygenerowanie odpowiednich plików konfiguracyjnych na podstawie zawartości repozytorium. Informacje o narzędziach oraz zasady pracy agenta są zawarte w systemowym promptcie (załącznik~\ref{att:prompt}).
 
-\bigskip
-\noindent
-
 \subsection{Proces testowy}
 
 Całość procesu podzielona jest na dwie główne fazy: generacji oraz ewaluacji.  
 
+\noindent
+\textbf{Faza generacji:}
+
 \begin{enumerate}
-    \item Przygotowanie środowiska roboczego.
-    \item Sklonowanie repozytorium aplikacji.
-    \item Generowanie pliku lub plików \texttt{Dockerfile} (w zależności od liczby komponentów) przez agenta LLM.
-    \item Generowanie manifestów Kubernetes (\texttt{.yaml}) dla odpowiednich zasobów: \texttt{Deployment}, \texttt{Service}, \texttt{Ingress}, \texttt{ConfigMap}, \texttt{Secret} itp.
+    \item Przygotowanie środowiska roboczego,
+    \item Sklonowanie repozytorium aplikacji,
+    \item Przygotowanie struktury katalogów i plików w repozytorium,
+    \item Odczytanie zawartości wybranych plików źródłowych,
+    \item Generowanie pliku lub plików \texttt{Dockerfile} (w zależności od liczby komponentów) przez agenta LLM,
+    \item Generowanie manifestów Kubernetes (\texttt{.yaml}) dla odpowiednich zasobów.
 \end{enumerate}
 
-Na tym etapie rola agenta LLM się kończy. Kolejne kroki realizowane są automatycznie w celu oceny jakości wygenerowanej konfiguracji:
+Na tym etapie rola agenta LLM się kończy. Kolejne kroki realizowane są automatycznie w celu oceny jakości wygenerowanej konfiguracji.
+
+\noindent
+\textbf{Faza ewaluacji:}
 
 \begin{enumerate}[resume]
     \item Weryfikacja syntaktycznej poprawności plików \texttt{Dockerfile}.
@@ -149,7 +156,7 @@ Wszystkie eksperymenty będą rejestrowane z użyciem narzędzi do śledzenia se
 \centering
 \caption{Zestaw rejestrowanych metryk podczas eksperymentu}
 \label{tab:metrics}
-\begin{tabular}{|p{6cm}|p{8cm}|}
+\begin{tabularx}{\textwidth}{|X|X|}
 \hline
 \textbf{Metryka} & \textbf{Opis} \\
 \hline
@@ -177,5 +184,5 @@ Czy aplikacja działa poprawnie (runtime) & Sprawdzenie dostępności aplikacji 
 \hline
 Różnice między przebiegami & Porównanie plików wygenerowanych w 3 przebiegach w celu oceny deterministyczności \\
 \hline
-\end{tabular}
+\end{tabularx}
 \end{table}
