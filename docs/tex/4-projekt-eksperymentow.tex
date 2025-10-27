@@ -102,7 +102,7 @@ Wszystkie narzędzia operują na lokalnej kopii repozytorium sklonowanej do kata
 
 \subsection{Proces testowy}
 
-Całość procesu podzielona jest na dwie główne fazy: generacji oraz ewaluacji.  
+Całość procesu podzielona jest na dwie główne fazy: generacji oraz ewaluacji.
 
 \noindent
 \textbf{Faza generacji:}
@@ -121,6 +121,8 @@ Na tym etapie rola agenta LLM się kończy. Kolejne kroki realizowane są automa
 \noindent
 \textbf{Faza ewaluacji:}
 
+Proces ewaluacji został zaimplementowany jako modułowy potok walidacyjny składający się z niezależnych kroków. Każdy krok jest realizowany przez dedykowany komponent:
+
 \begin{enumerate}[resume]
     \item Weryfikacja syntaktycznej poprawności plików \texttt{Dockerfile}.
     \item Statyczna analiza \texttt{Dockerfile} za pomocą narzędzia Hadolint.
@@ -128,10 +130,39 @@ Na tym etapie rola agenta LLM się kończy. Kolejne kroki realizowane są automa
     \item Weryfikacja syntaktycznej poprawności wygenerowanych manifestów Kubernetes.
     \item Statyczna analiza manifestów Kubernetes za pomocą narzędzia Kube-linter.
     \item Próba zaaplikowania manifestów Kubernetes w środowisku Kind.
-    \item Walidacja runtime — sprawdzenie, czy aplikacja uruchamia się poprawnie w klastrze (np. czy jej endpointy są dostępne przez load balancer).
+    \item Walidacja w czasie wykonania — sprawdzenie, czy aplikacja uruchamia się poprawnie w klastrze (np. czy jej punkty końcowe są dostępne).
 \end{enumerate}
 
-Aby ograniczyć wpływ losowych fluktuacji i zmienności w zachowaniu modeli (mimo stosowania parametrów promujących deterministyczność, takich jak \texttt{temperature = 0}), cały proces generacji i ewaluacji będzie powtarzany trzykrotnie dla każdej pary \textit{(model, repozytorium)}. Pozwoli to na wykrycie ewentualnych niepowtarzalnych wyników generacji oraz uśrednienie metryk w dalszej analizie porównawczej.
+Modułowa architektura potoku walidacyjnego umożliwia łatwe dodawanie nowych kroków walidacji oraz niezależne testowanie poszczególnych komponentów. Wszystkie wywołania zewnętrznych narzędzi są realizowane przez dedykowaną abstrakcję zarządzającą wykonywaniem poleceń, która rejestruje czasy wykonania, poziomy ważności błędów oraz dostępność narzędzi dla celów raportowania.
+
+\subsection{Orkiestracja eksperymentów}
+
+W celu ułatwienia przeprowadzania i zarządzania eksperymentami zaimplementowano dedykowaną warstwę orkiestracyjną. System zarządzania eksperymentami umożliwia definiowanie złożonych scenariuszy testowych w formie strukturalnych plików konfiguracyjnych (YAML), które określają macierze kombinacji model × repozytorium, liczbę powtórzeń, warianty promptów oraz wspólne ustawienia środowiskowe.
+
+Kluczowe cechy systemu orkiestracji:
+\begin{itemize}
+    \item \textbf{Deklaratywna konfiguracja eksperymentów} — wszystkie parametry eksperymentu (modele, repozytoria, prompty, liczba powtórzeń) są definiowane w plikach YAML,
+    \item \textbf{Bezstanowy ewaluator} — komponent ewaluatora konfiguracji pozostaje bezstanowy, co umożliwia jego wielokrotne użycie w różnych kontekstach,
+    \item \textbf{Wsparcie dla wariantów promptów} — możliwość porównywania różnych instrukcji systemowych poprzez referencje do alternatywnych plików promptów,
+    \item \textbf{Agregacja metryk} — automatyczne zbieranie i utrwalanie wyników w formatach przyjaznych dla analizy (CSV, JSON),
+    \item \textbf{Izolacja przestrzeni roboczych} — każdy przebieg eksperymentu operuje we własnym, unikalnym katalogu roboczym, co zapobiega konfliktom i zapewnia czystość środowiska testowego.
+\end{itemize}
+
+Aby ograniczyć wpływ losowych fluktuacji i zmienności w zachowaniu modeli (mimo stosowania parametrów promujących deterministyczność, takich jak \texttt{temperature = 0}), cały proces generacji i ewaluacji jest powtarzany wielokrotnie dla każdej kombinacji \textit{(model, repozytorium, wariant prompta)}. Liczba powtórzeń jest konfigurowana w pliku eksperymentu. Pozwala to na wykrycie ewentualnych niepowtarzalnych wyników generacji oraz uśrednienie metryk w dalszej analizie porównawczej.
+
+\subsection{Panel sterowania eksperymentami}
+
+W celu usprawnienia zarządzania eksperymentami oraz monitorowania ich postępu zaimplementowano dedykowany interfejs webowy. Panel sterowania umożliwia:
+
+\begin{itemize}
+    \item \textbf{Wybór i uruchamianie konfiguracji eksperymentów} — graficzny wybór plików konfiguracyjnych YAML i inicjowanie przebiegów testowych,
+    \item \textbf{Monitorowanie postępu w czasie rzeczywistym} — wyświetlanie aktualnego statusu eksperymentu, liczby ukończonych i pozostałych przebiegów oraz szacowanego czasu do zakończenia,
+    \item \textbf{Przeglądanie wyników} — dostęp do podsumowań eksperymentów z podziałem na modele, repozytoria i warianty promptów,
+    \item \textbf{Filtrowanie i agregacja danych} — możliwość szybkiego porównania wyników między różnymi konfiguracjami oraz identyfikacji problemów,
+    \item \textbf{Dostęp do artefaktów} — bezpośredni wgląd w wygenerowane pliki konfiguracyjne oraz raporty z walidacji.
+\end{itemize}
+
+Interfejs umożliwia również wyświetlanie zagregowanych statystyk per prompt, co ułatwia analizę wpływu różnych instrukcji systemowych na jakość generowanych konfiguracji. Panel został zaimplementowany jako aplikacja webowa w języku Python z wykorzystaniem biblioteki Streamlit, co zapewnia responsywny i intuicyjny interfejs użytkownika.
 
 \subsection{Kryteria oceny i metryki}
 

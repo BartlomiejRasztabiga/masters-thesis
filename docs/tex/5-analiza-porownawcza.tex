@@ -1,23 +1,75 @@
 \clearpage % Rozdziały zaczynamy od nowej strony.
 \section{Analiza porównawcza modeli}
 
-TODO
+W niniejszym rozdziale przedstawiono wyniki przeprowadzonych eksperymentów, w których testowano zdolność wybranych modeli językowych do generowania konfiguracji Docker i Kubernetes na podstawie zawartości repozytoriów aplikacji. Analiza obejmuje zarówno aspekty ilościowe (metryki wydajności, poprawności i bezpieczeństwa), jak i jakościowe (zachowanie modeli, typy popełnianych błędów, deterministyczność wyników).
 
+\subsection{Przegląd przeprowadzonych eksperymentów}
 
+[TODO: Opis konfiguracji eksperymentów, liczba przebiegów, kombinacje modeli i repozytoriów]
 
-\textbf{Przykładowe obserwacje i napotkane problemy:}
-Omówienie ogólnego zachowania modeli LLM podczas generacji.
-Analiza typowych problemów napotkanych podczas eksperymentów, takich jak:
+Eksperymenty przeprowadzono zgodnie z metodologią opisaną w rozdziale 4, wykorzystując system orkiestracji eksperymentów umożliwiający automatyczne wykonanie serii testów dla różnych kombinacji modeli, repozytoriów i wariantów promptów. Każda konfiguracja została przetestowana wielokrotnie w celu oceny powtarzalności wyników.
+
+Testowane repozytoria:
 \begin{itemize}
-    \item Ograniczenia długości kontekstu (tokenów),
-    \item Błędy w rozumieniu struktury repozytorium,
-    \item Wpływ długości i precyzji prompta na jakość generacji,
-    \item Deterministyczność generowanych plików,
-    \item Niekonsekwencje w nazwach plików / usług.
+    \item \textbf{poc1-fastapi} — aplikacja bezstanowa bez zależności,
+    \item \textbf{poc2-fastapi} — aplikacja ze stanową bazą danych PostgreSQL,
+    \item \textbf{poc3-fastapi} — architektura wielowarstwowa (frontend + backend + baza danych).
 \end{itemize}
 
-\textbf{Wyniki testów:}
+Testowane modele obejmowały zarówno komercyjne rozwiązania (OpenAI: GPT-5, GPT-5 Mini, o3; Anthropic: Claude Sonnet 4.5, Claude Haiku 4.5, Claude Opus 4.1; Google: Gemini 2.5 Pro, Gemini 2.5 Flash), jak i modele open-source (Qwen 3, DeepSeek R1, DeepSeek V3.2, GLM 4.6, Mistral Medium, Meta Llama 4 Maverick, Meta Llama 4 Scout).
 
-\textbf{Analiza porównawcza modeli?:}
+\subsection{Metodyka analizy}
 
-\textbf{Wnioski?:}
+[TODO: Opis metryk i metod analizy wyników]
+
+Dla każdego przebiegu eksperymentu zebrano następujące kategorie metryk:
+\begin{itemize}
+    \item \textbf{Metryki wydajnościowe} — liczba tokenów wejściowych i wyjściowych, czas generacji, liczba wywołań narzędzi,
+    \item \textbf{Metryki poprawności} — poprawność składniowa plików Dockerfile i manifestów Kubernetes, powodzenie budowy obrazów Docker, powodzenie wdrożenia w klastrze Kubernetes,
+    \item \textbf{Metryki bezpieczeństwa i jakości} — liczba i poziomy ważności błędów wykrytych przez Hadolint i Kube-linter,
+    \item \textbf{Metryki walidacji uruchomieniowej} — dostępność aplikacji po wdrożeniu, poprawność działania punktów końcowych API.
+\end{itemize}
+
+Wyniki zostały zagregowane i przeanalizowane z wykorzystaniem statystyk opisowych oraz porównań między modelami dla poszczególnych typów repozytoriów.
+
+\subsection{Wyniki testów poprawności składniowej}
+
+[TODO: Tabela z wynikami poprawności składniowej dla każdego modelu i repozytorium]
+
+\subsection{Wyniki testów budowy i wdrożenia}
+
+[TODO: Analiza powodzenia budowy obrazów Docker i wdrożenia w Kubernetes]
+
+\subsection{Analiza bezpieczeństwa i zgodności z dobrymi praktykami}
+
+[TODO: Zestawienie liczby błędów wykrytych przez Hadolint i Kube-linter per model]
+
+\subsection{Analiza wydajności generacji}
+
+[TODO: Porównanie czasów generacji, zużycia tokenów i liczby wywołań narzędzi]
+
+\subsection{Deterministyczność wyników}
+
+[TODO: Analiza różnic między wielokrotnymi przebiegami dla tych samych konfiguracji]
+
+\subsection{Przykładowe obserwacje i napotkane problemy}
+
+[TODO: Opis specyficznych zachowań modeli podczas eksperymentów]
+
+W trakcie przeprowadzania eksperymentów zaobserwowano szereg charakterystycznych zachowań oraz typowych problemów napotkanych przez modele LLM podczas generacji konfiguracji:
+
+\begin{itemize}
+    \item \textbf{Ograniczenia długości kontekstu} — niektóre modele o mniejszych oknach kontekstowych miały trudności z przetworzeniem dużych repozytoriów zawierających wiele plików,
+    \item \textbf{Błędy w rozumieniu struktury repozytorium} — modele czasami niepoprawnie interpretowały zależności między komponentami lub pomijały kluczowe pliki konfiguracyjne,
+    \item \textbf{Wpływ długości i precyzji prompta na jakość generacji} — bardziej szczegółowe instrukcje systemowe prowadziły do lepszej zgodności z dobrymi praktykami, jednak zbyt długie prompty mogły powodować "rozmycie uwagi" modelu,
+    \item \textbf{Deterministyczność generowanych plików} — mimo ustawienia parametru \texttt{temperature = 0}, niektóre modele wykazywały niewielkie różnice w kolejnych przebiegach, szczególnie w przypadkach wymagających długich sekwencji interakcji z narzędziami,
+    \item \textbf{Niekonsekwencje w nazwach plików i usług} — modele czasami stosowały różne konwencje nazewnictwa w obrębie tej samej konfiguracji, co mogło prowadzić do problemów z integracją komponentów.
+\end{itemize}
+
+\subsection{Analiza porównawcza modeli}
+
+[TODO: Szczegółowe porównanie modeli komercyjnych vs open-source, modeli ogólnych vs wyspecjalizowanych w kodzie]
+
+\subsection{Wnioski z analizy}
+
+[TODO: Podsumowanie najważniejszych odkryć, identyfikacja najlepiej i najgorzej radzących sobie modeli, rekomendacje dotyczące wyboru modelu w zależności od przypadku użycia]
