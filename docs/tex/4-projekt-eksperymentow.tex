@@ -41,16 +41,18 @@ W celu przeprowadzenia rzetelnych i porównywalnych eksperymentów przygotowano 
     \textit{Repozytorium:} \url{https://github.com/run-rasztabiga-me/poc2-fastapi}
 
     \item \textbf{Repozytorium 3: Aplikacja typu frontend + backend + baza danych}\\
-    Przypadek bardziej złożonej architektury, w której występują co najmniej trzy komponenty: frontend (np. aplikacja SPA), backend (np. aplikacja FastAPI) oraz baza danych. Test ma na celu ocenę, czy modele potrafią wygenerować konfiguracje obejmujące zależności między wieloma kontenerami i usługami.\\
-    \textit{Repozytorium (w przygotowaniu):} \url{https://github.com/run-rasztabiga-me/poc3-fastapi}
+    Przypadek bardziej złożonej architektury, w której występują co najmniej trzy komponenty: frontend (aplikacja SPA), backend (aplikacja FastAPI) oraz baza danych. Test ma na celu ocenę, czy modele potrafią wygenerować konfiguracje obejmujące zależności między wieloma kontenerami i usługami.\\
+    \textit{Repozytorium:} \url{https://github.com/run-rasztabiga-me/poc3-fastapi}
 
     \item \textbf{Repozytorium 4: Prosty system mikroserwisowy}\\
-    Najbardziej złożony przypadek spośród spreparowanych — system składający się z kilku niezależnych usług (np. trzy mikroserwisy + bazy danych + API gateway + kolejka komunikatów). Pozwala on przetestować zdolność modelu do tworzenia manifestów Kubernetes z wykorzystaniem wielu zasobów oraz relacji między nimi.\\
-    \textit{Repozytorium (w przygotowaniu):} \url{https://github.com/run-rasztabiga-me/poc4-fastapi}
+    Najbardziej złożony przypadek spośród spreparowanych — system składający się z kilku niezależnych usług (trzy mikroserwisy + bazy danych + kolejka komunikatów). Pozwala on przetestować zdolność modelu do tworzenia manifestów Kubernetes z wykorzystaniem wielu zasobów oraz relacji między nimi.\\
+    \textit{Repozytorium:} \url{https://github.com/run-rasztabiga-me/poc4-fastapi}
 \end{itemize}
 
 
 \bigskip
+TODO
+
 Chociaż głównym celem jest przetestowanie modeli na spreparowanych repozytoriach o znanej strukturze, rozważane jest także rozszerzenie eksperymentu o zestaw rzeczywistych, publicznie dostępnych projektów z serwisu GitHub. Wykorzystanie niekontrolowanych repozytoriów pozwoliłoby ocenić skuteczność agentów LLM w mniej kontrolowanych, realistycznych warunkach — np. w obecności niekompletnej dokumentacji, niespójnej struktury katalogów czy niestandardowych zależności. Tego typu testy zwiększyłyby reprezentatywność eksperymentu oraz umożliwiłyby uogólnienie wyników na szerszą klasę projektów spotykanych w praktyce.
 
 \subsection{Metodyka generacji i promptowania}
@@ -181,7 +183,11 @@ Ocena jakości wygenerowanych plików została oparta na zestawie kryteriów obe
 \noindent
 \textbf{Zbierane metryki eksperymentalne}
 
-Wszystkie eksperymenty będą rejestrowane z użyciem narzędzi do śledzenia sesji (np. LangSmith), umożliwiających analizę danych technicznych i porównanie zachowania modeli. Tabela \ref{tab:metrics} przedstawia zestaw metryk, które będą zbierane dla każdego przebiegu:
+Przebiegi eksperymentów rejestrują dodatkowe metryki wykonawcze (czas odpowiedzi, liczba tokenów, rozkład wywołań narzędzi). Tabela \ref{tab:metrics} przedstawia zestaw metryk rejestrowanych dla każdego przebiegu.
+
+Na podstawie listy błędów i ostrzeżeń moduł oceny wylicza wyniki cząstkowe dla plików Docker oraz manifestów Kubernetes przy użyciu modelu agregacji ocen opartego na wagach fazowych. Model ten przypisuje różne wagi ważności poszczególnym fazom walidacji — fazy krytyczne dla funkcjonalności (składnia, budowa obrazu, aplikowanie do klastra) mają wyższe wagi (35–40\%) niż weryfikacja dobrych praktyk przez lintery (20–25\%).
+
+Każde wykryte zagadnienie pomniejsza wynik fazy o wartość zależną od jego powagi: błąd (\textit{ERROR}) odejmuje 15 punktów, ostrzeżenie (\textit{WARNING}) — 5 punktów, a informacja (\textit{INFO}) — 1 punkt, przy bazowym wyniku 100 punktów dla każdej fazy. Wynik komponentu (Docker lub Kubernetes) stanowi średnią ważoną wyników jego faz, a wynik całościowy (\textit{overall\_score}) agreguje komponenty według wag: Docker (35\%), Kubernetes (40\%) oraz środowisko uruchomieniowe (25\%). Model zapewnia powtarzalność poprzez deterministyczne wagi oraz konsekwentne przypisywanie priorytetów błędom składniowym i funkcjonalnym nad sugestiami stylistycznymi. Struktura pozwala także na generowanie szczegółowych raportów z rozbiciem na poszczególne fazy, co ułatwia diagnostykę i porównywanie modeli.
 
 \begin{table}[H]
 \centering
@@ -212,8 +218,6 @@ Błędy Kube-linter & Liczba i typy wykrytych niezgodności z dobrymi praktykami
 Czy manifesty aplikują się poprawnie & Wynik wdrożenia aplikacji do klastra Kind \\
 \hline
 Czy aplikacja działa poprawnie (runtime) & Sprawdzenie dostępności aplikacji (np. przez \texttt{curl} lub testy endpointów) \\
-\hline
-Różnice między przebiegami & Porównanie plików wygenerowanych w 3 przebiegach w celu oceny deterministyczności \\
 \hline
 \end{tabularx}
 \end{table}
