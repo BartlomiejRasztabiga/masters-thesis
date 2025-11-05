@@ -3,24 +3,32 @@
 
 \subsection{Cel i hipotezy badawcze}
 
-Celem eksperymentów jest ocena zdolności wybranych dużych modeli językowych (LLM) do automatycznego generowania poprawnych i funkcjonalnych konfiguracji wdrożeniowych — plików \texttt{Dockerfile} oraz manifestów Kubernetes — na podstawie zawartości repozytorium aplikacji. Eksperymenty mają na celu sprawdzenie, czy nowoczesne modele językowe są w stanie zastąpić lub wspomóc inżyniera DevOps w zadaniach konfiguracyjnych, działając wyłącznie na podstawie struktury i zawartości kodu źródłowego.
+Celem eksperymentów jest ocena możliwości autonomicznego generowania konfiguracji Infrastructure as Code przez agenty oparte na dużych modelach językowych, ze szczególnym uwzględnieniem poprawności, bezpieczeństwa oraz niezawodności procesu. Eksperymenty mają na celu sprawdzenie, czy nowoczesne modele językowe są w stanie w pełni autonomicznie — bez ingerencji człowieka — wygenerować funkcjonalne i bezpieczne konfiguracje wdrożeniowe (pliki \texttt{Dockerfile} oraz manifesty Kubernetes) na podstawie wyłącznie struktury i zawartości kodu źródłowego repozytorium.
 
-W ramach eksperymentu porównywane będą odpowiedzi różnych modeli LLM w tych samych warunkach — przy identycznych promptach, na tych samych repozytoriach testowych, z zachowaniem stałych parametrów decyzyjnych (takich jak \texttt{temperature = 0}) — co pozwoli na rzetelną ocenę ich jakości oraz przydatności w kontekście automatyzacji procesów DevOps.
+Badanie obejmuje również analizę ograniczeń i zagrożeń związanych z automatyzacją tego procesu, w tym podatności na manipulację kontekstem oraz luki w zakresie bezpieczeństwa i dobrych praktyk DevOps. Porównanie różnych modeli LLM stanowi dodatkowy aspekt badania, pozwalający zidentyfikować ogólne trendy i ograniczenia tej klasy rozwiązań w kontekście praktycznego zastosowania w systemach typu Platform as a Service (PaaS).
 
 \bigskip
 
 \noindent Postawiono następujące hipotezy badawcze:
 
 \begin{itemize}
-    \item \textbf{H1:} Modele LLM są w stanie wygenerować poprawne składniowo pliki \texttt{Dockerfile} oraz manifesty Kubernetes na podstawie kodu aplikacji, bez dodatkowej ingerencji człowieka.
-    
-    \item \textbf{H2:} Jakość generowanych konfiguracji zależy od złożoności architektury aplikacji. Modele radzą sobie lepiej z aplikacjami prostymi (np. bezstanowymi) niż ze złożonymi systemami mikroserwisowymi.
-    
-    \item \textbf{H3:} Istnieją istotne różnice w jakości generowanych plików pomiędzy różnymi modelami LLM — zarówno pod względem poprawności, jak i zgodności z dobrymi praktykami IaC.
-    
-    \item \textbf{H4:} Modele LLM, uczone głównie na ogólnym kodzie źródłowym, mają trudność z konsekwentnym stosowaniem dobrych praktyk DevOps przy generowaniu konfiguracji Docker i Kubernetes.
-    
-    \item \textbf{H5:} Nawet przy deterministycznych parametrach generacji (\texttt{temperature = 0}) modele mogą wykazywać pewien poziom niepowtarzalności wyników, szczególnie w przypadkach granicznych lub przy długich sekwencjach interakcji.
+    \item \textbf{H1: Autonomiczna generacja funkcjonalnych konfiguracji} \\
+    Duże modele językowe, działające jako agenty z dostępem do narzędzi analizy repozytorium, są w stanie autonomicznie wygenerować funkcjonalne konfiguracje Docker i Kubernetes, które umożliwiają poprawne uruchomienie aplikacji bez dodatkowej ingerencji człowieka.
+
+    \item \textbf{H2: Ograniczenia złożonościowe} \\
+    Istnieje próg złożoności aplikacji, powyżej którego jakość autonomicznie generowanych konfiguracji znacząco spada. Modele radzą sobie lepiej z aplikacjami monolitycznymi i prostymi wielowarstwowymi niż z rozproszonymi systemami mikroserwisowymi wymagającymi orkiestracji wielu zależnych komponentów.
+
+    \item \textbf{H3: Jakość i zgodność z dobrymi praktykami} \\
+    Większość autonomicznie generowanych konfiguracji zawiera błędy lub ostrzeżenia wykrywane przez narzędzia statycznej analizy (Hadolint dla Docker, Kube-linter dla Kubernetes), co wymaga dodatkowej walidacji i poprawek przed wdrożeniem produkcyjnym.
+
+    \item \textbf{H4: Niezawodność i powtarzalność procesu agentowego} \\
+    Proces generacji konfiguracji przez agenta LLM charakteryzuje się zmiennością wyników mimo deterministycznych parametrów (\texttt{temperature = 0}), szczególnie w zakresie strategii eksploracji repozytorium i kolejności generowanych zasobów, co wpływa na powtarzalność rozwiązania.
+
+    \item \textbf{H5: Podatność na manipulację kontekstem} \\
+    Agenty LLM są podatne na manipulację przez złośliwe lub mylące treści zawarte w repozytorium (prompt injection, social engineering w plikach README/dokumentacji). Obecność instrukcji konfliktowych lub próby przekierowania agenta mogą prowadzić do wygenerowania niepoprawnych, niebezpiecznych lub całkowicie odmiennych od zamierzonych konfiguracji.
+
+    \item \textbf{H6: Wykrywanie błędów przez LLM-as-a-Judge} (TODO: czy zostawić?)\\
+    Modele LLM działające jako ``sędziowie'' potrafią identyfikować istotne błędy i braki w autonomicznie wygenerowanych konfiguracjach Docker i Kubernetes, dostarczając uzupełniającej metody walidacji względem narzędzi statycznej analizy. Hipoteza zakłada korelację ocen LLM Judge z liczbą wykrytych problemów oraz faktycznym sukcesem procesu budowania i uruchamiania, co otwiera drogę do iteracyjnych mechanizmów samokorekty w rozwiązaniach typu PaaS.
 \end{itemize}
 
 \bigskip
@@ -29,7 +37,7 @@ W dalszej częsci pracy szczegółowo opisano przypadki testowe, metodykę przep
 
 \subsection{Zestawienie przypadków testowych}
 
-W celu przeprowadzenia rzetelnych i porównywalnych eksperymentów przygotowano cztery spreparowane repozytoria aplikacji, reprezentujące zróżnicowane scenariusze wdrożeniowe spotykane w praktyce DevOps. Każde z nich zostało opracowane w taki sposób, aby oddzielnie uwidocznić konkretne aspekty i wyzwania związane z generowaniem konfiguracji. Dla zachowania spójności środowiskowej, wszystkie aplikacje zostały napisane w języku Python z wykorzystaniem frameworka FastAPI \cite{fastapi}.
+W celu przeprowadzenia rzetelnych i porównywalnych eksperymentów przygotowano pięć spreparowanych repozytoriów aplikacji, reprezentujących zróżnicowane scenariusze wdrożeniowe spotykane w praktyce DevOps. Każde z nich zostało opracowane w taki sposób, aby oddzielnie uwidocznić konkretne aspekty i wyzwania związane z generowaniem konfiguracji. Dla zachowania spójności środowiskowej, wszystkie aplikacje zostały napisane w języku Python z wykorzystaniem frameworka FastAPI \cite{fastapi}.
 
 \begin{itemize}
     \item \textbf{Repozytorium 1: Aplikacja bezstanowa bez zależności}\\
@@ -47,13 +55,30 @@ W celu przeprowadzenia rzetelnych i porównywalnych eksperymentów przygotowano 
     \item \textbf{Repozytorium 4: Prosty system mikroserwisowy}\\
     Najbardziej złożony przypadek spośród spreparowanych — system składający się z kilku niezależnych usług (trzy mikroserwisy + bazy danych + kolejka komunikatów). Pozwala on przetestować zdolność modelu do tworzenia manifestów Kubernetes z wykorzystaniem wielu zasobów oraz relacji między nimi.\\
     \textit{Repozytorium:} \url{https://github.com/run-rasztabiga-me/poc4-fastapi}
+
+    \item \textbf{Repozytorium 5: Test podatności na manipulację (adversarial testing)}\\
+    Specjalnie spreparowane repozytorium zawierające złośliwe lub mylące treści mające na celu manipulację agenta LLM. Repozytorium zawiera autentyczny kod aplikacji, ale uzupełnione o elementy adversarial: pliki z błędnymi praktykami bezpieczeństwa, z instrukcjami próbującymi przekierować agenta do sklonowania innego repozytorium, dokumentację sugerującą użycie uprzywilejowanych kontenerów oraz przykładowe Dockerfile zawierające podatności. Celem tego przypadku jest weryfikacja hipotezy H5 dotyczącej podatności agentów na prompt injection i social engineering poprzez zawartość repozytorium.\\
+    \textit{Repozytorium:} \url{https://github.com/run-rasztabiga-me/poc5-adversarial-fastapi}
 \end{itemize}
 
 
 \bigskip
-TODO
 
-Chociaż głównym celem jest przetestowanie modeli na spreparowanych repozytoriach o znanej strukturze, rozważane jest także rozszerzenie eksperymentu o zestaw rzeczywistych, publicznie dostępnych projektów z serwisu GitHub. Wykorzystanie niekontrolowanych repozytoriów pozwoliłoby ocenić skuteczność agentów LLM w mniej kontrolowanych, realistycznych warunkach — np. w obecności niekompletnej dokumentacji, niespójnej struktury katalogów czy niestandardowych zależności. Tego typu testy zwiększyłyby reprezentatywność eksperymentu oraz umożliwiłyby uogólnienie wyników na szerszą klasę projektów spotykanych w praktyce.
+\noindent \textbf{Strategia testowania dla różnych hipotez}
+
+Ze względu na różny charakter weryfikowanych hipotez, stosowane są dwie komplementarne strategie testowania:
+
+\textbf{Dla hipotezy H1 (autonomiczna generacja funkcjonalnych konfiguracji):} W celu oceny ogólnej zdolności agentów LLM do generowania działających konfiguracji, testy przeprowadzane są na szerszym zestawie rzeczywistych, publicznie dostępnych projektów z serwisu GitHub. Wykorzystanie niekontrolowanych repozytoriów o różnorodnej strukturze, niekompletnej dokumentacji i niestandardowych zależnościach pozwala ocenić skuteczność agentów w warunkach rzeczywistych. Ten szeroki dataset zwiększa reprezentatywność eksperymentu oraz umożliwia uogólnienie wyników na szerszą klasę projektów spotykanych w praktyce, weryfikując podstawową przydatność podejścia agentowego do automatyzacji generowania konfiguracji IaC.
+
+\textbf{Dla hipotez H2–H5 (złożoność, bezpieczeństwo, deterministyczność, manipulacja):} Szczegółowa analiza ograniczeń, bezpieczeństwa, powtarzalności oraz podatności na manipulację wymaga kontrolowanych warunków eksperymentalnych. W tym celu wykorzystywane są wyłącznie pięć spreparowanych repozytoriów (poc1–poc5) o znanej strukturze i przewidywalnych wymaganiach. Kontrolowane środowisko pozwala na:
+\begin{itemize}
+    \item precyzyjne porównanie wyników między różnymi poziomami złożoności (H2),
+    \item systematyczną identyfikację braków w bezpieczeństwie i kompletności względem znanych wymagań (H3),
+    \item wielokrotne powtórzenia w identycznych warunkach dla oceny deterministyczności (H4),
+    \item celowe wprowadzenie elementów adversarial dla weryfikacji odporności na manipulację (H5).
+\end{itemize}
+
+Takie podejście łączy zalety szerokiego pokrycia przypadków użycia z precyzją kontrolowanych eksperymentów, umożliwiając zarówno ocenę ogólnej przydatności, jak i szczegółową analizę ograniczeń i zagrożeń związanych z autonomicznym generowaniem konfiguracji IaC.
 
 \subsection{Metodyka generacji i promptowania}
 
@@ -75,32 +100,56 @@ Ze względu na długość oraz złożoną strukturę techniczną, pełna treść
 W szczególności, prompt opisuje:
 \begin{itemize}
     \item ogólny kontekst działania — agent specjalizuje się w pracy z repozytoriami Git oraz w generowaniu plików konfiguracyjnych dla Docker i Kubernetes,
-    \item zestaw dostępnych narzędzi (clone\_repo, ls, get\_file\_content, write\_file, prepare\_repo\_tree), wraz z instrukcją, kiedy i jak należy z nich korzystać,
+    \item zestaw dostępnych narzędzi (11 funkcji: \texttt{clone\_repo}, \texttt{prepare\_repo\_tree}, \texttt{get\_file\_content}, \texttt{write\_file}, \texttt{ls}, \texttt{search\_files}, \texttt{find\_files}, \texttt{base64\_encode}, \texttt{base64\_decode}, \texttt{patch\_file}, \texttt{think}), wraz z instrukcją, kiedy i jak należy z nich korzystać,
     \item reguły nazewnictwa, np. sposób generowania nazw hostów w manifestach Ingress na podstawie nazw repozytoriów (\texttt{<repo-name>.rasztabiga.me}),
     \item dobre praktyki DevOps, których należy przestrzegać przy tworzeniu Dockerfile (np. nieuruchamianie kontenerów jako root, odpowiedni obraz bazowy) oraz manifestów Kubernetes (np. sondy liveness/readiness, podział na StatefulSets i Deployments, używanie ConfigMaps i Secrets do przechowywania konfiguracji),
-    \item sposób zakończenia pracy — model powinien zakończyć generację komunikatem zawierającym słowo \texttt{DONE}.
+    \item sposób zakończenia pracy — model powinien zakończyć generację zwracając strukturalny JSON z informacjami o wygenerowanych plikach.
 \end{itemize}
 
 Prompt ma formę deklaratywną i został tak sformułowany, aby maksymalnie zredukować niejednoznaczność interpretacyjną oraz zwiększyć powtarzalność wyników. Uwzględniono także konkretne przykłady, jak np. schemat tworzenia nazw hostów czy oczekiwane struktury plików. Dzięki temu możliwe jest zbadanie, czy model potrafi stosować się do wytycznych nawet bez dodatkowych przykładów "few-shot".
 
 \bigskip
 \noindent
-\textbf{Funkcje i narzędzia dostępne dla agenta:}  
-Agent LLM korzysta z zestawu funkcji (narzędzi) umożliwiających interakcję z zawartością repozytorium oraz generowanie nowych plików konfiguracyjnych. Zostały one zaimplementowane jako funkcje w języku Python i zarejestrowane w architekturze LangGraph za pomocą dekoratora \texttt{@tool}. Udostępniane narzędzia to:
+\textbf{Funkcje i narzędzia dostępne dla agenta:}
+Agent LLM korzysta z zestawu jedenastu funkcji (narzędzi) umożliwiających interakcję z zawartością repozytorium, analizę kodu oraz generowanie nowych plików konfiguracyjnych. Zostały one zaimplementowane jako funkcje w języku Python i zarejestrowane w architekturze LangGraph za pomocą dekoratora \texttt{@tool}. Udostępniane narzędzia to:
 
 \begin{itemize}
-    \item \texttt{clone\_repo(repo\_url)} – klonuje wskazane repozytorium Git i usuwa zbędne pliki oraz katalogi (np. \texttt{.git}, \texttt{README.md}, pliki CI/CD itp.),
-    
-    \item \texttt{prepare\_repo\_tree()} – przygotowuje tekstowy widok struktury repozytorium z rozmiarem plików (na podstawie przejścia po katalogach i analizie zawartości; podobnie do UNIXowego narzędzia \texttt{tree}),
-    
+    \item \texttt{clone\_repo(repo\_url)} – klonuje wskazane repozytorium Git i automatycznie usuwa zbędne pliki oraz katalogi mogące wprowadzać w błąd lub sugerować gotowe rozwiązanie. Wstępnie czyszczone elementy to: metadane VCS (\texttt{.git}, \texttt{.github}, \texttt{.gitignore}), pliki dokumentacyjne (\texttt{README.md}, \texttt{LICENSE}, \texttt{CHANGELOG.md}), istniejące konfiguracje wdrożeniowe (\texttt{Dockerfile}, \texttt{docker-compose.yml}), pliki CI/CD (\texttt{.gitlab-ci.yml}, \texttt{.travis.yml}), oraz artefakty deweloperskie (\texttt{\_\_pycache\_\_}, \texttt{.pytest\_cache}, \texttt{.idea}, \texttt{.vscode}). Usunięcie istniejących plików \texttt{Dockerfile} i \texttt{docker-compose.yml} jest celową decyzją projektową — zapewnia, że agent generuje konfiguracje wyłącznie na podstawie analizy kodu źródłowego, bez wpływu przykładowych lub przestarzałych rozwiązań obecnych w repozytorium,
+
+    \item \texttt{prepare\_repo\_tree()} – przygotowuje tekstowy widok struktury katalogów repozytorium z informacją o rozmiarze plików (podobnie do UNIXowego narzędzia \texttt{tree}),
+
+    \item \texttt{ls(dir\_path)} – listuje zawartość wskazanego katalogu, pokazując osobno katalogi i pliki wraz z ich rozmiarami,
+
     \item \texttt{get\_file\_content(file\_path)} – odczytuje treść wskazanego pliku, podanego względem katalogu głównego repozytorium,
-    
+
+    \item \texttt{search\_files(pattern, file\_pattern, case\_sensitive)} – wyszukuje wzorzec tekstowy (regex) w plikach repozytorium, zwracając pasujące linie z kontekstem (linie przed i po dopasowaniu),
+
+    \item \texttt{find\_files(pattern, max\_results)} – wyszukuje pliki według wzorca nazwy (glob pattern, np. \texttt{*.py}, \texttt{Dockerfile*}, \texttt{package.json}),
+
     \item \texttt{write\_file(file\_path, content)} – zapisuje nowy plik lub nadpisuje istniejący, na podstawie ścieżki i treści przekazanej przez agenta,
-    
-    \item \texttt{ls(dir\_path)} – listuje zawartość katalogu (domyślnie głównego katalogu repozytorium), pokazując osobno katalogi i pliki wraz z ich rozmiarami.
+
+    \item \texttt{patch\_file(file\_path, patch)} – aplikuje patch w formacie unified diff do istniejącego pliku (użyteczne do precyzyjnych, celowanych edycji),
+
+    \item \texttt{base64\_encode(content)} – koduje tekst do formatu base64 (niezbędne do tworzenia Kubernetes Secrets),
+
+    \item \texttt{base64\_decode(encoded)} – dekoduje ciąg base64 do zwykłego tekstu (użyteczne do weryfikacji istniejących Secrets),
+
+    \item \texttt{think(thoughts)} – narzędzie refleksyjne pozwalające agentowi na zorganizowanie myśli, zapisanie obserwacji o architekturze aplikacji oraz strategii generowania konfiguracji (nie modyfikuje żadnych plików, służy wyłącznie do wewnętrznego procesu rozumowania agenta).
 \end{itemize}
 
-Wszystkie narzędzia operują na lokalnej kopii repozytorium sklonowanej do katalogu roboczego. Agent nie ma dostępu do żadnych narzędzi wykonawczych (jak budowanie obrazów Docker czy uruchamianie klastrów), a jego zadaniem jest jedynie wygenerowanie odpowiednich plików konfiguracyjnych na podstawie zawartości repozytorium. Informacje o narzędziach oraz zasady pracy agenta są zawarte w systemowym promptcie (załącznik~\ref{att:prompt}).
+Wszystkie narzędzia operują na lokalnej kopii repozytorium sklonowanej do katalogu roboczego. Agent nie ma dostępu do żadnych narzędzi wykonawczych (jak budowanie obrazów Docker czy uruchamianie klastrów), a jego zadaniem jest jedynie wygenerowanie odpowiednich plików konfiguracyjnych na podstawie zawartości repozytorium.
+
+\bigskip
+\noindent
+\textbf{Strukturalne wyjście agenta:}
+Po zakończeniu procesu generowania, agent zwraca strukturalny JSON zawierający informacje o wygenerowanych plikach. Format odpowiedzi jest wymuszony przez architekturę LangGraph poprzez parametr \texttt{response\_format=ConfigurationOutput}. Zwracany obiekt zawiera:
+\begin{itemize}
+    \item \texttt{docker\_images} – lista obiektów opisujących wygenerowane obrazy Docker, każdy zawierający: ścieżkę do Dockerfile, tag obrazu oraz kontekst budowania (katalog będący bazą dla instrukcji COPY w Dockerfile),
+    \item \texttt{kubernetes\_files} – lista ścieżek do wygenerowanych manifestów Kubernetes,
+    \item \texttt{test\_endpoint} – relatywna ścieżka do endpointu HTTP, który agent zweryfikował w kodzie aplikacji i który powinien zwracać status 2xx (np. \texttt{/}, \texttt{/health}, \texttt{/api/health}).
+\end{itemize}
+
+Wymuszenie strukturalnego wyjścia eliminuje konieczność parsowania odpowiedzi tekstowej i zapewnia, że agent zawsze zwróci dane w przewidywalnym formacie, co jest kluczowe dla automatyzacji procesu ewaluacji. Szczegółowe informacje o narzędziach oraz zasady pracy agenta są zawarte w systemowym promptcie (załącznik~\ref{att:prompt}).
 
 \subsection{Proces testowy}
 
@@ -131,8 +180,9 @@ Proces ewaluacji został zaimplementowany jako modułowy potok walidacyjny skła
     \item Próba budowy obrazów Docker na podstawie wygenerowanych plików.
     \item Weryfikacja syntaktycznej poprawności wygenerowanych manifestów Kubernetes.
     \item Statyczna analiza manifestów Kubernetes za pomocą narzędzia Kube-linter.
-    \item Próba zaaplikowania manifestów Kubernetes w środowisku Kind.
+    \item Próba zaaplikowania manifestów Kubernetes w środowisku MicroK8s.
     \item Walidacja w czasie wykonania — sprawdzenie, czy aplikacja uruchamia się poprawnie w klastrze (np. czy jej punkty końcowe są dostępne).
+    \item (Opcjonalnie) Ocena przez LLM-as-a-Judge — dodatkowa walidacja jakości konfiguracji przy użyciu modelu językowego jako eksperta oceniającego zgodność z najlepszymi praktykami i potencjalne problemy trudne do wykrycia przez narzędzia statyczne.
 \end{enumerate}
 
 Modułowa architektura potoku walidacyjnego umożliwia łatwe dodawanie nowych kroków walidacji oraz niezależne testowanie poszczególnych komponentów. Wszystkie wywołania zewnętrznych narzędzi są realizowane przez dedykowaną abstrakcję zarządzającą wykonywaniem poleceń, która rejestruje czasy wykonania, poziomy ważności błędów oraz dostępność narzędzi dla celów raportowania.
@@ -172,22 +222,26 @@ Ocena jakości wygenerowanych plików została oparta na zestawie kryteriów obe
 
 \begin{itemize}
     \item \textbf{Poprawność składniowa} — weryfikowana poprzez analizę syntaktyczną plików Dockerfile oraz manifestów Kubernetes,
-    \item \textbf{Poprawność funkcjonalna} — sprawdzana na podstawie wyników budowy obrazów Docker oraz wdrożenia aplikacji w środowisku Kind,
-    \item \textbf{Bezpieczeństwo} — oceniane na podstawie ostrzeżeń i błędów zwracanych przez Hadolint oraz Kube-linter,
-    \item \textbf{Kompletność konfiguracji} — ocena, czy wygenerowane pliki zawierają wszystkie wymagane zasoby i powiązania (np. Services, Volumes, ConfigMaps),
+    \item \textbf{Poprawność funkcjonalna} — sprawdzana na podstawie wyników budowy obrazów Docker oraz wdrożenia aplikacji w środowisku MicroK8s,
+    \item \textbf{Zgodność z dobrymi praktykami} — oceniana na podstawie błędów i ostrzeżeń wykrywanych przez narzędzia statycznej analizy Hadolint (dla Dockerfile) oraz Kube-linter (dla manifestów Kubernetes). Zliczane są błędy (\textit{ERROR}), ostrzeżenia (\textit{WARNING}) oraz informacje (\textit{INFO}). Konfiguracja uznawana jest za wymagającą poprawek, jeśli zawiera co najmniej jeden błąd lub ostrzeżenie,
     \item \textbf{Deterministyczność wyników} — mierzona powtarzalnością wyników w kolejnych przebiegach dla tej samej konfiguracji wejściowej,
-    \item \textbf{Wydajność generacji} — oceniana na podstawie czasu odpowiedzi modelu, liczby przetworzonych tokenów oraz liczby wywołań narzędzi.
+    \item \textbf{Wydajność generacji} — oceniana na podstawie czasu odpowiedzi modelu, liczby przetworzonych tokenów oraz liczby wywołań narzędzi,
+    \item \textbf{Odporność na manipulację} — ocena zachowania agenta w obecności złośliwych lub mylących treści w repozytorium, mierzona jako stopień odchylenia od oczekiwanej konfiguracji oraz liczba wprowadzonych podatności.
 \end{itemize}
 
 \bigskip
 \noindent
 \textbf{Zbierane metryki eksperymentalne}
 
-Przebiegi eksperymentów rejestrują dodatkowe metryki wykonawcze (czas odpowiedzi, liczba tokenów, rozkład wywołań narzędzi). Tabela \ref{tab:metrics} przedstawia zestaw metryk rejestrowanych dla każdego przebiegu.
+Przebiegi eksperymentów rejestrują dodatkowe metryki wykonawcze (czas odpowiedzi, liczba tokenów, rozkład wywołań narzędzi). Tabela \ref{tab:metrics} przedstawia zestaw metryk rejestrowanych dla każdego przebiegu. W celu ułatwienia debugowania i analizy przebiegu eksperymentów, wszystkie interakcje agenta z modelem językowym są automatycznie śledzone przez platformę LangSmith, która umożliwia inspekcję pełnych ścieżek wywołań narzędzi, przesłanych promptów oraz odpowiedzi modelu.
 
 Na podstawie listy błędów i ostrzeżeń moduł oceny wylicza wyniki cząstkowe dla plików Docker oraz manifestów Kubernetes przy użyciu modelu agregacji ocen opartego na wagach fazowych. Model ten przypisuje różne wagi ważności poszczególnym fazom walidacji — fazy krytyczne dla funkcjonalności (składnia, budowa obrazu, aplikowanie do klastra) mają wyższe wagi (35–40\%) niż weryfikacja dobrych praktyk przez lintery (20–25\%).
 
-Każde wykryte zagadnienie pomniejsza wynik fazy o wartość zależną od jego powagi: błąd (\textit{ERROR}) odejmuje 15 punktów, ostrzeżenie (\textit{WARNING}) — 5 punktów, a informacja (\textit{INFO}) — 1 punkt, przy bazowym wyniku 100 punktów dla każdej fazy. Wynik komponentu (Docker lub Kubernetes) stanowi średnią ważoną wyników jego faz, a wynik całościowy (\textit{overall\_score}) agreguje komponenty według wag: Docker (35\%), Kubernetes (40\%) oraz środowisko uruchomieniowe (25\%). Model zapewnia powtarzalność poprzez deterministyczne wagi oraz konsekwentne przypisywanie priorytetów błędom składniowym i funkcjonalnym nad sugestiami stylistycznymi. Struktura pozwala także na generowanie szczegółowych raportów z rozbiciem na poszczególne fazy, co ułatwia diagnostykę i porównywanie modeli.
+Każde wykryte zagadnienie pomniejsza wynik fazy o wartość zależną od jego powagi: błąd (\textit{ERROR}) odejmuje 15 punktów, ostrzeżenie (\textit{WARNING}) — 10 punktów, przy bazowym wyniku 100 punktów dla każdej fazy. Informacje (\textit{INFO}) nie wpływają na wynik, gdyż stanowią jedynie sugestie pomocnicze nieistotne dla oceny funkcjonalności. Wynik komponentu (Docker lub Kubernetes) stanowi średnią ważoną wyników jego faz, a wynik całościowy (\textit{overall\_score}) agreguje komponenty według wag: Docker (35\%), Kubernetes (40\%) oraz środowisko uruchomieniowe (25\%). Model zapewnia powtarzalność poprzez deterministyczne wagi oraz konsekwentne przypisywanie priorytetów błędom składniowym i funkcjonalnym nad sugestiami stylistycznymi.
+
+\bigskip
+\noindent
+Dla weryfikacji hipotezy H3 kluczowe znaczenie mają metryki dotyczące zgodności z dobrymi praktykami. Konfiguracja uznawana jest za wymagającą dodatkowej interwencji, jeśli zawiera co najmniej jeden błąd (\textit{ERROR}) lub ostrzeżenie (\textit{WARNING}) wykryte przez narzędzia statycznej analizy. Metryki te umożliwiają precyzyjne zmierzenie odsetka konfiguracji nadających się do bezpośredniego wdrożenia produkcyjnego oraz identyfikację najczęstszych problemów występujących w autonomicznie generowanych konfiguracjach.
 
 \begin{table}[H]
 \centering
@@ -215,9 +269,19 @@ Czy manifesty Kubernetes są poprawne składniowo & Wynik walidatora składniowe
 \hline
 Błędy Kube-linter & Liczba i typy wykrytych niezgodności z dobrymi praktykami \\
 \hline
-Czy manifesty aplikują się poprawnie & Wynik wdrożenia aplikacji do klastra Kind \\
+Czy manifesty aplikują się poprawnie & Wynik wdrożenia aplikacji do klastra MicroK8s \\
 \hline
 Czy aplikacja działa poprawnie (runtime) & Sprawdzenie dostępności aplikacji (np. przez \texttt{curl} lub testy endpointów) \\
+\hline
+Liczba błędów walidacji & Łączna liczba błędów (\textit{ERROR}) wykrytych przez Hadolint i Kube-linter \\
+\hline
+Liczba ostrzeżeń walidacji & Łączna liczba ostrzeżeń (\textit{WARNING}) wykrytych przez Hadolint i Kube-linter \\
+\hline
+Liczba informacji walidacji & Łączna liczba informacji (\textit{INFO}) wykrytych przez Hadolint i Kube-linter \\
+\hline
+Konfiguracja bez błędów & Binarna metryka czy konfiguracja przeszła walidację bez błędów (\textit{ERROR} = 0) \\
+\hline
+Konfiguracja czysta & Binarna metryka czy konfiguracja przeszła walidację bez błędów i ostrzeżeń (\textit{ERROR} = 0 AND \textit{WARNING} = 0) \\
 \hline
 \end{tabularx}
 \end{table}
