@@ -5,16 +5,18 @@ W ciągu ostatnich lat obserwujemy dynamiczny rozwój dużych modeli językowych
 
 \subsection{Cel i zakres pracy}
 
-Celem niniejszej pracy magisterskiej jest analiza możliwości zastosowania dużych modeli językowych (LLM) do automatycznego generowania konfiguracji typu Infrastructure as Code (IaC, infrastruktura jako kod) \cite{pahl_infrastructure_nodate}, ze szczególnym uwzględnieniem plików Dockerfile oraz manifestów Kubernetes.
-W ramach pracy zostanie przeprowadzona ocena jakości, poprawności i bezpieczeństwa generowanych konfiguracji, ze szczególnym uwzględnieniem zagrożeń wynikających z automatyzacji, takich jak podatności na ataki typu "prompt injection" czy manipulację zawartością repozytoriów. Finalnym celem jest zaprojektowanie oraz implementacja prototypowego systemu typu Platform as a Service (PaaS), który na podstawie kodu źródłowego repozytorium automatycznie generuje, buduje i wdraża aplikacje kontenerowe bez ingerencji człowieka.
+Celem niniejszej pracy magisterskiej jest zbadanie możliwości autonomicznego generowania konfiguracji typu Infrastructure as Code (IaC, infrastruktura jako kod) \cite{pahl_infrastructure_nodate} przez agenty oparte na dużych modelach językowych (LLM), ze szczególnym uwzględnieniem plików Dockerfile oraz manifestów Kubernetes. Praca koncentruje się na weryfikacji, czy agenty LLM są w stanie — bez ingerencji człowieka — wygenerować funkcjonalne, bezpieczne i zgodne z dobrymi praktykami konfiguracje wdrożeniowe.
 
-Praca ma charakter badawczo-rozwojowy i obejmuje następujące zagadnienia:
+W ramach pracy zostanie przeprowadzona kompleksowa ocena funkcjonalności, jakości, bezpieczeństwa oraz niezawodności generowanych konfiguracji, ze szczególnym uwzględnieniem zagrożeń wynikających z automatyzacji, takich jak podatności na ataki typu "prompt injection" czy manipulację zawartością repozytoriów. Badanie oparte jest na weryfikacji pięciu hipotez badawczych (H1–H5) dotyczących: autonomicznej generacji funkcjonalnych konfiguracji, ograniczeń złożonościowych, jakości i zgodności z dobrymi praktykami, niezawodności procesu oraz podatności na manipulację kontekstem. [TODO: Na końcu pracy pokazano praktyczne zastosowanie wypracowanych rozwiązań w postaci prototypowego systemu typu Platform as a Service (PaaS).]
+
+Praca ma charakter badawczo-eksperymentalny i obejmuje następujące zagadnienia:
 \begin{itemize}
 \item przegląd aktualnego stanu wiedzy na temat wykorzystania LLM w generowaniu kodu i konfiguracji infrastruktury,
 \item identyfikację braków i zagrożeń związanych z automatyzacją generacji IaC, w tym problemów bezpieczeństwa i odporności na ataki (np. "prompt injection", manipulacja repozytorium),
-\item analizę i porównanie skuteczności różnych modeli językowych (m.in. GPT, LLaMA, Falcon, Claude) w zadaniach generacji plików Dockerfile i manifestów Kubernetes,
-\item przeprowadzenie eksperymentów obejmujących testy poprawności, jakości, bezpieczeństwa i deterministyczności generowanych konfiguracji,
-\item zaprojektowanie architektury i implementację prototypowego systemu typu PaaS, który na podstawie repozytorium kodu automatycznie generuje, buduje i wdraża aplikacje kontenerowe bez ingerencji człowieka.
+\item sformułowanie i weryfikację hipotez badawczych dotyczących możliwości, ograniczeń oraz zagrożeń związanych z autonomicznym generowaniem konfiguracji IaC przez agenty LLM,
+\item przeprowadzenie eksperymentów obejmujących testy funkcjonalności, złożoności, jakości, bezpieczeństwa, deterministyczności oraz odporności na manipulację,
+\item wielowarstwową walidację jakości generowanych konfiguracji (automatyczna analiza statyczna, ocena przez model językowy, ocena ekspercka),
+\item TODO: zaprojektowanie i implementację prototypowego systemu typu PaaS demonstrującego praktyczne zastosowanie agentów LLM do automatycznego wdrażania aplikacji kontenerowych.
 \end{itemize}
 
 \subsection{Motywacja}
@@ -25,15 +27,13 @@ Jednocześnie automatyzacja generowania IaC rodzi pytania o poprawność i bezpi
 
 \subsection{Struktura pracy}
 
-Praca składa się z dziewięciu rozdziałów, odzwierciedlających pełny cykl badawczy:
+Praca składa się z następujących rozdziałów:
 \begin{itemize}
     \item \textbf{Rozdział 1 – Wprowadzenie}: przedstawienie tematu, celów, motywacji oraz układu pracy,
     \item \textbf{Rozdział 2 – Przegląd literatury}: analiza aktualnych badań nad wykorzystaniem LLM w generowaniu konfiguracji IaC (Docker, Kubernetes) oraz identyfikacja luk w istniejącej wiedzy,
-    \item \textbf{Rozdział 3 – Przegląd technologii i narzędzi}: opis wybranych modeli językowych, technologii infrastrukturalnych oraz porównanie podejść API vs open-source,
-    \item \textbf{Rozdział 4 – Projekt eksperymentów}: opis przypadków testowych, strategii promptowania oraz procesu generowania i testowania konfiguracji; przedstawienie kryteriów oceny,
-    \item \textbf{Rozdział 5 – Analiza porównawcza modeli LLM}: przedstawienie wyników testów oraz wniosków dotyczących jakości działania modeli,
-    \item \textbf{Rozdział 6 – Bezpieczeństwo konfiguracji}: analiza zagrożeń związanych z automatyczną generacją IaC, technik ataku na LLM oraz metod oceny bezpieczeństwa wygenerowanych plików,
-    \item \textbf{Rozdział 7 – Projekt systemu PaaS}: opis architektury systemu oraz procesu automatycznego wdrażania aplikacji na podstawie repozytorium kodu,
-    \item \textbf{Rozdział 8 – Implementacja i wdrożenie prototypu}: opis realizacji systemu PaaS, wykorzystanych technologii oraz przykładowych wdrożeń,
-    \item \textbf{Rozdział 9 – Wnioski i dalsze kierunki rozwoju}: podsumowanie wyników badań, ocena przydatności LLM w kontekście DevOps oraz wskazanie możliwych obszarów dalszych badań.
+    \item \textbf{Rozdział 3 – Przegląd technologii i narzędzi}: opis wybranych modeli językowych, technologii infrastrukturalnych oraz architektury systemu agentowego,
+    \item \textbf{Rozdział 4 – Projekt eksperymentów}: przedstawienie pięciu hipotez badawczych (H1–H5), metodyki ich weryfikacji, zestawów danych testowych, architektury systemu testowego oraz kryteriów oceny dla każdej hipotezy,
+    \item \textbf{Rozdział 5 – Wyniki eksperymentów}: szczegółowa prezentacja wyników dla każdej z pięciu hipotez, analiza danych, wielowarstwowa walidacja jakości (automatyczna, LLM-as-a-Judge, ekspercka), przekrojowe porównanie modeli oraz synteza wyników z wnioskami i implikacjami praktycznymi,
+    \item \textbf{[TODO: Rozdział 6 – Praktyczne zastosowanie – system PaaS]}: demonstracja praktycznego wykorzystania wypracowanych rozwiązań w postaci prototypowego systemu typu Platform as a Service automatyzującego wdrażanie aplikacji kontenerowych,
+    \item \textbf{[TODO: Rozdział 7 – Wnioski i dalsze kierunki rozwoju]}: podsumowanie wyników badań, weryfikacja hipotez, ocena przydatności agentów LLM w kontekście DevOps oraz wskazanie możliwych obszarów dalszych badań.
 \end{itemize}
