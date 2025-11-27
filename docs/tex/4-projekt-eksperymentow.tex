@@ -473,7 +473,21 @@ W celu usprawnienia zarządzania eksperymentami oraz monitorowania ich postępu 
 
 Na podstawie wyników walidacji z potoku testowego, moduł oceny wylicza wyniki cząstkowe dla plików Docker oraz manifestów Kubernetes przy użyciu modelu agregacji ocen opartego na wagach fazowych.
 
-Model przypisuje różne wagi ważności poszczególnym fazom walidacji — fazy krytyczne dla funkcjonalności (składnia, budowa obrazu, aplikowanie do klastra) mają wyższe wagi (35–40\%) niż weryfikacja dobrych praktyk przez lintery (20–25\%).
+Model przypisuje różne wagi ważności poszczególnym fazom walidacji — fazy krytyczne dla funkcjonalności (składnia, budowa obrazu, aplikowanie do klastra) mają wyższą wagę (40\% każda) niż weryfikacja dobrych praktyk przez lintery (20\%).
+
+\textbf{Wagi faz Docker:}
+\begin{itemize}
+    \item \textit{docker\_syntax} — 40\%
+    \item \textit{docker\_build} — 40\%
+    \item \textit{docker\_linters} — 20\%
+\end{itemize}
+
+\textbf{Wagi faz Kubernetes:}
+\begin{itemize}
+    \item \textit{k8s\_syntax} — 40\%
+    \item \textit{kubernetes\_apply} — 40\%
+    \item \textit{k8s\_linters} — 20\%
+\end{itemize}
 
 Każde wykryte zagadnienie pomniejsza wynik fazy o wartość zależną od jego powagi:
 \begin{itemize}
@@ -483,6 +497,14 @@ Każde wykryte zagadnienie pomniejsza wynik fazy o wartość zależną od jego p
 \end{itemize}
 
 Bazowy wynik każdej fazy wynosi 100 punktów. Wynik komponentu (Docker lub Kubernetes) stanowi średnią ważoną wyników jego faz, a wynik całościowy (\textit{overall\_score}) agreguje komponenty według wag: Docker (35\%), Kubernetes (40\%) oraz środowisko uruchomieniowe (25\%).
+
+\textbf{Ważne:} Wagi nie są normalizowane — jeśli dany komponent nie został wykonany (np. brak testów runtime), jest traktowany jako 0 punktów, a nie pomijany w obliczeniach. Oznacza to, że aby uzyskać maksymalny wynik, wszystkie komponenty muszą zostać przejściowo przetestowane.
+
+\textbf{Dodatkowe reguły kary za krytyczne błędy:}
+\begin{itemize}
+    \item Jeśli budowa obrazu Docker zakończy się niepowodzeniem (faza \textit{docker\_build} zawiera błędy ERROR), wszystkie wyniki faz Docker (składnia, linters, budowa) zostają zerowane, co odzwierciedla fakt, że niezdolność do zbudowania obrazu uniemożliwia dalsze użycie konfiguracji.
+    \item Jeśli aplikowanie manifestów Kubernetes do klastra zakończy się niepowodzeniem (faza \textit{kubernetes\_apply} zawiera błędy ERROR), wszystkie wyniki faz Kubernetes oraz wynik środowiska uruchomieniowego (\textit{runtime\_score}) zostają wyzerowane, ponieważ aplikacja nie może działać bez poprawnego wdrożenia.
+\end{itemize}
 
 Model zapewnia powtarzalność poprzez deterministyczne wagi oraz konsekwentne przypisywanie priorytetów błędom składniowym i funkcjonalnym nad sugestiami stylistycznymi.
 
@@ -497,7 +519,7 @@ Przebiegi eksperymentów rejestrują metryki w dwóch formatach:
     \item \textbf{Metadata}: experiment, timestamp, repo\_url, repo\_name, model\_provider, model\_name, model\_label, temperature, seed, prompt\_id, repetition,
     \item \textbf{Generation metrics}: generation\_success, generation\_time, tool\_calls, tokens\_used, input\_tokens, output\_tokens,
     \item \textbf{Validation metrics}: dockerfile\_syntax\_valid, k8s\_syntax\_valid, build\_success, runtime\_success,
-    \item \textbf{Scoring metrics}: overall\_score, dockerfile\_score, k8s\_score,
+    \item \textbf{Scoring metrics}: overall\_score, dockerfile\_score, k8s\_score, runtime\_score,
     \item \textbf{H3 Warstwa 1}: error\_count, warning\_count, info\_count, has\_errors, is\_clean,
     \item \textbf{H3 Warstwa 2}: llm\_security\_score, llm\_completeness\_score, llm\_best\_practices\_score, llm\_overall\_score,
     \item \textbf{H3 Warstwa 3}: human\_functionality\_score, human\_security\_score, human\_production\_score, human\_quality\_score, human\_overall\_score.
