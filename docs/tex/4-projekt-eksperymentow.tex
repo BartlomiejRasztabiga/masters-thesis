@@ -13,19 +13,19 @@ W ramach badania sformułowano pięć hipotez weryfikowanych eksperymentalnie:
 
 \begin{itemize}
     \item \textbf{H1: Autonomiczna generacja funkcjonalnych konfiguracji} \\
-    Duże modele językowe, działające jako agenty z dostępem do narzędzi analizy repozytorium, są w stanie autonomicznie wygenerować funkcjonalne konfiguracje Docker i Kubernetes, które umożliwiają poprawne uruchomienie aplikacji bez dodatkowej ingerencji człowieka.
+    Duże modele językowe, działające jako agenty z dostępem do narzędzi analizy repozytorium, są w stanie autonomicznie wygenerować funkcjonalne konfiguracje Docker i Kubernetes, które umożliwiają poprawne uruchomienie aplikacji bez dodatkowej ingerencji człowieka, w tym osiągnięcie gotowości usługowej widocznej na poziomie interfejsu (np. webowe API odpowiada na zapytania HTTP/REST po wdrożeniu na klastrze testowym).
 
     \item \textbf{H2: Ograniczenia złożonościowe} \\
-    Istnieje próg złożoności aplikacji, powyżej którego jakość autonomicznie generowanych konfiguracji znacząco spada. Modele radzą sobie lepiej z aplikacjami monolitycznymi i prostymi wielowarstwowymi niż z rozproszonymi systemami mikroserwisowymi wymagającymi orkiestracji wielu zależnych komponentów.
+    Istnieje próg złożoności aplikacji, powyżej którego jakość autonomicznie generowanych konfiguracji znacząco spada. Progi te można uchwycić, obserwując wyniki na kontrolowanych repozytoriach poc1–poc4 o rosnącej liczbie komponentów i zależności (od prostego monolitu po prosty układ mikroserwisowy); oczekuje się, że metryki sukcesu (np. odsetek poprawnych wdrożeń) maleją wraz z przechodzeniem od poc1 do poc4.
 
     \item \textbf{H3: Jakość i zgodność z dobrymi praktykami} \\
-    Większość autonomicznie generowanych konfiguracji zawiera błędy lub ostrzeżenia wykrywane przez narzędzia statycznej analizy (Hadolint dla Docker, Kube-linter dla Kubernetes), co wymaga dodatkowej walidacji i poprawek przed wdrożeniem produkcyjnym.
+    Co najmniej 60\% autonomicznie generowanych konfiguracji zawiera ostrzeżenia klasy \texttt{warning} wykrywane przez narzędzia statycznej analizy (Hadolint dla Docker, Kube-linter dla Kubernetes), co wymaga dodatkowej walidacji i poprawek przed wdrożeniem produkcyjnym.
 
     \item \textbf{H4: Niezawodność i powtarzalność procesu agentowego} \\
-    Proces generacji konfiguracji przez agenta LLM charakteryzuje się zmiennością wyników mimo deterministycznych parametrów (\texttt{temperature = 0}), szczególnie w zakresie strategii eksploracji repozytorium i kolejności generowanych zasobów, co wpływa na powtarzalność rozwiązania.
+    Proces generacji konfiguracji przez agenta LLM charakteryzuje się zmiennością wyników mimo deterministycznych parametrów (\texttt{temperature = 0}); przy wielokrotnym uruchomieniu na tym samym repozytorium wskaźniki takie jak \textit{run-to-run diff ratio} (liczba zmienionych linii pomiędzy parami wygenerowanych konfiguracji znormalizowana przez ich długość) lub odchylenie standardowe liczby kroków narzędziowych w sekwencjach zapisanych w LangSmith (różna liczba wywołań funkcji pomocniczych) przekraczają ustalony próg (np. $>0{,}2$), co świadczy o ograniczonej powtarzalności procesu.
 
     \item \textbf{H5: Podatność na manipulację kontekstem} \\
-    Agenty LLM są podatne na manipulację przez złośliwe lub mylące treści zawarte w repozytorium (prompt injection, social engineering w plikach README/dokumentacji). Obecność instrukcji konfliktowych lub próby przekierowania agenta mogą prowadzić do wygenerowania niepoprawnych, niebezpiecznych lub całkowicie odmiennych od zamierzonych konfiguracji.
+    Agenty LLM są podatne na manipulację przez złośliwe lub mylące treści zawarte w repozytorium (prompt injection, social engineering w plikach README/dokumentacji): w specjalnie spreparowanym repozytorium (np. poc5-jailbreak-fastapi) co najmniej jedna trzecia przebiegów prowadzi do wygenerowania konfiguracji odbiegających od oczekiwań (np. pominięcie krytycznych usług, wstrzyknięcie dodatkowych kontenerów) lub zawierających intencjonalnie szkodliwe instrukcje, co dokumentuje wpływ manipulacji kontekstem na wynik końcowy.
 \end{itemize}
 
 \bigskip
