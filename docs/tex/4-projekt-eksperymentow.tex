@@ -13,7 +13,7 @@ W ramach badania sformułowano pięć hipotez weryfikowanych eksperymentalnie:
 
 \begin{itemize}
     \item \textbf{H1: Autonomiczna generacja funkcjonalnych konfiguracji} \\
-    Duże modele językowe, działające jako agenty z dostępem do narzędzi analizy repozytorium, są w stanie autonomicznie wygenerować funkcjonalne konfiguracje Docker i Kubernetes, które umożliwiają poprawne uruchomienie aplikacji bez dodatkowej ingerencji człowieka, w tym osiągnięcie gotowości usługowej widocznej na poziomie interfejsu (np. webowe API odpowiada na zapytania HTTP/REST po wdrożeniu na klastrze testowym). Dodatkowo, weryfikujemy wpływ szczegółowości instrukcji systemowych (prompt engineering) poprzez porównanie wariantów prompta różniących się poziomem szczegółowości wskazówek dotyczących najlepszych praktyk DevOps, co pozwoli ocenić wrażliwość podejścia agentowego na jakość prompt engineering.
+    Duże modele językowe, działające jako agenty z dostępem do narzędzi analizy repozytorium, są w stanie autonomicznie wygenerować funkcjonalne konfiguracje Docker i Kubernetes, które umożliwiają poprawne uruchomienie aplikacji bez dodatkowej ingerencji człowieka, w tym osiągnięcie gotowości usługowej widocznej na poziomie interfejsu (np. webowe API odpowiada na zapytania HTTP/REST po wdrożeniu na klastrze testowym). Dodatkowo, weryfikujemy wpływ szczegółowości instrukcji systemowych (prompt engineering) przy użyciu wariantów prompta różniących się poziomem szczegółowości wskazówek dotyczących najlepszych praktyk DevOps, co pozwoli ocenić wrażliwość podejścia agentowego na jakość prompt engineering.
 
     \item \textbf{H2: Ograniczenia złożonościowe} \\
     Istnieje próg złożoności aplikacji, powyżej którego jakość autonomicznie generowanych konfiguracji znacząco spada. Progi te można uchwycić, obserwując wyniki na kontrolowanych repozytoriach poc1–poc4 o rosnącej liczbie komponentów i zależności (od prostego monolitu po prosty układ mikroserwisowy); oczekuje się, że metryki sukcesu (np. odsetek poprawnych wdrożeń) maleją wraz z przechodzeniem od poc1 do poc4.
@@ -123,7 +123,7 @@ Modułowa architektura umożliwia łatwe dodawanie nowych kroków walidacji. Wsz
 
 \subsubsection{Parametry generacji}
 
-Wszystkie testowane modele otrzymują identyczny prompt oraz to samo repozytorium testowe, co zapewnia warunki umożliwiające rzetelne porównanie. Parametry wywołania:
+Wszystkie testowane modele otrzymują identyczny prompt oraz to samo repozytorium testowe, co zapewnia spójne warunki oceny wpływu architektury modelu na jakość generacji IaC. Parametry wywołania:
 
 \begin{itemize}
     \item \texttt{temperature = 1.0} dla większości eksperymentów (H1–H3, H5) — naturalny tryb generowania zgodny z domyślnymi parametrami modeli,
@@ -239,7 +239,7 @@ W przeciwieństwie do H1, szczegółowa analiza wpływu złożoności wymaga \te
 
 \bigskip
 \noindent
-Kontrolowane środowisko pozwala na precyzyjne porównanie wyników między różnymi poziomami złożoności. Testy obejmują 3–5 powtórzeń dla każdej kombinacji (model, repozytorium) z 4–6 modelami (commercial + open-source).
+Kontrolowane środowisko pozwala na precyzyjne śledzenie różnic w wynikach między różnymi poziomami złożoności. Testy obejmują 3–5 powtórzeń dla każdej kombinacji (model, repozytorium) z 4–6 modelami (commercial + open-source).
 
 \subsubsection{Metryki}
 
