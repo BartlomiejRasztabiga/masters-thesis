@@ -2,11 +2,11 @@
 
 \section{Przegląd technologii i narzędzi}
 
-Celem tego rozdziału jest przedstawienie najważniejszych technologii i narzędzi, stanowiących podstawę niniejszego badania. Szczególny nacisk położony zostanie na duże modele językowe, opis ich architektur oraz ich zastosowanie w generowaniu konfiguracji wdrożeniowej. Ponadto, omówione zostaną istotne narzędzia DevOps, takie jak Docker i Kubernetes, niezbędne w zarządzaniu środowiskami uruchomieniowymi, oraz narzędzia służące do walidacji i oceny jakości generowanego kodu IaC. Rozdział zawiera także opis środowiska eksperymentalnego oraz wykorzystywanych technologii wspierających automatyzację i monitorowanie eksperymentów.
+Celem tego rozdziału jest przedstawienie najważniejszych technologii i narzędzi, stanowiących podstawę niniejszego badania. Szczególny nacisk położony zostanie na sposób wykorzystania dużych modeli językowych w generowaniu konfiguracji wdrożeniowej. Ponadto, omówione zostaną istotne narzędzia DevOps, takie jak Docker i Kubernetes, niezbędne w zarządzaniu środowiskami uruchomieniowymi, oraz narzędzia służące do walidacji i oceny jakości generowanego kodu IaC. Rozdział zawiera także opis środowiska eksperymentalnego oraz wykorzystywanych technologii wspierających automatyzację i monitorowanie eksperymentów.
 
 \subsection{Modele językowe wykorzystywane w badaniu}
 
-Duże modele językowe pełnią istotną rolę w prezentowanych eksperymentach, służąc jako generatory konfiguracji IaC. Ich zdolność do przetwarzania języka naturalnego oraz generowania poprawnego kodu czyni je ważnym elementem automatyzacji procesów DevOps. W tym podrozdziale przedstawiono charakterystykę wybranych modeli, opis ich architektur oraz praktyczne aspekty związane z ich wykorzystaniem.
+Duże modele językowe pełnią istotną rolę w prezentowanych eksperymentach, służąc jako generatory konfiguracji IaC. Ich zdolność do przetwarzania języka naturalnego oraz generowania poprawnego kodu czyni je ważnym elementem automatyzacji procesów DevOps. W tym podrozdziale przedstawiono przegląd wybranych modeli, opis ich architektur oraz praktyczne aspekty związane z ich wykorzystaniem.
 
 Rynek dużych modeli językowych rozwija się dynamicznie, oferując zarówno modele komercyjne, dostępne przez API, jak i modele open-source, możliwe do uruchomienia lokalnie lub na własnej infrastrukturze. Decyzja o wyborze konkretnego rodzaju modelu często zależy od dostępności zasobów sprzętowych (zwłaszcza GPU), wymagań dotyczących licencji, kwestii związanych z prywatnością danych oraz możliwości dostosowania modeli do specyficznych zastosowań.
 
@@ -67,31 +67,6 @@ Poniżej przedstawiono najważniejsze cechy różnicujące współczesne modele 
     \item \textbf{Okno kontekstowe:} Okno kontekstowe odnosi się do maksymalnej długości sekwencji tokenów (słów, znaków, fragmentów kodu), którą model może przetworzyć i wykorzystać do wygenerowania odpowiedzi. Jest to szczególnie istotne w kontekście generowania konfiguracji IaC z repozytoriów kodu. Duże okno kontekstowe pozwala na dostarczenie modelowi całych plików źródłowych aplikacji, fragmentów dokumentacji, wielu powiązanych ze sobą promptów, a nawet wyników walidacji z zewnętrznych narzędzi. To umożliwia agentowi LLM holistyczne zrozumienie projektu i kontekstu, co przekłada się na wyższą jakość i trafność generowanych konfiguracji. Modele takie jak Google Gemini 2.5 Pro wyróżniają się wyjątkowo dużym oknem kontekstowym (do miliona tokenów), co jest znaczącą przewagą w zadaniach wymagających głębokiej analizy kodu i dokumentacji.
     \item \textbf{Specjalizacje i optymalizacje:} Niektóre modele, takie jak Mistral Codestral, są specjalizowane lub fine-tuninguowane w kierunku generowania kodu. Oznacza to, że są one trenowane na dużych zbiorach danych zawierających kod programistyczny, co poprawia ich zdolność do generowania syntaktycznie poprawnego i semantycznie trafnego kodu. Architektury takie jak Mixture-of-Experts (MoE) stosowane np. w DeepSeek V3 pozwalają na efektywne skalowanie modeli, aktywując tylko część ekspertów dla danego zapytania, co optymalizuje zużycie zasobów przy zachowaniu wysokiej jakości odpowiedzi.
 \end{itemize}
-
-Poniższa tabela \ref{tab:llm-characteristic} przedstawia ogólne charakterystyki wybranych modeli LLM, które będą wykorzystywane w badaniu. Okno kontekstu podano w liczbie tokenów, a liczba parametrów — w miliardach, jeśli została opublikowana.
-
-\begin{table}[!h] \centering
-\caption{Charakterystyka wybranych modeli LLM}
-\label{tab:llm-characteristic}
-\begin{tabular}{| c | c | c | c |} \hline
-\textbf{Dostawca} & \textbf{Model} & \textbf{Parametry (mld)} & \textbf{Okno kontekstu (tokeny)} \\ \hline\hline
-OpenAI & GPT-5 & - & TODO \\ \hline
-OpenAI & GPT-5 Mini & - & TODO \\ \hline
-OpenAI & o3 & - & TODO \\ \hline
-Anthropic & Claude Sonnet 4.5 & - & TODO \\ \hline
-Anthropic & Claude Haiku 4.5 & - & TODO \\ \hline
-Anthropic & Claude Opus 4.1 & - & TODO \\ \hline
-Google & Gemini 2.5 Pro & - & TODO \\ \hline
-Google & Gemini 2.5 Flash & - & TODO \\ \hline
-Qwen & Qwen 3 & TODO & TODO \\ \hline
-DeepSeek & DeepSeek R1 & TODO & TODO \\ \hline
-DeepSeek & DeepSeek V3.2 & TODO & TODO \\ \hline
-Zhipu AI & GLM 4.6 & TODO & TODO \\ \hline
-Mistral AI & Mistral Medium & TODO & TODO \\ \hline
-Meta & Llama 4 Maverick & TODO & TODO \\ \hline
-Meta & Llama 4 Scout & TODO & TODO \\ \hline
-\end{tabular}
-\end{table}
 
 \subsection{Sposoby wykorzystania modeli}
 
