@@ -14,6 +14,8 @@ Modele komercyjne dostępne przez API zazwyczaj cechują się wysoką wydajnośc
 
 Wybrane do badania modele komercyjne to:
 
+TODO zaktualizować listę modeli jak już będzie finalna!
+
 \begin{itemize}
     \item \textbf{OpenAI GPT-5} \cite{gpt5}: TODO
 
@@ -186,7 +188,6 @@ Eksperymenty zostały przeprowadzone na lokalnej stacji roboczej, którą stanow
 Do zarządzania kontenerami i środowiskami uruchomieniowymi wykorzystano następujące narzędzia:
 \begin{itemize}
 	\item \textbf{Docker Desktop:} \cite{docker_desktop} Używany do uruchamiania kontenerów oraz do budowania obrazów Docker na podstawie generowanych plików Dockerfile. Docker Desktop służył jako podstawowe środowisko konteneryzacji.
-	\item \textbf{Kind (Kubernetes in Docker):} \cite{kind} Lekki klaster Kubernetes uruchamiany w kontenerach Docker. Kind posłużył jako środowisko do walidacji wygenerowanych manifestów Kubernetes w fazie eksperymentalnej. Pozwoliło to na weryfikację, czy aplikacje faktycznie uruchamiają się i działają poprawnie w środowisku Kubernetes.
 	\item \textbf{MicroK8s:} \cite{microk8s} Lekka dystrybucja Kubernetes przeznaczona do uruchamiania w środowiskach produkcyjnych oraz testowych. MicroK8s został wykorzystany jako bardziej zbliżony do środowiska produkcyjnego klaster Kubernetes, umożliwiający walidację wygenerowanych konfiguracji w warunkach bardziej odpowiadających rzeczywistym wdrożeniom.
 \end{itemize}
 
