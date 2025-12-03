@@ -38,7 +38,7 @@ Eksperymenty wymagają kompleksowego środowiska testowego składającego się z
 
 \subsubsection{Agent LLM}
 
-Agent został zaimplementowany przy użyciu biblioteki LangGraph i pełni rolę autonomicznego generatora konfiguracji. Otrzymuje on link do repozytorium Git oraz systemowy prompt z instrukcjami i ma za zadanie wygenerować kompletne pliki \texttt{Dockerfile} oraz manifesty Kubernetes.
+Agent został zaimplementowany przy użyciu bibliotek LangChain oraz LangGraph i pełni rolę autonomicznego generatora konfiguracji. Otrzymuje on link do repozytorium Git oraz systemowy prompt z instrukcjami i ma za zadanie wygenerować kompletne pliki \texttt{Dockerfile} oraz manifesty Kubernetes.
 
 \bigskip
 \noindent
@@ -63,7 +63,7 @@ Agent dysponuje zestawem jedenastu funkcji umożliwiających interakcję z repoz
 
     \item \texttt{patch\_file(file\_path, patch)} – aplikuje patch w formacie unified diff,
 
-    \item \texttt{base64\_encode(content)} – koduje tekst do base64 (dla Kubernetes Secrets),
+    \item \texttt{base64\_encode(content)} – koduje tekst do base64 (np. dla Kubernetes Secrets),
 
     \item \texttt{base64\_decode(encoded)} – dekoduje base64,
 
