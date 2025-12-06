@@ -1,6 +1,8 @@
 \clearpage % Rozdziały zaczynamy od nowej strony.
 \section{Projekt eksperymentów}
 
+TODO przeczytac uwaznie calosc i zredagowac pod katem spojnosc i logiki oraz aktualnosci ze stanem faktycznym projektu
+
 \subsection{Cel badania}
 
 Celem eksperymentów jest ocena możliwości autonomicznego generowania konfiguracji Infrastructure as Code przez agenty oparte na dużych modelach językowych. Badanie koncentruje się na weryfikacji, czy nowoczesne modele językowe są w stanie — bez ingerencji człowieka — wygenerować funkcjonalne, bezpieczne i zgodne z dobrymi praktykami konfiguracje wdrożeniowe (pliki \texttt{Dockerfile} oraz manifesty Kubernetes) na podstawie wyłącznie analizy struktury i zawartości kodu źródłowego repozytorium.
@@ -151,6 +153,8 @@ Dataset obejmuje 30–50 projektów zróżnicowanych pod względem:
 
 Ten szeroki dataset zwiększa reprezentatywność eksperymentu oraz umożliwia uogólnienie wyników na szerszą klasę projektów spotykanych w praktyce, weryfikując podstawową przydatność podejścia agentowego do automatyzacji generowania konfiguracji IaC.
 
+\textbf{Ograniczenia praktyczne:} w badaniu H1 celowo wykorzystano zestaw relatywnie prostych aplikacji (mało komponentów, brak skomplikowanej orkiestracji), aby umożliwić tanią i szybką ewaluację. Bardziej złożone przypadki są analizowane w H2. Liczba powtórzeń na kombinację (model, repozytorium, prompt) została ograniczona do 2 ze względu na budżet obliczeniowy — należy to uwzględnić przy interpretacji szerokich przedziałów ufności i istotności różnic między modelami/promptami.
+
 \bigskip
 \noindent
 \textbf{Warianty promptów:}
@@ -176,19 +180,26 @@ Ze względu na koszt wywołań API oraz objętość danych, dla H1 przeprowadzan
     \item \texttt{dockerfile\_syntax\_valid} — czy Dockerfile jest poprawny składniowo,
     \item \texttt{k8s\_syntax\_valid} — czy manifesty Kubernetes są poprawne składniowo,
     \item \texttt{build\_success} — czy obrazy Docker zbudowały się pomyślnie,
+    \item \texttt{k8s\_apply\_success} — czy manifesty zostały poprawnie zaaplikowane do klastra,
     \item \texttt{runtime\_success} — czy aplikacja uruchomiła się poprawnie w klastrze i odpowiada na żądania HTTP,
     \item \texttt{prompt\_id} — identyfikator wariantu prompta (basic / default).
 \end{itemize}
 
 \textbf{Wskaźnik sukcesu:}
 \[
-\text{Success rate} = \frac{\text{build\_success} \land \text{runtime\_success}}{\text{total\_runs}} \times 100\%
+\text{Success rate} = \frac{\text{build\_success} \land \text{k8s\_apply\_success} \land \text{runtime\_success}}{\text{total\_runs}} \times 100\%
 \]
+
+\textbf{TODO: kaskada etapów:} raportować drop-off per etap (build → apply → runtime), by pokazać wąskie gardła.
+
+\textbf{TODO: przedziały ufności:} raportować 95\% CI dla success rate — dla $n \ge 30$ Wilson, dla mniejszych prób Clopper–Pearson (dwumianowy dokładny). Przy $n \approx 20$ stosować Clopper–Pearson i w tabeli podać wprost „95\% CI (Clopper–Pearson)”.
 
 \textbf{Porównanie wariantów promptów:}
 \[
 \Delta_{\text{prompt}} = \text{Success rate}_{\text{default}} - \text{Success rate}_{\text{basic}}
 \]
+
+\textbf{TODO: istotność różnicy:} dla $\Delta_{\text{prompt}}$ wykonać test różnicy proporcji (lub raportować, czy 95\% CI się nie pokrywają), aby ocenić znaczenie prompt engineering. Przy $n \approx 20$ rozważyć dokładny test dwumianowy albo bootstrap zamiast asymptotycznego przybliżenia normalnego.
 
 \subsubsection{Kryteria weryfikacji}
 

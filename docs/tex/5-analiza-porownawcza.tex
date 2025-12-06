@@ -40,6 +40,8 @@ Testowano następujące modele językowe:
     \item \textbf{poc5-adversarial-fastapi} — repozytorium z elementami manipulacyjnymi (prompt injection, błędne praktyki).
 \end{itemize}
 
+\textbf{Ograniczenia praktyczne H1:} z uwagi na koszty obliczeń, w badaniu H1 zastosowano 2 powtórzenia na kombinację (model, repozytorium, wariant prompta) oraz zestaw relatywnie prostych aplikacji. Wnioski dotyczą więc prostych/średnio złożonych projektów; dla systemów złożonych odniesieniem są wyniki H2. Szerokość przedziałów ufności i istotność różnic między modelami/promptami należy interpretować z uwzględnieniem małej liczby powtórzeń.
+
 \subsubsection{Podsumowanie przebiegów}
 
 [TODO: Wypełnić po przeprowadzeniu eksperymentów]
@@ -63,7 +65,7 @@ Duże modele językowe, działające jako agenty z dostępem do narzędzi analiz
 
 \textbf{Współczynnik sukcesu ogólny:}
 
-[TODO: Wartość procentowa] projektów zostało pomyślnie uruchomionych w klastrze Kubernetes przy użyciu autonomicznie wygenerowanych konfiguracji.
+[TODO: Wartość procentowa] projektów zostało pomyślnie uruchomionych w klastrze Kubernetes przy użyciu autonomicznie wygenerowanych konfiguracji (sukces = build \& k8s\_apply \& runtime 2xx).
 
 \textbf{Rozbicie według języka programowania:}
 
@@ -85,6 +87,13 @@ Duże modele językowe, działające jako agenty z dostępem do narzędzi analiz
 \subsubsection{Typowe problemy i tryby awarii}
 
 [TODO: Analiza najczęstszych przyczyn niepowodzeń]
+
+Drop-off kaskadowy:
+\begin{itemize}
+    \item Build: [X]\% sukcesu,
+    \item K8s apply: [Y]\% sukcesu (z tych, które się zbudowały),
+    \item Runtime (2xx na ingress): [Z]\% sukcesu (z tych, które się zaaplikowały).
+\end{itemize}
 
 Najczęstsze problemy napotkane podczas generacji konfiguracji dla rzeczywistych projektów:
 
