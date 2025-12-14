@@ -144,7 +144,7 @@ Duże modele językowe, działające jako agenty z dostępem do narzędzi analiz
 
 W celu oceny ogólnej zdolności agentów LLM do generowania działających konfiguracji, testy H1 przeprowadzane są na \textbf{szerokim zestawie rzeczywistych, publicznie dostępnych projektów z GitHub}. Wykorzystanie niekontrolowanych repozytoriów o różnorodnej strukturze, niekompletnej dokumentacji i niestandardowych zależnościach pozwala ocenić skuteczność agentów w warunkach rzeczywistych.
 
-Dataset obejmuje 30–50 projektów zróżnicowanych pod względem:
+Dataset obejmuje 25 projektów zróżnicowanych pod względem:
 \begin{itemize}
     \item języków programowania (Python, Node.js, Go, Java, Ruby, Rust),
     \item frameworków (FastAPI, Express, Django, Spring Boot, Rails),
@@ -169,9 +169,11 @@ Aby ocenić wpływ jakości instrukcji systemowych na skuteczność generacji, t
 
 Porównanie wyników między wariantami pozwoli określić, w jakim stopniu szczegółowość i jakość prompt engineering wpływa na success rate oraz jakość wygenerowanych konfiguracji, co ma istotne implikacje praktyczne dla wdrożeń produkcyjnych systemów opartych na agentach LLM.
 
+\textbf{Wariant bazowy (H1.0):} pierwsza seria testów uruchamiana jest wyłącznie z wariantem \texttt{default.prompt} na zestawie ~30 prostszych aplikacji webowych (zgodnie z listą w \texttt{experiments/h1.yaml}) oraz trzema modelami (gemini-2.5-flash, gpt-5-mini, deepseek-chat). Celem jest oszacowanie bazowego success rate i drop-off na etapach (build, apply, runtime) przy niskim koszcie. Porównanie z innymi wariantami promptów zostanie przeprowadzone w kolejnych przebiegach.
+
 \bigskip
 \noindent
-Ze względu na koszt wywołań API oraz objętość danych, dla H1 przeprowadzane są 1–2 powtórzenia dla każdego repozytorium z 2–3 najlepszymi modelami komercyjnymi (np. GPT-5, Claude Sonnet 4.5) oraz oboma wariantami promptów.
+Ze względu na koszt wywołań API oraz objętość danych, dla H1 przeprowadzane są 2 powtórzenia dla każdego repozytorium z trzema modelami faktycznie użytymi w eksperymencie (gemini-2.5-flash, gpt-5-mini, deepseek-chat) oraz oboma wariantami promptów.
 
 \subsubsection{Metryki}
 
@@ -209,12 +211,14 @@ Ze względu na koszt wywołań API oraz objętość danych, dla H1 przeprowadzan
         \item Success rate > 60–70\% na różnorodnym zbiorze projektów — wskazuje, że agenty LLM potrafią autonomicznie generować funkcjonalne konfiguracje w większości przypadków,
         \item $\Delta_{\text{prompt}}$ > 15\% — szczegółowy prompt znacząco poprawia skuteczność generacji, co potwierdza istotność prompt engineering w kontekście agentów LLM.
     \end{itemize}
-    \item \textbf{Negatywna weryfikacja hipotezy}:
-    \begin{itemize}
-        \item Success rate < 50\% — wskazuje na fundamentalne ograniczenia podejścia agentowego w praktycznym zastosowaniu,
-        \item $|\Delta_{\text{prompt}}|$ < 5\% — wariant prompta nie ma istotnego wpływu na wyniki, co sugeruje, że jakość prompt engineering jest drugorzędna wobec innych czynników (np. możliwości modelu, złożoność repozytorium).
+\item \textbf{Negatywna weryfikacja hipotezy}:
+\begin{itemize}
+    \item Success rate < 50\% — wskazuje na fundamentalne ograniczenia podejścia agentowego w praktycznym zastosowaniu,
+    \item $|\Delta_{\text{prompt}}|$ < 5\% — wariant prompta nie ma istotnego wpływu na wyniki, co sugeruje, że jakość prompt engineering jest drugorzędna wobec innych czynników (np. możliwości modelu, złożoność repozytorium).
     \end{itemize}
 \end{itemize}
+
+\textbf{Raportowanie w przypadku niskiego sukcesu E2E:} jeżeli współczynnik sukcesu end-to-end jest niski (np. kilkadziesiąt procent), w analizie prezentowane są również wskaźniki per etap (build/apply/runtime) oraz drop-off między etapami, aby wskazać, gdzie najczęściej dochodzi do awarii.
 
 \subsection{Weryfikacja H2: Ograniczenia złożonościowe}
 

@@ -9,27 +9,22 @@ Eksperymenty przeprowadzono zgodnie z metodologią opisaną w rozdziale 4, wykor
 
 \subsubsection{Badane modele językowe}
 
-Testowano następujące modele językowe:
+Testowano następujące modele językowe (zgodnie z konfiguracją \texttt{experiments/h1.yaml}):
 
 \textbf{Modele komercyjne:}
 \begin{itemize}
-    \item \textbf{OpenAI}: GPT-5, GPT-5 Mini, o3,
-    \item \textbf{Anthropic}: Claude Sonnet 4.5, Claude Haiku 4.5, Claude Opus 4.1,
-    \item \textbf{Google}: Gemini 2.5 Pro, Gemini 2.5 Flash.
+    \item \textbf{OpenAI}: GPT-5 Mini,
+    \item \textbf{Google}: Gemini 2.5 Flash.
 \end{itemize}
 
 \textbf{Modele otwarte:}
 \begin{itemize}
-    \item Qwen 3 (Alibaba),
-    \item DeepSeek R1, DeepSeek V3.2,
-    \item GLM 4.6,
-    \item Mistral Medium,
-    \item Meta Llama 4 Maverick, Meta Llama 4 Scout.
+    \item \textbf{DeepSeek}: DeepSeek-Chat (V3.2) — uruchamiany przez dedykowane API dostawcy.
 \end{itemize}
 
 \subsubsection{Zbiory danych}
 
-\textbf{Dla hipotezy H1} (ogólna funkcjonalność): Dataset obejmował 30–50 publicznie dostępnych projektów z GitHub, zróżnicowanych pod względem języków programowania (Python, Node.js, Go, Java, Ruby, Rust), frameworków (FastAPI, Express, Django, Spring Boot, Rails) oraz architektur (monolity, aplikacje wielowarstwowe, systemy rozproszone).
+\textbf{Dla hipotezy H1} (ogólna funkcjonalność): Dataset obejmował 25 publicznie dostępnych projektów z GitHub, zróżnicowanych pod względem języków programowania (Python, Node.js, Go, Java, Ruby, Rust), frameworków (FastAPI, Express, Django, Spring Boot, Rails) oraz architektur (monolity, aplikacje wielowarstwowe, systemy rozproszone). W iteracji bazowej wykorzystano 25 prostszych aplikacji webowych (lista w \texttt{experiments/h1.yaml}) jako punkt wyjścia do późniejszych porównań promptów.
 
 \textbf{Dla hipotez H2–H5} (szczegółowa analiza): Wykorzystano pięć kontrolowanych repozytoriów testowych:
 \begin{itemize}
@@ -59,13 +54,22 @@ Testowano następujące modele językowe:
 
 Duże modele językowe, działające jako agenty z dostępem do narzędzi analizy repozytorium, są w stanie autonomicznie wygenerować funkcjonalne konfiguracje Docker i Kubernetes, które umożliwiają poprawne uruchomienie aplikacji bez dodatkowej ingerencji człowieka.
 
+\textbf{Zakres iteracji H1.0 (bazowej):} uruchomione z jednym wariantem prompta (\texttt{default.prompt}), trzema modelami (gemini-2.5-flash, gpt-5-mini, deepseek-chat), 2 powtórki na repo/model na 25 prostych aplikacjach webowych (lista w \texttt{experiments/h1.yaml}). Kolejne iteracje będą obejmować porównanie promptów.
+
 \subsubsection{Wyniki eksperymentalne}
 
-[TODO: Tabela ze współczynnikiem sukcesu per model na zbiorze GitHub]
+[TODO: Tabela ze współczynnikiem sukcesu per model na zbiorze GitHub: end-to-end (build \& k8s\_apply \& runtime) oraz per etap]
 
 \textbf{Współczynnik sukcesu ogólny:}
 
-[TODO: Wartość procentowa] projektów zostało pomyślnie uruchomionych w klastrze Kubernetes przy użyciu autonomicznie wygenerowanych konfiguracji (sukces = build \& k8s\_apply \& runtime 2xx).
+[TODO: Wartość procentowa] projektów zostało pomyślnie uruchomionych w klastrze Kubernetes przy użyciu autonomicznie wygenerowanych konfiguracji (sukces = build \& k8s\_apply \& runtime 2xx). Przy niskim odsetku sukcesów E2E raportowane są także wskaźniki per etap.
+
+\textbf{Per etap (kaskada):}
+\begin{itemize}
+    \item Build: [X]\% sukcesu,
+    \item K8s apply: [Y]\% sukcesu (z tych, które się zbudowały),
+    \item Runtime (2xx na ingress): [Z]\% sukcesu (z tych, które się zaaplikowały).
+\end{itemize}
 
 \textbf{Rozbicie według języka programowania:}
 
@@ -87,13 +91,6 @@ Duże modele językowe, działające jako agenty z dostępem do narzędzi analiz
 \subsubsection{Typowe problemy i tryby awarii}
 
 [TODO: Analiza najczęstszych przyczyn niepowodzeń]
-
-Drop-off kaskadowy:
-\begin{itemize}
-    \item Build: [X]\% sukcesu,
-    \item K8s apply: [Y]\% sukcesu (z tych, które się zbudowały),
-    \item Runtime (2xx na ingress): [Z]\% sukcesu (z tych, które się zaaplikowały).
-\end{itemize}
 
 Najczęstsze problemy napotkane podczas generacji konfiguracji dla rzeczywistych projektów:
 
@@ -480,9 +477,11 @@ Hipoteza H5 została [POTWIERDZONA/ODRZUCONA]. Odsetek agentów podatnych na man
 \hline
 \textbf{Model} & \textbf{H1} & \textbf{H2} & \textbf{H3} & \textbf{H4} & \textbf{H5} \\
 \hline
-GPT-5 & [pozycja] & [pozycja] & [pozycja] & [pozycja] & [pozycja] \\
+GPT-5 Mini & [pozycja] & [pozycja] & [pozycja] & [pozycja] & [pozycja] \\
 \hline
-Claude Sonnet 4.5 & [pozycja] & [pozycja] & [pozycja] & [pozycja] & [pozycja] \\
+Gemini 2.5 Flash & [pozycja] & [pozycja] & [pozycja] & [pozycja] & [pozycja] \\
+\hline
+DeepSeek-Chat (V3.2) & [pozycja] & [pozycja] & [pozycja] & [pozycja] & [pozycja] \\
 \hline
 [...] & [...] & [...] & [...] & [...] & [...] \\
 \hline
@@ -493,14 +492,21 @@ Claude Sonnet 4.5 & [pozycja] & [pozycja] & [pozycja] & [pozycja] & [pozycja] \\
 
 [TODO: Analiza jakościowa dla każdego modelu]
 
-\textbf{GPT-5:}
+\textbf{GPT-5 Mini:}
 \begin{itemize}
     \item Mocne strony: [lista],
     \item Słabe strony: [lista],
     \item Najlepszy w: [scenariusz].
 \end{itemize}
 
-\textbf{Claude Sonnet 4.5:}
+\textbf{Gemini 2.5 Flash:}
+\begin{itemize}
+    \item Mocne strony: [lista],
+    \item Słabe strony: [lista],
+    \item Najlepszy w: [scenariusz].
+\end{itemize}
+
+\textbf{DeepSeek-Chat (V3.2):}
 \begin{itemize}
     \item Mocne strony: [lista],
     \item Słabe strony: [lista],
