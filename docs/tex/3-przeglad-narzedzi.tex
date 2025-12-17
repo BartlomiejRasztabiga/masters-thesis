@@ -139,20 +139,20 @@ Do zarządzania kontenerami i środowiskami uruchomieniowymi wykorzystano nastę
 	\item \textbf{MicroK8s:} \cite{microk8s} Lekka dystrybucja Kubernetes przeznaczona do uruchamiania w środowiskach produkcyjnych oraz testowych. MicroK8s został wykorzystany jako bardziej zbliżony do środowiska produkcyjnego klaster Kubernetes, umożliwiający walidację wygenerowanych konfiguracji w warunkach bardziej odpowiadających rzeczywistym wdrożeniom.
 \end{itemize}
 
-Cała logika sterowania eksperymentami, w tym implementacja agentów, wywoływanie narzędzi, walidacja i zbieranie wyników, została zrealizowana przy użyciu języka \textbf{Python w wersji 3.13}. Wykorzystane biblioteki Python obejmowały:
+Cała logika sterowania eksperymentami, w tym implementacja agentów, wywoływanie narzędzi, walidacja i zbieranie wyników, została zrealizowana przy użyciu języka \textbf{Python (3.11+)}. Wykorzystane komponenty obejmowały:
 \begin{itemize}
-	\item \textbf{LangChain i LangGraph:} \cite{langchain} \cite{langgraph} Te frameworki stanowiły podstawę do budowy architektury agentowej, zarządzania przepływami konwersacji z LLM oraz integrowania wywołań narzędzi.
-	\item \textbf{Docker SDK for Python (docker):} \cite{docker_sdk_python} Umożliwiała programistyczną interakcję z Docker Daemon, w tym budowanie obrazów i zarządzanie kontenerami.
-	\item \textbf{Kubernetes Python Client (kubernetes):} \cite{kubernetes_sdk_python} Służyła do programistycznej interakcji z API Kubernetes, umożliwiając wdrażanie manifestów i sprawdzanie stanu zasobów.
-	\item \textbf{Pydantic:} \cite{pydantic} Wykorzystywana do walidacji danych i definiowania schematów wejścia/wyjścia dla funkcji i narzędzi używanych przez agentów, co zwiększyło niezawodność i bezpieczeństwo interakcji.
-	\item \textbf{Streamlit:} \cite{streamlit} Framework do szybkiego tworzenia aplikacji webowych w języku Python, wykorzystany do implementacji panelu sterowania eksperymentami. Umożliwił stworzenie interaktywnego interfejsu do zarządzania eksperymentami, monitorowania ich postępu oraz przeglądania wyników.
-	\item Inne standardowe biblioteki Python do obsługi danych, operacji na plikach oraz generowania raportów.
+    \item \textbf{LangChain i LangGraph:} \cite{langchain} \cite{langgraph} Te frameworki stanowiły podstawę do budowy architektury agentowej, zarządzania przepływami konwersacji z LLM oraz integrowania wywołań narzędzi.
+    \item \textbf{Narzędzia CLI Docker i Kubernetes:} Do walidacji i uruchamiania konfiguracji wykorzystywano polecenia \texttt{docker} (m.in. \texttt{buildx} oraz \texttt{push}) oraz \texttt{kubectl} (walidacja \texttt{--dry-run}, wdrażanie manifestów i sprawdzanie stanu zasobów w klastrze).
+    \item \textbf{PyYAML:} Wykorzystywany do parsowania i modyfikacji manifestów Kubernetes w celu ich dostosowania do kontekstu uruchomienia (np. tagów obrazów i przestrzeni nazw).
+    \item \textbf{Pydantic:} \cite{pydantic} Wykorzystywana do walidacji danych i definiowania schematów wejścia/wyjścia dla funkcji i narzędzi używanych przez agentów, co zwiększyło niezawodność i bezpieczeństwo interakcji.
+    \item \textbf{Streamlit:} \cite{streamlit} Framework do szybkiego tworzenia aplikacji webowych w języku Python, wykorzystany do implementacji panelu sterowania eksperymentami. Umożliwił stworzenie interaktywnego interfejsu do zarządzania eksperymentami, monitorowania ich postępu oraz przeglądania wyników.
+    \item Inne standardowe biblioteki Python do obsługi danych, operacji na plikach oraz generowania raportów.
 \end{itemize}
 
 Interakcje z modelami LLM odbywały się za pośrednictwem dwóch głównych ścieżek:
 \begin{itemize}
-	\item \textbf{Bezpośrednie API:} W przypadku modeli komercyjnych, które oferują własne dedykowane API (np. OpenAI GPT-4, Google Gemini Pro, Anthropic Claude), korzystano z ich natywnych interfejsów programistycznych.
-	\item \textbf{OpenRouter:} Dla modeli open-source (np. Mistral, Meta Llama), które często nie posiadają własnych komercyjnych API lub ich infrastruktura do hostingu jest zbyt kosztowna dla pojedynczego badacza, wykorzystano platformę \textbf{OpenRouter}. OpenRouter działa jako brama API (API Gateway), agregująca dostęp do wielu modeli od różnych dostawców za pośrednictwem ujednoliconego interfejsu API, co znacząco ułatwiało testowanie różnorodnych modeli bez konieczności integracji z wieloma odrębnymi API.
+    \item \textbf{Bezpośrednie API:} W przypadku modeli komercyjnych, które oferują własne dedykowane API (np. OpenAI GPT-5 Mini, Google Gemini 2.5 Flash, Anthropic Claude), korzystano z ich natywnych interfejsów programistycznych.
+    \item \textbf{OpenRouter:} Dla modeli open-source (np. Mistral, Meta Llama), które często nie posiadają własnych komercyjnych API lub ich infrastruktura do hostingu jest zbyt kosztowna dla pojedynczego badacza, wykorzystano platformę \textbf{OpenRouter}. OpenRouter działa jako brama API (API Gateway), agregująca dostęp do wielu modeli od różnych dostawców za pośrednictwem ujednoliconego interfejsu API, co znacząco ułatwiało testowanie różnorodnych modeli bez konieczności integracji z wieloma odrębnymi API.
 \end{itemize}
 
 W trakcie prowadzenia badań i eksperymentów wykorzystano również szereg narzędzi wspomagających, które były cenne dla efektywnego zarządzania procesem badawczym i analizą wyników:
