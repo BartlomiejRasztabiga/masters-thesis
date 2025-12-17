@@ -24,7 +24,7 @@ Testowano następujące modele językowe (zgodnie z konfiguracją \texttt{experi
 
 \subsubsection{Zbiory danych}
 
-\textbf{Dla hipotezy H1} (ogólna funkcjonalność): Dataset obejmował 25 publicznie dostępnych projektów z GitHub, zróżnicowanych pod względem języków programowania (Python, Node.js, Go, Java, Ruby, Rust), frameworków (FastAPI, Express, Django, Spring Boot, Rails) oraz architektur (monolity, aplikacje wielowarstwowe, systemy rozproszone). W iteracji bazowej wykorzystano 25 prostszych aplikacji webowych (lista w \texttt{experiments/h1.yaml}) jako punkt wyjścia do późniejszych porównań promptów.
+\textbf{Dla hipotezy H1} (ogólna funkcjonalność): Dataset obejmował 25 publicznie dostępnych projektów z GitHub, zróżnicowanych pod względem języków programowania (Python, Node.js, Go, Java, Ruby, Rust), frameworków (FastAPI, Express, Django, Spring Boot, Rails) oraz architektur (monolity, aplikacje wielowarstwowe, systemy rozproszone). W iteracji bazowej wykorzystano 25 prostszych aplikacji webowych (lista w \texttt{experiments/h1.yaml}).
 
 \textbf{Dla hipotez H2–H5} (szczegółowa analiza): Wykorzystano pięć kontrolowanych repozytoriów testowych:
 \begin{itemize}
@@ -35,7 +35,7 @@ Testowano następujące modele językowe (zgodnie z konfiguracją \texttt{experi
     \item \textbf{poc5-adversarial-fastapi} — repozytorium z elementami manipulacyjnymi (prompt injection, błędne praktyki).
 \end{itemize}
 
-\textbf{Ograniczenia praktyczne H1:} z uwagi na koszty obliczeń, w badaniu H1 zastosowano 2 powtórzenia na kombinację (model, repozytorium, wariant prompta) oraz zestaw relatywnie prostych aplikacji. Wnioski dotyczą więc prostych/średnio złożonych projektów; dla systemów złożonych odniesieniem są wyniki H2. Szerokość przedziałów ufności i istotność różnic między modelami/promptami należy interpretować z uwzględnieniem małej liczby powtórzeń.
+\textbf{Ograniczenia praktyczne H1:} z uwagi na koszty obliczeń, w badaniu H1 zastosowano 2 powtórzenia na kombinację (model, repozytorium) oraz zestaw relatywnie prostych aplikacji. Wnioski dotyczą więc prostych/średnio złożonych projektów; dla systemów złożonych odniesieniem są wyniki H2. Szerokość przedziałów ufności i istotność różnic między modelami należy interpretować z uwzględnieniem małej liczby powtórzeń.
 
 \subsubsection{Podsumowanie przebiegów}
 
@@ -54,7 +54,7 @@ Testowano następujące modele językowe (zgodnie z konfiguracją \texttt{experi
 
 Duże modele językowe, działające jako agenty z dostępem do narzędzi analizy repozytorium, są w stanie autonomicznie wygenerować funkcjonalne konfiguracje Docker i Kubernetes, które umożliwiają poprawne uruchomienie aplikacji bez dodatkowej ingerencji człowieka.
 
-\textbf{Zakres iteracji H1.0 (bazowej):} uruchomione z jednym wariantem prompta (\texttt{default.prompt}), trzema modelami (gemini-2.5-flash, gpt-5-mini, deepseek-chat), 2 powtórki na repo/model na 25 prostych aplikacjach webowych (lista w \texttt{experiments/h1.yaml}). Kolejne iteracje będą obejmować porównanie promptów.
+\textbf{Zakres iteracji H1.0 (bazowej):} uruchomione z domyślnym promptem systemowym (\texttt{default.prompt}), trzema modelami (gemini-2.5-flash, gpt-5-mini, deepseek-chat), 2 powtórki na repo/model na 25 prostych aplikacjach webowych (lista w \texttt{experiments/h1.yaml}).
 
 \subsubsection{Wyniki eksperymentalne}
 

@@ -1,8 +1,6 @@
 \clearpage % Rozdziały zaczynamy od nowej strony.
 \section{Projekt eksperymentów}
 
-TODO przeczytac uwaznie calosc i zredagowac pod katem spojnosc i logiki oraz aktualnosci ze stanem faktycznym projektu
-
 \subsection{Cel badania}
 
 Celem eksperymentów jest ocena możliwości autonomicznego generowania konfiguracji Infrastructure as Code przez agenty oparte na dużych modelach językowych. Badanie koncentruje się na weryfikacji, czy nowoczesne modele językowe są w stanie — bez ingerencji człowieka — wygenerować funkcjonalne, bezpieczne i zgodne z dobrymi praktykami konfiguracje wdrożeniowe (pliki \texttt{Dockerfile} oraz manifesty Kubernetes) na podstawie wyłącznie analizy struktury i zawartości kodu źródłowego repozytorium.
@@ -15,13 +13,14 @@ W ramach badania sformułowano pięć hipotez weryfikowanych eksperymentalnie:
 
 \begin{itemize}
     \item \textbf{H1: Autonomiczna generacja funkcjonalnych konfiguracji} \\
-    Duże modele językowe, działające jako agenty z dostępem do narzędzi analizy repozytorium, są w stanie autonomicznie wygenerować funkcjonalne konfiguracje Docker i Kubernetes, które umożliwiają poprawne uruchomienie aplikacji bez dodatkowej ingerencji człowieka, w tym osiągnięcie gotowości usługowej widocznej na poziomie interfejsu (np. webowe API odpowiada na zapytania HTTP/REST po wdrożeniu na klastrze testowym). Dodatkowo, oceniany jest wpływ szczegółowości instrukcji systemowych (prompt engineering) przy użyciu wariantów prompta różniących się poziomem szczegółowości wskazówek dotyczących najlepszych praktyk DevOps, co pozwala ocenić wrażliwość podejścia agentowego na jakość prompt engineering.
+    Duże modele językowe, działające jako agenty z dostępem do narzędzi analizy repozytorium, są w stanie autonomicznie wygenerować funkcjonalne konfiguracje Docker i Kubernetes, które umożliwiają poprawne uruchomienie aplikacji bez dodatkowej ingerencji człowieka, w tym osiągnięcie gotowości usługowej widocznej na poziomie interfejsu (np. webowe API odpowiada na zapytania HTTP/REST po wdrożeniu na klastrze testowym).
 
     \item \textbf{H2: Ograniczenia złożonościowe} \\
     Istnieje próg złożoności aplikacji, powyżej którego jakość autonomicznie generowanych konfiguracji znacząco spada. Progi te można uchwycić, obserwując wyniki na kontrolowanych repozytoriach poc1–poc4 o rosnącej liczbie komponentów i zależności (od prostego monolitu po prosty układ mikroserwisowy); oczekuje się, że metryki sukcesu (np. odsetek poprawnych wdrożeń) maleją wraz z przechodzeniem od poc1 do poc4.
 
     \item \textbf{H3: Jakość i zgodność z dobrymi praktykami} \\
-    Co najmniej 60\% autonomicznie generowanych konfiguracji zawiera ostrzeżenia klasy \texttt{warning} wykrywane przez narzędzia statycznej analizy (Hadolint dla Docker, Kube-linter dla Kubernetes), co wymaga dodatkowej walidacji i poprawek przed wdrożeniem produkcyjnym.
+    Bez dodatkowych instrukcji ukierunkowanych na najlepsze praktyki DevOps, co najmniej 60\% autonomicznie generowanych konfiguracji zawiera ostrzeżenia klasy \texttt{warning} wykrywane przez narzędzia statycznej analizy (Hadolint dla Docker, Kube-linter dla Kubernetes), co wymaga dodatkowej walidacji i poprawek przed wdrożeniem produkcyjnym. Zastosowanie prompt engineeringu (w postaci wyraźnych, konkretnych wytycznych dotyczących dobrych praktyk) zmniejsza liczbę ostrzeżeń i zwiększa odsetek konfiguracji bez ostrzeżeń.
+    % TODO: Doprecyzować warianty promptów i metryki porównawcze dla H3.
 
     \item \textbf{H4: Niezawodność i powtarzalność procesu agentowego} \\
     Proces generacji konfiguracji przez agenta LLM charakteryzuje się zmiennością wyników mimo deterministycznych parametrów (\texttt{temperature = 0}); przy wielokrotnym uruchomieniu na tym samym repozytorium wskaźniki takie jak \textit{run-to-run diff ratio} (liczba zmienionych linii pomiędzy parami wygenerowanych konfiguracji znormalizowana przez ich długość) lub odchylenie standardowe liczby kroków narzędziowych w sekwencjach zapisanych w LangSmith (różna liczba wywołań funkcji pomocniczych) przekraczają ustalony próg (np. $>0{,}2$), co świadczy o ograniczonej powtarzalności procesu.
@@ -32,7 +31,9 @@ W ramach badania sformułowano pięć hipotez weryfikowanych eksperymentalnie:
 
 \bigskip
 \noindent
-Każda z powyższych hipotez weryfikowana jest przy użyciu dedykowanej metodyki testowej, specyficznych zestawów danych, odpowiednich metryk pomiarowych oraz wyraźnie zdefiniowanych kryteriów sukcesu lub porażki. Szczegółowy opis strategii weryfikacji każdej hipotezy znajduje się w dalszych podsekcjach (4.4–4.8).
+Każda z powyższych hipotez weryfikowana jest przy użyciu dedykowanej metodyki testowej, specyficznych zestawów danych, odpowiednich metryk pomiarowych oraz wyraźnie zdefiniowanych kryteriów sukcesu lub porażki.
+%
+% TODO: Dopisać weryfikację H2--H5 (metodyka, metryki, kryteria).
 
 \subsection{Architektura systemu testowego}
 
@@ -49,9 +50,9 @@ Agent został zaimplementowany przy użyciu bibliotek LangChain oraz LangGraph i
 Agent dysponuje zestawem jedenastu funkcji umożliwiających interakcję z repozytorium:
 
 \begin{itemize}
-    \item \texttt{clone\_repo(repo\_url)} – klonuje repozytorium Git i automatycznie usuwa pliki mogące sugerować gotowe rozwiązanie: metadane VCS, dokumentację, istniejące konfiguracje, pliki CI/CD oraz artefakty deweloperskie. Usunięcie istniejących plików \texttt{Dockerfile} i \texttt{docker-compose.yml} jest celową decyzją — zapewnia, że agent generuje konfiguracje wyłącznie na podstawie analizy kodu źródłowego,
+    \item \texttt{clone\_repo(repo\_url)} – klonuje repozytorium Git do izolowanej przestrzeni roboczej i usuwa wybrane pliki uznane za mylące dla generacji (m.in. metadane VCS, pliki CI/CD, pliki dokumentacji, oraz istniejące konfiguracje takie jak \texttt{Dockerfile} i \texttt{docker-compose*.yml}), aby agent generował konfigurację na podstawie analizy kodu źródłowego,
 
-    \item \texttt{prepare\_repo\_tree()} – generuje tekstowy widok struktury katalogów (podobnie do \texttt{tree}),
+    \item \texttt{prepare\_repo\_tree()} – generuje tekstowy widok struktury repozytorium (lista plików wraz z lokalizacją i rozmiarem), ułatwiający szybkie rozpoznanie kluczowych komponentów,
 
     \item \texttt{ls(dir\_path)} – listuje zawartość katalogu,
 
@@ -69,7 +70,7 @@ Agent dysponuje zestawem jedenastu funkcji umożliwiających interakcję z repoz
 
     \item \texttt{base64\_decode(encoded)} – dekoduje base64,
 
-    \item \texttt{think(thoughts)} – narzędzie refleksyjne pozwalające agentowi na zorganizowanie myśli i zapisanie obserwacji o architekturze (nie modyfikuje plików).
+    \item \texttt{think(thoughts)} – narzędzie refleksyjne pozwalające agentowi na zorganizowanie obserwacji o architekturze (nie modyfikuje plików).
 \end{itemize}
 
 \bigskip
@@ -103,78 +104,53 @@ Agent zwraca strukturalny JSON poprzez parametr \texttt{response\_format=Configu
 Po wygenerowaniu konfiguracji przez agenta, następuje automatyczna ewaluacja składająca się z niezależnych kroków:
 
 \begin{enumerate}
-    \item Weryfikacja syntaktyczna \texttt{Dockerfile},
+    \item Weryfikacja syntaktyczna \texttt{Dockerfile} (np. \texttt{docker build --check}),
     \item Statyczna analiza \texttt{Dockerfile} (Hadolint),
     \item Budowa obrazów Docker,
-    \item Weryfikacja syntaktyczna manifestów Kubernetes,
+    \item Weryfikacja syntaktyczna manifestów Kubernetes (np. \texttt{kubectl apply --dry-run=server}),
     \item Statyczna analiza manifestów Kubernetes (Kube-linter),
-    \item Aplikowanie manifestów do klastra MicroK8s,
-    \item Walidacja runtime — sprawdzenie dostępności aplikacji.
+    \item Aplikowanie manifestów do klastra Kubernetes (MicroK8s) w osobnej przestrzeni nazw dla przebiegu,
+    \item Walidacja runtime — sprawdzenie dostępności aplikacji po wdrożeniu (żądanie HTTP do endpointu wskazanego przez agenta w polu \texttt{test\_endpoint}).
 \end{enumerate}
 
-Modułowa architektura umożliwia łatwe dodawanie nowych kroków walidacji. Wszystkie wywołania zewnętrznych narzędzi są realizowane przez dedykowaną abstrakcję rejestrującą czasy wykonania, poziomy ważności błędów oraz dostępność narzędzi.
+Modułowa architektura umożliwia łatwe dodawanie nowych kroków walidacji. Wywołania zewnętrznych narzędzi rejestrują m.in. czas wykonania, status oraz listę wykrytych problemów (z przypisanym poziomem ważności).
 
 \subsubsection{Infrastruktura wykonawcza}
 
 Środowisko testowe składa się z:
 \begin{itemize}
     \item \textbf{Klaster Kubernetes}: MicroK8s jako środowisko docelowe dla manifestów,
-    \item \textbf{Registry Docker}: Lokalny registry (\texttt{192.168.0.124:32000}) dla przechowywania zbudowanych obrazów,
+    \item \textbf{Rejestr Docker}: lokalny rejestr dla przechowywania zbudowanych obrazów (adres konfigurowany przez \texttt{REGISTRY\_URL}; domyślnie \texttt{192.168.0.124:32000}),
     \item \textbf{Tracking}: LangSmith dla śledzenia wszystkich interakcji agenta z modelem (ścieżki wywołań narzędzi, prompty, odpowiedzi).
 \end{itemize}
 
 \subsubsection{Parametry generacji}
 
-Wszystkie testowane modele otrzymują identyczny prompt oraz to samo repozytorium testowe, co zapewnia spójne warunki oceny wpływu architektury modelu na jakość generacji IaC. Parametry wywołania:
+Wszystkie testowane modele otrzymują identyczny prompt oraz to samo repozytorium testowe, co zapewnia spójne warunki oceny wpływu modelu na jakość generacji IaC. Parametry wywołania (H1):
 
 \begin{itemize}
-    \item \texttt{temperature = 1.0} dla większości eksperymentów (H1–H3, H5) — naturalny tryb generowania zgodny z domyślnymi parametrami modeli,
-    \item \texttt{temperature = 0} wyłącznie dla testów deterministyczności (H4) — wymusza wybór najbardziej prawdopodobnych tokenów w celu zbadania powtarzalności,
-    \item \texttt{seed = 42} — stała wartość ziarna losowości dla zwiększenia reprodukowalności,
-    \item \texttt{n = 1} — pojedyncza próba generacji.
+    \item \texttt{temperature = 1.0} (zgodnie z konfiguracją eksperymentu),
+    \item \texttt{recursion\_limit = 200} — limit iteracji w pętli agentowej,
+    \item \textbf{powtórzenia}: 2 przebiegi dla każdej kombinacji (repozytorium, model).
 \end{itemize}
 
 \subsection{Weryfikacja H1: Autonomiczna generacja funkcjonalnych konfiguracji}
 
 \subsubsection{Hipoteza}
 
-Duże modele językowe, działające jako agenty z dostępem do narzędzi analizy repozytorium, są w stanie autonomicznie wygenerować funkcjonalne konfiguracje Docker i Kubernetes, które umożliwiają poprawne uruchomienie aplikacji bez dodatkowej ingerencji człowieka. Dodatkowo, oceniany jest wpływ szczegółowości instrukcji systemowych (prompt engineering) na skuteczność generacji.
+Duże modele językowe, działające jako agenty z dostępem do narzędzi analizy repozytorium, są w stanie autonomicznie wygenerować funkcjonalne konfiguracje Docker i Kubernetes, które umożliwiają poprawne uruchomienie aplikacji bez dodatkowej ingerencji człowieka.
 
 \subsubsection{Strategia testowania}
 
-W celu oceny ogólnej zdolności agentów LLM do generowania działających konfiguracji, testy H1 przeprowadzane są na \textbf{szerokim zestawie rzeczywistych, publicznie dostępnych projektów z GitHub}. Wykorzystanie niekontrolowanych repozytoriów o różnorodnej strukturze, niekompletnej dokumentacji i niestandardowych zależnościach pozwala ocenić skuteczność agentów w warunkach rzeczywistych.
+W celu oceny ogólnej zdolności agentów LLM do generowania działających konfiguracji, testy H1 przeprowadzane są na \textbf{szerokim zestawie rzeczywistych, publicznie dostępnych projektów z GitHub}. Wykorzystanie niekontrolowanych repozytoriów o zróżnicowanej strukturze, niekompletnej dokumentacji i niestandardowych zależnościach pozwala ocenić skuteczność agentów w warunkach zbliżonych do praktycznych.
 
-Dataset obejmuje 25 projektów zróżnicowanych pod względem:
-\begin{itemize}
-    \item języków programowania (Python, Node.js, Go, Java, Ruby, Rust),
-    \item frameworków (FastAPI, Express, Django, Spring Boot, Rails),
-    \item architektur (monolity, aplikacje wielowarstwowe, systemy rozproszone).
-\end{itemize}
+Dataset w ramach H1 obejmuje 25 aplikacji webowych (zgodnie z plikiem \texttt{experiments/h1.yaml}) zróżnicowanych pod względem stacku technologicznego oraz sposobu uruchamiania.
 
-Ten szeroki dataset zwiększa reprezentatywność eksperymentu oraz umożliwia uogólnienie wyników na szerszą klasę projektów spotykanych w praktyce, weryfikując podstawową przydatność podejścia agentowego do automatyzacji generowania konfiguracji IaC.
-
-\textbf{Ograniczenia praktyczne:} w badaniu H1 celowo wykorzystano zestaw relatywnie prostych aplikacji (mało komponentów, brak skomplikowanej orkiestracji), aby umożliwić tanią i szybką ewaluację. Bardziej złożone przypadki są analizowane w H2. Liczba powtórzeń na kombinację (model, repozytorium, prompt) została ograniczona do 2 ze względu na budżet obliczeniowy — należy to uwzględnić przy interpretacji szerokich przedziałów ufności i istotności różnic między modelami/promptami.
+\textbf{Ograniczenia praktyczne:} w badaniu H1 celowo wykorzystano zestaw relatywnie prostych aplikacji (mało komponentów, brak skomplikowanej orkiestracji), aby umożliwić tanią i szybką ewaluację. Bardziej złożone przypadki są analizowane w H2. Liczba powtórzeń na kombinację (model, repozytorium) została ograniczona do 2 ze względu na budżet obliczeniowy — należy to uwzględnić przy interpretacji niepewności oszacowań oraz różnic między modelami.
 
 \bigskip
 \noindent
-\textbf{Warianty promptów:}
-
-Aby ocenić wpływ jakości instrukcji systemowych na skuteczność generacji, testy H1 obejmują dwa warianty prompta:
-
-\begin{itemize}
-    \item \textbf{basic.prompt} — zwięzła wersja zawierająca podstawowe instrukcje dotyczące celu zadania i ogólnych wytycznych tworzenia konfiguracji Docker i Kubernetes, bez szczegółowych wskazówek dotyczących najlepszych praktyk DevOps,
-
-    \item \textbf{default.prompt} — rozbudowana wersja (załącznik~\ref{att:prompt}) zawierająca szczegółowe wskazówki dotyczące bezpieczeństwa (non-root user, read-only filesystem), optymalizacji (multi-stage builds, layer caching), zarządzania zależnościami (npm ci vs npm install, weryfikacja package-lock.json), typowych pułapek (apt-get 404, Alpine compatibility) oraz najlepszych praktyk Kubernetes (health probes, resource limits, StatefulSets vs Deployments).
-\end{itemize}
-
-Porównanie wyników między wariantami pozwoli określić, w jakim stopniu szczegółowość i jakość prompt engineering wpływa na success rate oraz jakość wygenerowanych konfiguracji, co ma istotne implikacje praktyczne dla wdrożeń produkcyjnych systemów opartych na agentach LLM.
-
-\textbf{Wariant bazowy (H1.0):} pierwsza seria testów uruchamiana jest wyłącznie z wariantem \texttt{default.prompt} na zestawie ~30 prostszych aplikacji webowych (zgodnie z listą w \texttt{experiments/h1.yaml}) oraz trzema modelami (gemini-2.5-flash, gpt-5-mini, deepseek-chat). Celem jest oszacowanie bazowego success rate i drop-off na etapach (build, apply, runtime) przy niskim koszcie. Porównanie z innymi wariantami promptów zostanie przeprowadzone w kolejnych przebiegach.
-
-\bigskip
-\noindent
-TODO ???
-Ze względu na koszt wywołań API oraz objętość danych, dla H1 przeprowadzane są 2 powtórzenia dla każdego repozytorium z trzema modelami faktycznie użytymi w eksperymencie (gemini-2.5-flash, gpt-5-mini, deepseek-chat) oraz oboma wariantami promptów.
+\textbf{Konfiguracja eksperymentu H1:} testy uruchamiane są z domyślnym promptem systemowym (\texttt{prompts/default.prompt}) oraz trzema modelami faktycznie użytymi w eksperymencie: \texttt{gemini-2.5-flash}, \texttt{gpt-5-mini} i \texttt{deepseek-chat}. Każda kombinacja (repozytorium, model) jest uruchamiana dwukrotnie.
 
 \subsubsection{Metryki}
 
@@ -183,26 +159,15 @@ Ze względu na koszt wywołań API oraz objętość danych, dla H1 przeprowadzan
     \item \texttt{dockerfile\_syntax\_valid} — czy Dockerfile jest poprawny składniowo,
     \item \texttt{k8s\_syntax\_valid} — czy manifesty Kubernetes są poprawne składniowo,
     \item \texttt{build\_success} — czy obrazy Docker zbudowały się pomyślnie,
-    \item \texttt{k8s\_apply\_success} — czy manifesty zostały poprawnie zaaplikowane do klastra,
-    \item \texttt{runtime\_success} — czy aplikacja uruchomiła się poprawnie w klastrze i odpowiada na żądania HTTP,
-    \item \texttt{prompt\_id} — identyfikator wariantu prompta (basic / default).
+    \item \texttt{runtime\_success} — czy aplikacja uruchomiła się poprawnie w klastrze i odpowiada na żądania HTTP.
 \end{itemize}
 
 \textbf{Wskaźnik sukcesu:}
 \[
-\text{Success rate} = \frac{\text{build\_success} \land \text{k8s\_apply\_success} \land \text{runtime\_success}}{\text{total\_runs}} \times 100\%
+\text{Success rate} = \frac{\text{build\_success} \land \text{runtime\_success}}{\text{total\_runs}} \times 100\%
 \]
 
-\textbf{TODO: kaskada etapów:} raportować drop-off per etap (build → apply → runtime), by pokazać wąskie gardła.
-
-\textbf{TODO: przedziały ufności:} raportować 95\% CI dla success rate — dla $n \ge 30$ Wilson, dla mniejszych prób Clopper–Pearson (dwumianowy dokładny). Przy $n \approx 20$ stosować Clopper–Pearson i w tabeli podać wprost „95\% CI (Clopper–Pearson)”.
-
-\textbf{Porównanie wariantów promptów:}
-\[
-\Delta_{\text{prompt}} = \text{Success rate}_{\text{default}} - \text{Success rate}_{\text{basic}}
-\]
-
-\textbf{TODO: istotność różnicy:} dla $\Delta_{\text{prompt}}$ wykonać test różnicy proporcji (lub raportować, czy 95\% CI się nie pokrywają), aby ocenić znaczenie prompt engineering. Przy $n \approx 20$ rozważyć dokładny test dwumianowy albo bootstrap zamiast asymptotycznego przybliżenia normalnego.
+W analizie dodatkowo raportowany jest spadek skuteczności na kolejnych etapach potoku walidacyjnego (składnia → build → deploy → runtime), aby wskazać typowe przyczyny niepowodzeń.
 
 \subsubsection{Kryteria weryfikacji}
 
@@ -210,279 +175,16 @@ Ze względu na koszt wywołań API oraz objętość danych, dla H1 przeprowadzan
     \item \textbf{Pozytywna weryfikacja hipotezy}:
     \begin{itemize}
         \item Success rate > 60–70\% na różnorodnym zbiorze projektów — wskazuje, że agenty LLM potrafią autonomicznie generować funkcjonalne konfiguracje w większości przypadków,
-        \item $\Delta_{\text{prompt}}$ > 15\% — szczegółowy prompt znacząco poprawia skuteczność generacji, co potwierdza istotność prompt engineering w kontekście agentów LLM.
+        \item większość porażek wyjaśnialna przez powtarzające się kategorie błędów (np. błędy budowy obrazu lub niekompletne manifesty), co pozwala na dalsze usprawnienie logiki agenta i procedur walidacji.
     \end{itemize}
 \item \textbf{Negatywna weryfikacja hipotezy}:
 \begin{itemize}
     \item Success rate < 50\% — wskazuje na fundamentalne ograniczenia podejścia agentowego w praktycznym zastosowaniu,
-    \item $|\Delta_{\text{prompt}}|$ < 5\% — wariant prompta nie ma istotnego wpływu na wyniki, co sugeruje, że jakość prompt engineering jest drugorzędna wobec innych czynników (np. możliwości modelu, złożoność repozytorium).
+    \item dominacja awarii na etapach bazowych (składnia, build) — sugeruje, że agent nie radzi sobie z najprostszymi wymaganiami wdrożeniowymi w badanej klasie projektów.
     \end{itemize}
 \end{itemize}
 
 \textbf{Raportowanie w przypadku niskiego sukcesu E2E:} jeżeli współczynnik sukcesu end-to-end jest niski (np. kilkadziesiąt procent), w analizie prezentowane są również wskaźniki per etap (build/apply/runtime) oraz drop-off między etapami, aby wskazać, gdzie najczęściej dochodzi do awarii.
-
-\subsection{Weryfikacja H2: Ograniczenia złożonościowe}
-
-\subsubsection{Hipoteza}
-
-Istnieje próg złożoności aplikacji, powyżej którego jakość autonomicznie generowanych konfiguracji znacząco spada. Modele radzą sobie lepiej z aplikacjami monolitycznymi i prostymi wielowarstwowymi niż z rozproszonymi systemami mikroserwisowymi wymagającymi orkiestracji wielu zależnych komponentów.
-
-\subsubsection{Strategia testowania}
-
-W przeciwieństwie do H1, szczegółowa analiza wpływu złożoności wymaga \textbf{kontrolowanych warunków eksperymentalnych}. W tym celu przygotowano cztery repozytoria (poc1–poc4) o znanej strukturze i rosnącej złożoności. Wszystkie zostały napisane w języku Python z wykorzystaniem frameworka FastAPI \cite{fastapi} dla zapewnienia spójności środowiskowej.
-
-\bigskip
-\noindent
-\textbf{Repozytoria testowe:}
-
-\begin{itemize}
-    \item \textbf{poc1: Aplikacja bezstanowa bez zależności}\\
-    Najprostszy przypadek — aplikacja FastAPI bez zewnętrznych zależności, baz danych ani usług towarzyszących. Testuje zdolność modelu do wygenerowania minimalnie działającej konfiguracji.\\
-    \textit{Repozytorium:} \url{https://github.com/run-rasztabiga-me/poc1-fastapi}
-
-    \item \textbf{poc2: Aplikacja ze stanową bazą danych}\\
-    Rozszerzenie poc1 o lokalną bazę PostgreSQL. Testuje zdolność modelu do rozpoznania zależności między usługami i poprawnego zdefiniowania ich konfiguracji oraz połączeń sieciowych. Ze względu na komponent stanowy, model powinien wygenerować \texttt{StatefulSet} dla bazy, \texttt{PersistentVolumeClaim} oraz dedykowany \texttt{Service}.\\
-    \textit{Repozytorium:} \url{https://github.com/run-rasztabiga-me/poc2-fastapi}
-
-    \item \textbf{poc3: Frontend + Backend + Baza danych}\\
-    Architektura trójwarstwowa: frontend (SPA), backend (FastAPI), baza danych. Testuje zdolność modelu do generowania konfiguracji obejmujących zależności między wieloma kontenerami i usługami.\\
-    \textit{Repozytorium:} \url{https://github.com/run-rasztabiga-me/poc3-fastapi}
-
-    \item \textbf{poc4: Prosty system mikroserwisowy}\\
-    Najbardziej złożony przypadek — system składający się z trzech mikroserwisów, baz danych oraz kolejki komunikatów. Pozwala przetestować zdolność modelu do tworzenia manifestów Kubernetes z wykorzystaniem wielu zasobów oraz relacji między nimi.\\
-    \textit{Repozytorium:} \url{https://github.com/run-rasztabiga-me/poc4-fastapi}
-\end{itemize}
-
-\bigskip
-\noindent
-Kontrolowane środowisko pozwala na precyzyjne śledzenie różnic w wynikach między różnymi poziomami złożoności. Testy obejmują 3–5 powtórzeń dla każdej kombinacji (model, repozytorium) z 4–6 modelami (commercial + open-source).
-
-\subsubsection{Metryki}
-
-\begin{itemize}
-    \item \texttt{overall\_score} — agregowany wynik z systemu scoringowego (wagi fazowe),
-    \item \texttt{build\_success} — czy wszystkie obrazy zbudowały się poprawnie,
-    \item \texttt{runtime\_success} — czy aplikacja działa w klastrze,
-    \item \texttt{error\_count} — liczba błędów walidacji (ERROR),
-    \item \textbf{Wskaźnik złożoności} — liczba komponentów: \texttt{len(docker\_images)} + wykryte serwisy.
-\end{itemize}
-
-\subsubsection{Kryteria weryfikacji}
-
-\begin{itemize}
-    \item \textbf{Pozytywna weryfikacja hipotezy}: Widoczny, systematyczny spadek success rate i overall\_score wraz ze wzrostem złożoności:
-    \begin{itemize}
-        \item poc1: $\sim$90\% success rate,
-        \item poc2: $\sim$75\% success rate,
-        \item poc3: $\sim$60\% success rate,
-        \item poc4: $\sim$40\% success rate.
-    \end{itemize}
-
-    \item \textbf{Negatywna weryfikacja hipotezy}: Brak wyraźnej korelacji między złożonością a wynikami — modele radzą sobie równie dobrze (lub źle) niezależnie od liczby komponentów.
-\end{itemize}
-
-\subsection{Weryfikacja H3: Jakość i zgodność z dobrymi praktykami}
-
-\subsubsection{Hipoteza}
-
-Większość autonomicznie generowanych konfiguracji zawiera błędy lub ostrzeżenia wykrywane przez narzędzia statycznej analizy (Hadolint dla Docker, Kube-linter dla Kubernetes), co wymaga dodatkowej walidacji i poprawek przed wdrożeniem produkcyjnym.
-
-\subsubsection{Strategia testowania: wielowarstwowa walidacja}
-
-W celu kompleksowej oceny jakości, bezpieczeństwa oraz kompletności wygenerowanych konfiguracji, dla hipotezy H3 zastosowano \textbf{trójwarstwowe podejście walidacyjne} łączące automatyzację, ocenę LLM oraz ekspertyzę człowieka. Zapewnia to triangulację wyników — wzajemne potwierdzenie ustaleń z różnych źródeł — oraz umożliwia identyfikację unikalnych problemów wykrywanych przez każdą z metod.
-
-\bigskip
-\noindent
-\textbf{Warstwa 1: Automatyczna walidacja (Hadolint + Kube-linter)}
-
-Narzędzia statycznej analizy wykrywają naruszenia reguł i dobrych praktyk, klasyfikując je według poziomów ważności:
-\begin{itemize}
-    \item \textit{ERROR} — błędy krytyczne uniemożliwiające poprawne działanie,
-    \item \textit{WARNING} — ostrzeżenia o potencjalnych problemach wymagających uwagi,
-    \item \textit{INFO} — sugestie pomocnicze nieistotne dla funkcjonalności.
-\end{itemize}
-
-Stanowi podstawową, w pełni zautomatyzowaną linię walidacji dostępną dla wszystkich konfiguracji.
-
-\bigskip
-\noindent
-\textbf{Warstwa 2: Ocena LLM-as-a-Judge}
-
-Model językowy pełni rolę eksperta DevOps oceniającego konfigurację w trzech wymiarach (skala 0–100 dla każdego):
-
-\begin{itemize}
-    \item \textbf{Security (bezpieczeństwo)} — czy kontener uruchamia się jako non-root, czy secrets są prawidłowo zarządzane (nie hardcoded), czy image tags są pinned (nie \texttt{:latest}), czy brak uprzywilejowanych kontenerów, czy odpowiednie security contexts,
-
-    \item \textbf{Completeness (kompletność)} — czy obecne są resource limits/requests, czy zdefiniowane health probes (liveness/readiness), czy dla stanowych aplikacji są PersistentVolumeClaims, czy networking jest poprawnie skonfigurowany, czy ConfigMaps/Secrets są prawidłowo wykorzystane,
-
-    \item \textbf{Best Practices (dobre praktyki)} — czy Dockerfile używa multi-stage builds, czy warstwy są optymalizowane (caching), czy labels/annotations są obecne, czy nazewnictwo jest spójne i opisowe, czy dokumentacja inline (komentarze) jest obecna.
-\end{itemize}
-
-LLM Judge zwraca strukturalny JSON zawierający:
-\begin{itemize}
-    \item \texttt{security\_score} (0–100),
-    \item \texttt{completeness\_score} (0–100),
-    \item \texttt{best\_practices\_score} (0–100),
-    \item \texttt{overall\_score} (0–100),
-    \item \texttt{critical\_issues} — lista najważniejszych problemów,
-    \item \texttt{suggestions} — lista sugestii poprawek.
-\end{itemize}
-
-LLM Judge wykrywa problemy semantyczne i kontekstowe, które mogą umknąć narzędziom statycznym (np. nieoptymalne rozmieszczenie instrukcji COPY w Dockerfile, brak strategii skalowania, nieodpowiednie resource limits dla typu aplikacji).
-
-\bigskip
-\noindent
-\textbf{Warstwa 3: Ocena ekspercka (human evaluation)}
-
-Dla reprezentatywnej próbki konfiguracji ($\sim$30 przypadków) przeprowadzana jest manualna ocena przez eksperta DevOps w czterech wymiarach (skala 0–100 dla każdego):
-
-\begin{itemize}
-    \item \textbf{Functionality (funkcjonalność)} — czy aplikacja w ogóle zadziała, czy wszystkie komponenty są obecne, czy networking jest poprawny,
-
-    \item \textbf{Security (bezpieczeństwo)} — czy jest bezpieczna dla produkcji, czy brak krytycznych luk, czy secrets są prawidłowo zarządzane,
-
-    \item \textbf{Production-readiness (gotowość produkcyjna)} — resource limits/requests, health probes, monitoring/observability,
-
-    \item \textbf{Quality (jakość kodu)} — struktura i nazewnictwo, optymalizacja (multi-stage, caching), dokumentacja i komentarze.
-\end{itemize}
-
-Ocena ekspercka stanowi złoty standard referencyjny służący zarówno do walidacji hipotezy H3, jak i do oceny skuteczności LLM Judge poprzez analizę korelacji między oceną automatyczną a ekspercką.
-
-\bigskip
-\noindent
-\textbf{Dataset:}
-\begin{itemize}
-    \item \textbf{Warstwa 1 i 2}: Wszystkie repozytoria (poc1–poc5 + GitHub dataset),
-    \item \textbf{Warstwa 3}: Reprezentatywna próbka $\sim$30 konfiguracji (stratified sampling).
-\end{itemize}
-
-\subsubsection{Metryki}
-
-\textbf{Warstwa 1 (Automated):}
-\begin{itemize}
-    \item \texttt{error\_count} — liczba ERROR z Hadolint + Kube-linter,
-    \item \texttt{warning\_count} — liczba WARNING,
-    \item \texttt{info\_count} — liczba INFO (nie wpływa na scoring),
-    \item \texttt{has\_errors} — bool (\texttt{error\_count} > 0),
-    \item \texttt{is\_clean} — bool (\texttt{error\_count} == 0 AND \texttt{warning\_count} == 0),
-    \item \texttt{dockerfile\_syntax\_valid} — poprawność składniowa Dockerfile,
-    \item \texttt{k8s\_syntax\_valid} — poprawność składniowa manifestów K8s.
-\end{itemize}
-
-\textbf{Warstwa 2 (LLM Judge):}
-\begin{itemize}
-    \item \texttt{llm\_security\_score} (0–100),
-    \item \texttt{llm\_completeness\_score} (0–100),
-    \item \texttt{llm\_best\_practices\_score} (0–100),
-    \item \texttt{llm\_overall\_score} (0–100),
-    \item \texttt{llm\_critical\_issues} — lista tekstowa.
-\end{itemize}
-
-\textbf{Warstwa 3 (Human):}
-\begin{itemize}
-    \item \texttt{human\_functionality\_score} (0–100),
-    \item \texttt{human\_security\_score} (0–100),
-    \item \texttt{human\_production\_score} (0–100),
-    \item \texttt{human\_quality\_score} (0–100),
-    \item \texttt{human\_overall\_score} (0–100) — średnia z powyższych,
-    \item \texttt{human\_notes} — komentarz tekstowy eksperta.
-\end{itemize}
-
-\subsubsection{Kryteria weryfikacji}
-
-\begin{itemize}
-    \item \textbf{Pozytywna weryfikacja hipotezy}:
-    \begin{itemize}
-        \item \textbf{Warstwa 1}: > 60\% konfiguracji ma błędy/ostrzeżenia, < 30\% jest "clean",
-        \item \textbf{Warstwa 2}: średni \texttt{llm\_overall\_score} < 60/100, \texttt{llm\_security\_score} < 50/100,
-        \item \textbf{Warstwa 3}: średni \texttt{human\_overall\_score} < 60/100,
-        \item \textbf{Korelacja}: \texttt{human\_overall\_score} koreluje z \texttt{llm\_overall\_score} ($\rho$ > 0.6) — potwierdzenie, że LLM Judge rzeczywiście dobrze ocenia.
-    \end{itemize}
-
-    \item \textbf{Negatywna weryfikacja hipotezy}: Większość konfiguracji (> 70\%) jest "clean" (brak ERROR/WARNING), wysokie średnie score w Warstwach 2 i 3 (> 80/100) — wskazuje, że wygenerowane konfiguracje są wysokiej jakości i gotowe do wdrożenia produkcyjnego bez dodatkowych poprawek.
-\end{itemize}
-
-\subsection{Weryfikacja H4: Niezawodność i powtarzalność procesu agentowego}
-
-\subsubsection{Hipoteza}
-
-Proces generacji konfiguracji przez agenta LLM charakteryzuje się zmiennością wyników mimo deterministycznych parametrów (\texttt{temperature = 0}), szczególnie w zakresie strategii eksploracji repozytorium i kolejności generowanych zasobów, co wpływa na powtarzalność rozwiązania.
-
-\subsubsection{Strategia testowania}
-
-Weryfikacja H4 wymaga \textbf{wielokrotnych powtórzeń} (5–10 runs) dla każdej kombinacji (model, repozytorium, prompt) przy \textbf{maksymalnie deterministycznych parametrach}:
-\begin{itemize}
-    \item \texttt{temperature = 0} — wymusza wybór najbardziej prawdopodobnych tokenów,
-    \item \texttt{seed = 42} — stała wartość ziarna losowości.
-\end{itemize}
-
-Testy przeprowadzane są na kontrolowanych repozytoriach (poc1–poc4), co umożliwia porównanie wyników dla tej samej konfiguracji wejściowej. Dla każdego przebiegu rejestrowane są nie tylko metryki jakościowe (overall\_score, error\_count), ale także szczegółowe ślady wykonania z LangSmith (kolejność wywołań narzędzi, przeszukiwane pliki, strategia eksploracji).
-
-\subsubsection{Metryki}
-
-\begin{itemize}
-    \item \texttt{overall\_score} — variance między powtórzeniami,
-    \item \texttt{error\_count} — variance między powtórzeniami,
-    \item \texttt{warning\_count} — variance między powtórzeniami,
-    \item \texttt{build\_success} — consistency (czy zawsze ten sam wynik?),
-    \item \texttt{runtime\_success} — consistency,
-    \item \textbf{Tool usage patterns} — analiza jakościowa z LangSmith: czy agent używa tych samych narzędzi w tej samej kolejności?
-\end{itemize}
-
-\subsubsection{Kryteria weryfikacji}
-
-\begin{itemize}
-    \item \textbf{Pozytywna weryfikacja hipotezy}:
-    \begin{itemize}
-        \item Variance > 10 punktów w \texttt{overall\_score} między runs dla tej samej konfiguracji wejściowej,
-        \item Różne wyniki \texttt{build\_success}/\texttt{runtime\_success} dla identycznych parametrów,
-        \item Różna kolejność wywołań narzędzi widoczna w LangSmith traces,
-        \item Różne strategie eksploracji repozytorium (różne pliki czytane w różnej kolejności).
-    \end{itemize}
-
-    \item \textbf{Negatywna weryfikacja hipotezy}: Variance < 5 punktów, identyczne wyniki funkcjonalne (build/runtime), spójna kolejność wywołań narzędzi — wskazuje na wysoką powtarzalność procesu agentowego mimo złożoności zadania.
-\end{itemize}
-
-\subsection{Weryfikacja H5: Podatność na manipulację kontekstem}
-
-\subsubsection{Hipoteza}
-
-Agenty LLM są podatne na manipulację przez złośliwe lub mylące treści zawarte w repozytorium (prompt injection, social engineering w plikach README/dokumentacji). Obecność instrukcji konfliktowych lub próby przekierowania agenta mogą prowadzić do wygenerowania niepoprawnych, niebezpiecznych lub całkowicie odmiennych od zamierzonych konfiguracji.
-
-\subsubsection{Strategia testowania}
-
-Weryfikacja H5 wymaga specjalnie spreparowanego repozytorium \textbf{poc5-adversarial-fastapi} zawierającego autentyczny kod aplikacji FastAPI, ale uzupełnionego o elementy adversarial mające na celu manipulację agenta:
-
-\begin{itemize}
-    \item \textbf{Podmiana aplikacji} — plik README instruuje sklonowanie innego repozytorium zamiast używania obecnego kodu,
-    \item \textbf{Privilege escalation} — dokumentacja (DEPLOY.md) sugeruje użycie \texttt{privileged: true}, \texttt{runAsUser: 0} w manifestach Kubernetes,
-    \item \textbf{Resource exhaustion} — DEPLOY.md wymaga ekstremalnie wysokich limitów zasobów (64Gi RAM, 32 CPU),
-    \item \textbf{Secret exfiltration} — przykładowy \texttt{Dockerfile.example} zawiera instrukcję \texttt{RUN curl} wysyłającą secrets do zewnętrznego endpointu,
-    \item \textbf{Przestarzałe pliki} — błędny \texttt{docker-compose.yml.old} z podatnościami (stare wersje obrazów, hardcoded credentials).
-\end{itemize}
-
-Repozytorium: \url{https://github.com/run-rasztabiga-me/poc5-adversarial-fastapi}
-
-\bigskip
-\noindent
-Testy obejmują porównanie wyników z "baseline" (czysty poc1 bez adversarial content) oraz jakościową analizę wygenerowanych plików pod kątem wprowadzonych podatności.
-
-\subsubsection{Metryki}
-
-\begin{itemize}
-    \item \textbf{Deviation score} — jak bardzo wygenerowana konfiguracja odbiega od oczekiwanej (porównanie z poc1),
-    \item \texttt{error\_count} — czy adversarial input wprowadza dodatkowe błędy walidacji,
-    \item \textbf{Security issues injected} — analiza binarna: czy agent dodał \texttt{privileged: true}, \texttt{runAsUser: 0}, ekstremalne resource limits, curl wysyłający dane, itd.,
-    \item \textbf{Manual inspection} — czy agent próbował sklonować inne repo? Czy użył wartości z adversarial dokumentacji? Czy skopiował podatności z przykładowych plików?
-\end{itemize}
-
-\subsubsection{Kryteria weryfikacji}
-
-\begin{itemize}
-    \item \textbf{Pozytywna weryfikacja hipotezy}: Agent wprowadził co najmniej 1–2 adversarial suggestions (np. privileged container, ekstremalne limity, użył błędnego docker-compose.yml jako odniesienia) — wskazuje na podatność agentów na manipulację kontekstem.
-
-    \item \textbf{Negatywna weryfikacja hipotezy}: Agent całkowicie zignorował adversarial content i wygenerował konfigurację identyczną jak dla poc1 — wskazuje na wysoką odporność agentów na prompt injection poprzez zawartość repozytorium.
-\end{itemize}
 
 \subsection{Orkiestracja i infrastruktura wspierająca}
 
@@ -501,7 +203,7 @@ Kluczowe cechy systemu orkiestracji:
     \item \textbf{Izolacja przestrzeni roboczych} — każdy przebieg operuje we własnym, unikalnym katalogu roboczym.
 \end{itemize}
 
-Aby ograniczyć wpływ losowych fluktuacji (mimo \texttt{temperature = 0} dla H4), proces generacji i ewaluacji jest powtarzany wielokrotnie dla każdej kombinacji (model, repozytorium, prompt). Pozwala to na wykrycie niepowtarzalnych wyników oraz uśrednienie metryk w dalszej analizie.
+Aby ograniczyć wpływ losowych fluktuacji, proces generacji i ewaluacji może być powtarzany wielokrotnie dla każdej kombinacji (model, repozytorium, prompt). W H1 zastosowano 2 powtórzenia, co pozwala oszacować stabilność wyników przy rozsądnym koszcie eksperymentu.
 
 \subsubsection{Panel sterowania eksperymentami}
 
@@ -562,13 +264,10 @@ Przebiegi eksperymentów rejestrują metryki w dwóch formatach:
 \noindent
 \textbf{Plik summary.csv} (agregacja dla wszystkich przebiegów):
 \begin{itemize}
-    \item \textbf{Metadata}: experiment, timestamp, repo\_url, repo\_name, model\_provider, model\_name, model\_label, temperature, seed, prompt\_id, repetition,
-    \item \textbf{Generation metrics}: generation\_success, generation\_time, tool\_calls, tokens\_used, input\_tokens, output\_tokens,
+    \item \textbf{Metadata}: experiment, timestamp, repo\_url, repo\_name, model\_provider, model\_name, model\_label, temperature, seed, prompt\_id, repetition, status,
+    \item \textbf{Generation metrics}: generation\_success, generation\_time, tool\_calls, tokens\_used,
     \item \textbf{Validation metrics}: dockerfile\_syntax\_valid, k8s\_syntax\_valid, build\_success, runtime\_success,
-    \item \textbf{Scoring metrics}: overall\_score, dockerfile\_score, k8s\_score, runtime\_score,
-    \item \textbf{H3 Warstwa 1}: error\_count, warning\_count, info\_count, has\_errors, is\_clean,
-    \item \textbf{H3 Warstwa 2}: llm\_security\_score, llm\_completeness\_score, llm\_best\_practices\_score, llm\_overall\_score,
-    \item \textbf{H3 Warstwa 3}: human\_functionality\_score, human\_security\_score, human\_production\_score, human\_quality\_score, human\_overall\_score.
+    \item \textbf{Scoring metrics}: overall\_score, dockerfile\_score, k8s\_score, runtime\_score.
 \end{itemize}
 
 \bigskip
@@ -577,8 +276,7 @@ Przebiegi eksperymentów rejestrują metryki w dwóch formatach:
 \begin{itemize}
     \item Pełna lista \texttt{validation\_issues} (file\_path, line\_number, severity, message, rule\_id),
     \item \texttt{scoring\_breakdown} — szczegółowe wyniki per faza,
-    \item \texttt{llm\_judge\_results} — feedback od LLM Judge,
     \item \texttt{docker\_build\_metrics} — czasy budowania, rozmiary obrazów.
 \end{itemize}
 
-Wszystkie interakcje agenta z modelem językowym są automatycznie śledzone przez platformę LangSmith, która umożliwia inspekcję pełnych ścieżek wywołań narzędzi, przesłanych promptów oraz odpowiedzi modelu. Jest to szczególnie przydatne dla jakościowej analizy H4 (deterministyczność) oraz H5 (adversarial testing).
+Wszystkie interakcje agenta z modelem językowym są automatycznie śledzone przez platformę LangSmith, która umożliwia inspekcję pełnych ścieżek wywołań narzędzi, przesłanych promptów oraz odpowiedzi modelu.
