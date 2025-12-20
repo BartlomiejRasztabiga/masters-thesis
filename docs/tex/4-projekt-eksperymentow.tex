@@ -177,7 +177,7 @@ Testy H1 opierają się na \textbf{rzeczywistych, publicznie dostępnych projekt
 
 W analizie dodatkowo raportowany jest spadek skuteczności na kolejnych etapach potoku walidacyjnego (build → apply → runtime) oraz wskaźniki warunkowe (apply | build, runtime | apply), aby wskazać typowe miejsca, w których występują niepowodzenia.
 
-\textbf{Przedziały ufności:} dla wskaźników proporcji (success rate, metryki per etap i warunkowe) stosowane są 95\% przedziały ufności wyznaczane metodą Clopper–Pearsona (implementacja w skrypcie \texttt{scripts/summarize\_experiment.py}), co jest konserwatywnym podejściem dla niewielkich prób.
+\textbf{Przedziały ufności:} dla wskaźników proporcji (success rate, metryki per etap i warunkowe) stosowane są 95\% przedziały ufności wyznaczane metodą Clopper–Pearsona, co jest konserwatywnym podejściem dla niewielkiej liczby prób. % TODO znalezc paper ze metoda CP jest dobra
 
 \subsubsection{Kryteria weryfikacji}
 
@@ -186,13 +186,12 @@ W analizie dodatkowo raportowany jest spadek skuteczności na kolejnych etapach 
     \begin{itemize}
         \item end-to-end success rate (build \& apply \& runtime) co najmniej 60\% na zbiorze H1,
         \item sukcesy per etap: build $\geq$ 75\%, apply $\geq$ 75\%, runtime $\geq$ 60\%,
-        \item conditional apply $|$ build $\geq$ 95\% oraz conditional runtime $|$ apply $\geq$ 80\% — wskazuje, że główne awarie nie wynikają z błędów deploy/runtime przy poprawnie zbudowanych obrazach i zaaplikowanych manifestach,
+        \item conditional apply $|$ build $\geq$ 95\% oraz conditional runtime $|$ apply $\geq$ 80\% (ogranicza wpływ awarii na wcześniejszych etapach),
         \item co najmniej połowa repozytoriów osiąga $\geq$ 50\% sukcesu (obniża ryzyko, że wynik jest zawyżony przez kilka „łatwych” projektów),
-        \item brak dominującej pojedynczej klasy błędów w fazie build/apply (pojedyncze repozytoria nie blokują wyniku globalnego).
     \end{itemize}
 \end{itemize}
 
-\textbf{Raportowanie w przypadku niskiego sukcesu E2E:} jeżeli współczynnik sukcesu end-to-end jest niski (np. kilkadziesiąt procent), w analizie prezentowane są również wskaźniki per etap (build/apply/runtime) oraz drop-off między etapami, aby wskazać, gdzie najczęściej dochodzi do awarii.
+% TODO dodac opis H2-H5
 
 \subsection{Orkiestracja i infrastruktura wspierająca}
 
@@ -211,7 +210,7 @@ Kluczowe cechy systemu orkiestracji:
     \item \textbf{Izolacja przestrzeni roboczych} — każdy przebieg operuje we własnym, unikalnym katalogu roboczym.
 \end{itemize}
 
-Aby ograniczyć wpływ losowych fluktuacji, proces generacji i ewaluacji może być powtarzany wielokrotnie dla każdej kombinacji (model, repozytorium, prompt). W H1 zastosowano 2 powtórzenia, co pozwala oszacować stabilność wyników przy rozsądnym koszcie eksperymentu.
+Aby ograniczyć wpływ losowych fluktuacji, proces generacji i ewaluacji może być powtarzany wielokrotnie dla każdej kombinacji (model, repozytorium, prompt).
 
 \subsubsection{Panel sterowania eksperymentami}
 
@@ -225,76 +224,23 @@ W celu usprawnienia zarządzania eksperymentami oraz monitorowania ich postępu 
     \item \textbf{Dostęp do artefaktów} — bezpośredni wgląd w wygenerowane pliki konfiguracyjne oraz raporty z walidacji.
 \end{itemize}
 
-\subsubsection{Model scoringowy}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{tex/img/streamlit1.png}
+  \caption{Widok panelu Streamlit używanego do uruchamiania i monitorowania eksperymentów.}
+\end{figure}
 
-Na podstawie wyników walidacji z potoku testowego, moduł oceny wylicza wyniki cząstkowe dla plików Docker oraz manifestów Kubernetes przy użyciu modelu agregacji ocen opartego na wagach fazowych.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{tex/img/streamlit2.png}
+  \caption{Przykładowy widok artefaktów dla pojedynczego przebiegu (dostęp do wygenerowanych plików).}
+\end{figure}
 
-Model przypisuje różne wagi ważności poszczególnym fazom walidacji — fazy krytyczne dla funkcjonalności (składnia, budowa obrazu, aplikowanie do klastra) mają wyższą wagę (40\% każda) niż weryfikacja dobrych praktyk przez lintery (20\%).
-
-\textbf{Wagi faz Docker:}
-\begin{itemize}
-    \item \textit{docker\_syntax} — 40\%
-    \item \textit{docker\_build} — 40\%
-    \item \textit{docker\_linters} — 20\%
-\end{itemize}
-
-\textbf{Wagi faz Kubernetes:}
-\begin{itemize}
-    \item \textit{k8s\_syntax} — 40\%
-    \item \textit{kubernetes\_apply} — 40\%
-    \item \textit{k8s\_linters} — 20\%
-\end{itemize}
-
-Każde wykryte zagadnienie pomniejsza wynik fazy o wartość zależną od jego powagi:
-\begin{itemize}
-    \item \textit{ERROR} — odejmuje 15 punktów,
-    \item \textit{WARNING} — odejmuje 10 punktów,
-    \item \textit{INFO} — nie wpływa na wynik (jedynie sugestie pomocnicze).
-\end{itemize}
-
-Bazowy wynik każdej fazy wynosi 100 punktów. Wynik komponentu (Docker lub Kubernetes) stanowi średnią ważoną wyników jego faz, a wynik całościowy (\textit{overall\_score}) agreguje komponenty według wag: Docker (35\%), Kubernetes (40\%) oraz środowisko uruchomieniowe (25\%).
-
-\textbf{Ważne:} Wagi nie są normalizowane — jeśli dany komponent nie został wykonany (np. brak testów runtime), jest traktowany jako 0 punktów, a nie pomijany w obliczeniach. Oznacza to, że aby uzyskać maksymalny wynik, wszystkie komponenty muszą zostać przejściowo przetestowane.
-
-\textbf{Dodatkowe reguły kary za krytyczne błędy:}
-\begin{itemize}
-    \item Jeśli budowa obrazu Docker zakończy się niepowodzeniem (faza \textit{docker\_build} zawiera błędy ERROR), wszystkie wyniki faz Docker (składnia, linters, budowa) zostają zerowane, co odzwierciedla fakt, że niezdolność do zbudowania obrazu uniemożliwia dalsze użycie konfiguracji.
-    \item Jeśli aplikowanie manifestów Kubernetes do klastra zakończy się niepowodzeniem (faza \textit{kubernetes\_apply} zawiera błędy ERROR), wszystkie wyniki faz Kubernetes oraz wynik środowiska uruchomieniowego (\textit{runtime\_score}) zostają wyzerowane, ponieważ aplikacja nie może działać bez poprawnego wdrożenia.
-\end{itemize}
-
-Model zapewnia powtarzalność poprzez deterministyczne wagi oraz konsekwentne przypisywanie priorytetów błędom składniowym i funkcjonalnym nad sugestiami stylistycznymi.
-
-\subsubsection{Rejestrowane metryki}
-
-Przebiegi eksperymentów rejestrują metryki w dwóch formatach:
-
-\bigskip
-\noindent
-\textbf{Plik summary.csv} (agregacja dla wszystkich przebiegów):
-\begin{itemize}
-    \item \textbf{Metadata}: experiment, timestamp, repo\_url, repo\_name, model\_provider, model\_name, model\_label, temperature, seed, prompt\_id, repetition, status,
-    \item \textbf{Generation metrics}: generation\_success, generation\_time, tool\_calls, tokens\_used,
-    \item \textbf{Validation metrics}: dockerfile\_syntax\_valid, k8s\_syntax\_valid, build\_success, runtime\_success,
-    \item \textbf{Scoring metrics}: overall\_score, dockerfile\_score, k8s\_score, runtime\_score.
-\end{itemize}
-
-\bigskip
-\noindent
-\textbf{Pliki JSON} (szczegółowe raporty per przebieg):
-\begin{itemize}
-    \item Pełna lista \texttt{validation\_issues} (file\_path, line\_number, severity, message, rule\_id),
-    \item \texttt{scoring\_breakdown} — szczegółowe wyniki per faza,
-    \item \texttt{docker\_build\_metrics} — czasy budowania, rozmiary obrazów.
-\end{itemize}
-
-Interakcje agenta z modelem językowym mogą być śledzone przez platformę LangSmith (po włączeniu mechanizmu tracingu), co umożliwia inspekcję ścieżek wywołań narzędzi, przesłanych promptów oraz odpowiedzi modelu.
-
-\subsubsection{Zagrożenia ważności eksperymentów}
+\subsection{Zagrożenia ważności eksperymentów}
 \begin{itemize}
     \item \textbf{Reprezentatywność zbioru H1}: 25 relatywnie prostych aplikacji webowych może nie odzwierciedlać złożoności systemów produkcyjnych; wyniki mogą nie uogólniać się na złożone architektury (odniesienie w H2).
     \item \textbf{Walidacja runtime jednym endpointem}: sprawdzenie dostępności pojedynczego \texttt{test\_endpoint} nie weryfikuje w pełni komunikacji między usługami ani scenariuszy biznesowych; złożone zależności mogą pozostać niewykryte.
-    \item \textbf{Ograniczona liczba powtórzeń}: 2 przebiegi na kombinację (repozytorium, model) dają szerokie przedziały ufności i niską moc testów przy porównaniach modeli/promptów.
+    \item \textbf{Ograniczona liczba powtórzeń}: 2 przebiegi na kombinację (repozytorium, model) dają szerokie przedziały ufności.
     \item \textbf{Środowisko testowe}: MicroK8s i lokalny rejestr na jednej maszynie mogą różnić się od produkcyjnych klastrów (wydajność, sieć, storage); wyniki mogą być wrażliwe na konfigurację hosta.
     \item \textbf{Czyszczenie repozytorium}: usuwanie istniejących \texttt{Dockerfile}/\texttt{docker-compose*} eliminuje podpowiedzi dla modelu, ale też odbiega od scenariusza, w którym część konfiguracji już istnieje.
-    \item \textbf{Opcjonalny tracing}: brak włączonego LangSmith w części przebiegów ogranicza możliwość analizy zachowania agenta i może utrudniać wyjaśnienie niepowodzeń.
 \end{itemize}
