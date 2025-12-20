@@ -91,7 +91,7 @@ Prompt został sformułowany deklaratywnie, aby maksymalnie zredukować niejedno
 \noindent
 \textbf{Strukturalne wyjście:}
 
-Agent zwraca strukturalny JSON poprzez parametr \texttt{response\_format=ConfigurationOutput}:
+Agent po zakończeniu pracy zwraca JSON o następującej strukturze:
 \begin{itemize}
     \item \texttt{docker\_images} – lista obiektów z informacją o Dockerfile, tagu obrazu i kontekście budowania,
     \item \texttt{kubernetes\_files} – lista ścieżek do manifestów Kubernetes,
@@ -103,10 +103,10 @@ Agent zwraca strukturalny JSON poprzez parametr \texttt{response\_format=Configu
 Po wygenerowaniu konfiguracji przez agenta, następuje automatyczna ewaluacja składająca się z niezależnych kroków:
 
 \begin{enumerate}
-    \item Weryfikacja syntaktyczna \texttt{Dockerfile} (np. \texttt{docker build --check}),
+    \item Weryfikacja syntaktyczna \texttt{Dockerfile} (\texttt{docker build --check}),
     \item Statyczna analiza \texttt{Dockerfile} (Hadolint),
     \item Budowa obrazów Docker oraz publikacja do lokalnego rejestru,
-    \item Weryfikacja syntaktyczna manifestów Kubernetes (np. \texttt{kubectl apply --dry-run=server}),
+    \item Weryfikacja syntaktyczna manifestów Kubernetes (\texttt{kubectl apply --dry-run=server}),
     \item Statyczna analiza manifestów Kubernetes (Kube-linter),
     \item Aplikowanie manifestów do klastra Kubernetes (MicroK8s) w osobnej przestrzeni nazw dla przebiegu,
     \item Walidacja runtime — sprawdzenie dostępności aplikacji po wdrożeniu (żądanie HTTP do endpointu wskazanego przez agenta w polu \texttt{test\_endpoint}).
@@ -119,67 +119,76 @@ Modułowa architektura umożliwia łatwe dodawanie nowych kroków walidacji. Wyw
 Środowisko testowe składa się z:
 \begin{itemize}
     \item \textbf{Klaster Kubernetes}: MicroK8s jako środowisko docelowe dla manifestów,
-    \item \textbf{Rejestr Docker}: lokalny rejestr dla przechowywania zbudowanych obrazów (adres konfigurowany przez \texttt{REGISTRY\_URL}; domyślnie \texttt{192.168.0.124:32000}),
+    \item \textbf{Rejestr Docker}: lokalny rejestr dla przechowywania zbudowanych obrazów,
     \item \textbf{Śledzenie}: LangSmith do inspekcji przebiegów agenta, w tym wywołań narzędzi, promptów i odpowiedzi.
 \end{itemize}
 
 \subsubsection{Parametry generacji}
 
-Wszystkie testowane modele otrzymują identyczny prompt oraz to samo repozytorium testowe, co zapewnia spójne warunki oceny wpływu modelu na jakość generacji IaC. Parametry wywołania (H1):
-
+Konfiguracja agenta jest sterowana zestawem parametrów przekazywanych w definicji eksperymentu lub przez zmienne środowiskowe:
 \begin{itemize}
-    \item \texttt{temperature = 1.0} (zgodnie z konfiguracją eksperymentu),
-    \item \texttt{recursion\_limit = 200} — limit iteracji w pętli agentowej,
-    \item \textbf{powtórzenia}: 2 przebiegi dla każdej kombinacji (repozytorium, model).
+    \item \texttt{temperature} — kontroluje losowość generacji; typowo 1.0 (eksploracja) lub 0.0 w testach powtarzalności,
+    \item \texttt{seed} — opcjonalne ziarno losowości (np. dla powtarzalnych przebiegów),
+    \item \texttt{prompt\_version} — pozwalają wymusić konkretny wariant prompta,
+    \item \texttt{recursion\_limit} — limit kroków w pętli agentowej (domyślnie 200),
+    \item liczba powtórzeń — ustawiana w definicji eksperymentu (\texttt{repetitions}); określa, ile razy uruchamiany jest ten sam zestaw parametrów (repozytorium, model, prompt/parametry) w celu np. oszacowania zmienności wyników.
 \end{itemize}
 
 \subsection{Weryfikacja H1: Autonomiczna generacja funkcjonalnych konfiguracji}
 
+% TODO tu skonczylem
+
 \subsubsection{Hipoteza}
 
-Duże modele językowe, działające jako agenty z dostępem do narzędzi analizy repozytorium, są w stanie autonomicznie wygenerować funkcjonalne konfiguracje Docker i Kubernetes, które umożliwiają poprawne uruchomienie aplikacji bez dodatkowej ingerencji człowieka, w tym osiągnięcie gotowości usługowej widocznej na poziomie interfejsu (np. webowe API odpowiada na zapytania HTTP/REST po wdrożeniu na klastrze testowym).
+Duże modele językowe, działające jako agenty z dostępem do narzędzi analizy repozytorium, są w stanie autonomicznie wygenerować funkcjonalne konfiguracje Docker i Kubernetes, które umożliwiają poprawne uruchomienie aplikacji bez dodatkowej ingerencji człowieka, w tym osiągnięcie gotowości usługowej widocznej na poziomie interfejsu (np. webowe API odpowiada na zapytania HTTP po wdrożeniu na klastrze testowym).
 
-\subsubsection{Strategia testowania}
+\subsubsection{Zbiór danych testowych}
 
-W celu oceny ogólnej zdolności agentów LLM do generowania działających konfiguracji, testy H1 przeprowadzane są na \textbf{szerokim zestawie rzeczywistych, publicznie dostępnych projektów z GitHub}. Wykorzystanie niekontrolowanych repozytoriów o zróżnicowanej strukturze, niekompletnej dokumentacji i niestandardowych zależnościach pozwala ocenić skuteczność agentów w warunkach zbliżonych do praktycznych.
+Testy H1 opierają się na \textbf{rzeczywistych, publicznie dostępnych projektach z serwisu GitHub}, aby ocenić skuteczność agentów w warunkach zbliżonych do praktycznych. Wykorzystanie niekontrolowanych repozytoriów o zróżnicowanej strukturze, niekompletnej dokumentacji i niestandardowych zależnościach pozwala ocenić, jak agent radzi sobie poza scenariuszami laboratoryjnymi. Zbiór obejmuje 25 aplikacji webowych (załącznik~\ref{att:h1-dataset}) zróżnicowanych pod względem stosu technologicznego, architektury oraz sposobu uruchamiania. Repozytoria zostały zebrane przy użyciu GitHub API z kryteriami:
+\begin{itemize}
+    \item zapytanie: \texttt{webapp pushed:>=2025-01-01} (ostatni push po 1 stycznia 2025),
+    \item języki: Python, JavaScript, TypeScript, Java, Kotlin, C\#, Go, PHP, Ruby (popularne języki stosowane w aplikacjach webowych),
+    \item temat: \texttt{webapp},
+    \item liczba gwiazdek ("stars"): 0–10 (mniej popularne projekty),
+    \item sortowanie: \texttt{pushed} \texttt{desc} (ostatnio aktualizowane).
+\end{itemize}
 
-Dataset w ramach H1 obejmuje 25 aplikacji webowych (zgodnie z plikiem \texttt{experiments/h1.yaml}) zróżnicowanych pod względem stacku technologicznego oraz sposobu uruchamiania.
-
-\textbf{Ograniczenia praktyczne:} w badaniu H1 celowo wykorzystano zestaw relatywnie prostych aplikacji (mało komponentów, brak skomplikowanej orkiestracji), aby umożliwić tanią i szybką ewaluację. Bardziej złożone przypadki są analizowane w H2. Liczba powtórzeń na kombinację (model, repozytorium) została ograniczona do 2 ze względu na budżet obliczeniowy — należy to uwzględnić przy interpretacji niepewności oszacowań oraz różnic między modelami.
+\textbf{Ograniczenia praktyczne:} w badaniu H1 znalazł się zestaw relatywnie prostych aplikacji (mało komponentów, brak skomplikowanej orkiestracji), co obniża koszt eksperymentu, ale ogranicza uogólnienie wyników na złożone systemy — jest to jedno z zagrożeń ważności opisanych w sekcji o threats to validity.
 
 \bigskip
 \noindent
-\textbf{Konfiguracja eksperymentu H1:} testy uruchamiane są z domyślnym promptem systemowym (\texttt{prompts/default.prompt}) oraz trzema modelami faktycznie użytymi w eksperymencie: \texttt{gemini-2.5-flash}, \texttt{gpt-5-mini} i \texttt{deepseek-chat}. Każda kombinacja (repozytorium, model) jest uruchamiana dwukrotnie.
+\textbf{Konfiguracja eksperymentu H1:} testy uruchamiane są z domyślnym promptem systemowym (\texttt{prompts/default.prompt}, załącznik~\ref{att:prompt}) oraz trzema modelami użytymi w eksperymencie: \texttt{gemini-2.5-flash}, \texttt{gpt-5-mini} i \texttt{deepseek-chat}. Każda kombinacja (repozytorium, model) jest uruchamiana dwukrotnie (2 powtórzenia).
 
 \subsubsection{Metryki}
 
 \begin{itemize}
     \item \texttt{generation\_success} — czy agent zwrócił strukturalny JSON z konfiguracją,
-    \item \texttt{dockerfile\_syntax\_valid} — czy Dockerfile jest poprawny składniowo,
+    \item \texttt{dockerfile\_syntax\_valid} — czy pliki Dockerfile są poprawne składniowo,
     \item \texttt{k8s\_syntax\_valid} — czy manifesty Kubernetes są poprawne składniowo,
     \item \texttt{build\_success} — czy obrazy Docker zbudowały się pomyślnie,
+    \item \texttt{kubernetes\_apply\_success} — czy manifesty zostały poprawnie zaaplikowane do klastra,
     \item \texttt{runtime\_success} — czy aplikacja uruchomiła się poprawnie w klastrze i odpowiada na żądania HTTP.
 \end{itemize}
 
 \textbf{Wskaźnik sukcesu:}
 \[
-\text{Success rate} = \frac{\text{build\_success} \land \text{runtime\_success}}{\text{total\_runs}} \times 100\%
+\text{Success rate} = \frac{\text{build\_success} \land \text{kubernetes\_apply\_success} \land \text{runtime\_success}}{\text{total\_runs}} \times 100\%
 \]
 
-W analizie dodatkowo raportowany jest spadek skuteczności na kolejnych etapach potoku walidacyjnego (składnia → build → deploy → runtime), aby wskazać typowe przyczyny niepowodzeń.
+W analizie dodatkowo raportowany jest spadek skuteczności na kolejnych etapach potoku walidacyjnego (build → apply → runtime) oraz wskaźniki warunkowe (apply | build, runtime | apply), aby wskazać typowe miejsca, w których występują niepowodzenia.
+
+\textbf{Przedziały ufności:} dla wskaźników proporcji (success rate, metryki per etap i warunkowe) stosowane są 95\% przedziały ufności wyznaczane metodą Clopper–Pearsona (implementacja w skrypcie \texttt{scripts/summarize\_experiment.py}), co jest konserwatywnym podejściem dla niewielkich prób.
 
 \subsubsection{Kryteria weryfikacji}
 
 \begin{itemize}
-    \item \textbf{Pozytywna weryfikacja hipotezy}:
+    \item \textbf{Pozytywna weryfikacja hipotezy}: \textit{łączne spełnienie poniższych progów}:
     \begin{itemize}
-        \item Success rate > 60–70\% na różnorodnym zbiorze projektów — wskazuje, że agenty LLM potrafią autonomicznie generować funkcjonalne konfiguracje w większości przypadków,
-        \item większość porażek wyjaśnialna przez powtarzające się kategorie błędów (np. błędy budowy obrazu lub niekompletne manifesty), co pozwala na dalsze usprawnienie logiki agenta i procedur walidacji.
-    \end{itemize}
-\item \textbf{Negatywna weryfikacja hipotezy}:
-\begin{itemize}
-    \item Success rate < 50\% — wskazuje na fundamentalne ograniczenia podejścia agentowego w praktycznym zastosowaniu,
-    \item dominacja awarii na etapach bazowych (składnia, build) — sugeruje, że agent nie radzi sobie z najprostszymi wymaganiami wdrożeniowymi w badanej klasie projektów.
+        \item end-to-end success rate (build \& apply \& runtime) co najmniej 60\% na zbiorze H1,
+        \item sukcesy per etap: build $\geq$ 75\%, apply $\geq$ 75\%, runtime $\geq$ 60\%,
+        \item conditional apply $|$ build $\geq$ 95\% oraz conditional runtime $|$ apply $\geq$ 80\% — wskazuje, że główne awarie nie wynikają z błędów deploy/runtime przy poprawnie zbudowanych obrazach i zaaplikowanych manifestach,
+        \item co najmniej połowa repozytoriów osiąga $\geq$ 50\% sukcesu (obniża ryzyko, że wynik jest zawyżony przez kilka „łatwych” projektów),
+        \item brak dominującej pojedynczej klasy błędów w fazie build/apply (pojedyncze repozytoria nie blokują wyniku globalnego).
     \end{itemize}
 \end{itemize}
 
@@ -279,3 +288,13 @@ Przebiegi eksperymentów rejestrują metryki w dwóch formatach:
 \end{itemize}
 
 Interakcje agenta z modelem językowym mogą być śledzone przez platformę LangSmith (po włączeniu mechanizmu tracingu), co umożliwia inspekcję ścieżek wywołań narzędzi, przesłanych promptów oraz odpowiedzi modelu.
+
+\subsubsection{Zagrożenia ważności eksperymentów}
+\begin{itemize}
+    \item \textbf{Reprezentatywność zbioru H1}: 25 relatywnie prostych aplikacji webowych może nie odzwierciedlać złożoności systemów produkcyjnych; wyniki mogą nie uogólniać się na złożone architektury (odniesienie w H2).
+    \item \textbf{Walidacja runtime jednym endpointem}: sprawdzenie dostępności pojedynczego \texttt{test\_endpoint} nie weryfikuje w pełni komunikacji między usługami ani scenariuszy biznesowych; złożone zależności mogą pozostać niewykryte.
+    \item \textbf{Ograniczona liczba powtórzeń}: 2 przebiegi na kombinację (repozytorium, model) dają szerokie przedziały ufności i niską moc testów przy porównaniach modeli/promptów.
+    \item \textbf{Środowisko testowe}: MicroK8s i lokalny rejestr na jednej maszynie mogą różnić się od produkcyjnych klastrów (wydajność, sieć, storage); wyniki mogą być wrażliwe na konfigurację hosta.
+    \item \textbf{Czyszczenie repozytorium}: usuwanie istniejących \texttt{Dockerfile}/\texttt{docker-compose*} eliminuje podpowiedzi dla modelu, ale też odbiega od scenariusza, w którym część konfiguracji już istnieje.
+    \item \textbf{Opcjonalny tracing}: brak włączonego LangSmith w części przebiegów ogranicza możliwość analizy zachowania agenta i może utrudniać wyjaśnienie niepowodzeń.
+\end{itemize}
