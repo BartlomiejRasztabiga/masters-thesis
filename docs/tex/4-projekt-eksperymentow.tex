@@ -136,8 +136,6 @@ Konfiguracja agenta jest sterowana zestawem parametrów przekazywanych w definic
 
 \subsection{Weryfikacja H1: Autonomiczna generacja funkcjonalnych konfiguracji}
 
-% TODO tu skonczylem
-
 \subsubsection{Hipoteza}
 
 Duże modele językowe, działające jako agenty z dostępem do narzędzi analizy repozytorium, są w stanie autonomicznie wygenerować funkcjonalne konfiguracje Docker i Kubernetes, które umożliwiają poprawne uruchomienie aplikacji bez dodatkowej ingerencji człowieka, w tym osiągnięcie gotowości usługowej widocznej na poziomie interfejsu (np. webowe API odpowiada na zapytania HTTP po wdrożeniu na klastrze testowym).
@@ -177,7 +175,7 @@ Testy H1 opierają się na \textbf{rzeczywistych, publicznie dostępnych projekt
 
 W analizie dodatkowo raportowany jest spadek skuteczności na kolejnych etapach potoku walidacyjnego (build → apply → runtime) oraz wskaźniki warunkowe (apply | build, runtime | apply), aby wskazać typowe miejsca, w których występują niepowodzenia.
 
-\textbf{Przedziały ufności:} dla wskaźników proporcji (success rate, metryki per etap i warunkowe) stosowane są 95\% przedziały ufności wyznaczane metodą Clopper–Pearsona, co jest konserwatywnym podejściem dla niewielkiej liczby prób. % TODO znalezc paper ze metoda CP jest dobra
+\textbf{Przedziały ufności:} dla wskaźników proporcji (success rate, metryki per etap i warunkowe) stosowane są 95\% przedziały ufności wyznaczane metodą Cloppera–Pearsona, która daje „dokładne” (konserwatywne) granice dla rozkładu dwumianowego i jest rekomendowana przy niewielkiej liczbie prób~\cite{clopper_pearson_1934}.
 
 \subsubsection{Kryteria weryfikacji}
 
@@ -192,6 +190,93 @@ W analizie dodatkowo raportowany jest spadek skuteczności na kolejnych etapach 
 \end{itemize}
 
 % TODO dodac opis H2-H5
+
+\subsection{Weryfikacja H2: Ograniczenia złożonościowe}
+
+% TODO: Opisz metodykę (kontrolowane repozytoria o rosnącej złożoności),
+% TODO: Zdefiniuj miary złożoności (np. liczba usług, zależności, typ architektury),
+% TODO: Określ metryki sukcesu i progi (spadek success rate vs. poziom złożoności),
+% TODO: Dodaj kryteria weryfikacji (pozytywna/negatywna).
+
+\subsubsection{Hipoteza}
+
+% TODO: Wstaw treść hipotezy H2 (z sekcji hipotez badawczych).
+
+\subsubsection{Zbiór danych testowych}
+
+% TODO: Opisz zestaw repozytoriów kontrolowanych i sposób eskalacji złożoności.
+
+\subsubsection{Metryki}
+
+% TODO: Zdefiniuj metryki złożoności i metryki skuteczności.
+
+\subsubsection{Kryteria weryfikacji}
+
+% TODO: Zdefiniuj progi i warunki uznania H2.
+
+\subsection{Weryfikacja H3: Jakość i zgodność z dobrymi praktykami}
+
+% TODO: Opisz metodykę (prompt bazowy vs. prompt z dobrymi praktykami),
+% TODO: Zdefiniuj sposób liczenia ostrzeżeń Hadolint/Kube-linter,
+% TODO: Określ metryki jakości i kryteria sukcesu.
+
+\subsubsection{Hipoteza}
+
+% TODO: Wstaw treść hipotezy H3 (z sekcji hipotez badawczych).
+
+\subsubsection{Zbiór danych testowych}
+
+% TODO: Opisz zbiór (może H1 lub rozszerzony) i warunki uruchomień.
+
+\subsubsection{Metryki}
+
+% TODO: Liczba ostrzeżeń per plik/repo, odsetek konfiguracji bez ostrzeżeń, itp.
+
+\subsubsection{Kryteria weryfikacji}
+
+% TODO: Progi dla spadku ostrzeżeń po prompt engineeringu.
+
+\subsection{Weryfikacja H4: Niezawodność i powtarzalność procesu agentowego}
+
+% TODO: Opisz liczbę powtórzeń, parametry deterministyczne (temperature=0, seed),
+% TODO: Zdefiniuj sposób liczenia run-to-run diff ratio i analizę LangSmith.
+
+\subsubsection{Hipoteza}
+
+% TODO: Wstaw treść hipotezy H4 (z sekcji hipotez badawczych).
+
+\subsubsection{Zbiór danych testowych}
+
+% TODO: Opisz repozytoria i liczbę powtórzeń.
+
+\subsubsection{Metryki}
+
+% TODO: run-to-run diff ratio, odchylenie std. liczby kroków narzędziowych, itp.
+
+\subsubsection{Kryteria weryfikacji}
+
+% TODO: Progi dla zmienności (np. diff ratio > 0.2).
+
+\subsection{Weryfikacja H5: Podatność na manipulację kontekstem}
+
+% TODO: Opisz repozytorium z prompt injection i scenariusze manipulacji,
+% TODO: Zdefiniuj kryteria "odstępstwa od oczekiwań" i metryki podatności.
+
+\subsubsection{Hipoteza}
+
+% TODO: Wstaw treść hipotezy H5 (z sekcji hipotez badawczych).
+
+\subsubsection{Zbiór danych testowych}
+
+% TODO: Opisz złośliwe repozytorium i warianty ataków.
+
+\subsubsection{Metryki}
+
+% TODO: Odsetek przebiegów z niepożądanymi efektami i typy odchyleń.
+
+\subsubsection{Kryteria weryfikacji}
+
+% TODO: Progi potwierdzające podatność (np. >=30% odchyleń).
 
 \subsection{Orkiestracja i infrastruktura wspierająca}
 

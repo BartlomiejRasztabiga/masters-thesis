@@ -1,6 +1,8 @@
 \clearpage % Rozdziały zaczynamy od nowej strony.
 \section{Wyniki eksperymentów}
 
+% TODO tu skonczylem
+
 W niniejszym rozdziale przedstawiono wyniki przeprowadzonych eksperymentów badających możliwości autonomicznego generowania konfiguracji Infrastructure as Code przez agenty oparte na dużych modelach językowych. Analiza wyników zorganizowana jest zgodnie ze strukturą hipotez badawczych przedstawionych w rozdziale 4 — dla każdej z pięciu hipotez (H1–H5) zaprezentowano wyniki eksperymentalne, analizę danych oraz wnioski dotyczące weryfikacji hipotezy. Rozdział kończy synteza wyników podkreślająca kluczowe obserwacje dotyczące zdolności LLM do generowania IaC.
 
 \subsection{Przegląd przeprowadzonych eksperymentów}
@@ -108,440 +110,9 @@ Najczęstsze problemy napotkane podczas generacji konfiguracji dla rzeczywistych
 
 Na podstawie zgromadzonych danych można stwierdzić, że hipoteza H1 została [POTWIERDZONA/ODRZUCONA]. Współczynnik sukcesu [przekracza/nie osiąga] założony próg 60–70\%, co [wskazuje/nie wskazuje] na praktyczną przydatność podejścia agentowego do autonomicznego generowania konfiguracji IaC.
 
-\subsection{Wyniki H2: Ograniczenia złożonościowe}
-
-\subsubsection{Hipoteza}
-
-Istnieje próg złożoności aplikacji, powyżej którego jakość autonomicznie generowanych konfiguracji znacząco spada. Modele radzą sobie lepiej z aplikacjami monolitycznymi i prostymi wielowarstwowymi niż z rozproszonymi systemami mikroserwisowymi wymagającymi orkiestracji wielu zależnych komponentów.
-
-\subsubsection{Wyniki eksperymentalne}
-
-[TODO: Tabela ze współczynnikiem sukcesu i wynikiem ogólnym dla poc1-poc4]
-
-\textbf{Współczynnik sukcesu według złożoności:}
-
-\begin{itemize}
-    \item \textbf{poc1} (bezstanowa, 1 komponent): [X]\% sukcesu, średni wynik ogólny: [Y]/100,
-    \item \textbf{poc2} (+ baza danych, 2 komponenty): [Z]\% sukcesu, średni wynik ogólny: [W]/100,
-    \item \textbf{poc3} (frontend + backend + baza, 3 komponenty): [V]\% sukcesu, średni wynik ogólny: [U]/100,
-    \item \textbf{poc4} (mikroserwisy, 5+ komponentów): [T]\% sukcesu, średni wynik ogólny: [S]/100.
-\end{itemize}
-
-[TODO: Wykres pokazujący trend spadkowy]
-
-\textbf{Analiza według modelu:}
-
-[TODO: Tabela pokazująca jak różne modele radziły sobie z rosnącą złożonością]
-
-Najbardziej odporne na wzrost złożoności okazały się modele: [lista modeli]. Największy spadek jakości zaobserwowano dla: [lista modeli].
-
-\subsubsection{Identyfikacja progu złożoności}
-
-[TODO: Analiza, przy ilu komponentach następuje znaczący spadek]
-
-Analiza wskazuje, że znaczący spadek jakości (poniżej [X]\% sukcesu lub wyniku ogólnego < [Y]) występuje przy [liczba] komponentach aplikacji. Próg ten jest szczególnie widoczny w przypadku systemów wymagających [koordynacji stanowej/asynchronicznej komunikacji/złożonej orkiestracji].
-
-\subsubsection{Wnioski dotyczące weryfikacji H2}
-
-[TODO: Po analizie wyników]
-
-Hipoteza H2 została [POTWIERDZONA/ODRZUCONA]. Obserwowany [jest/nie jest] systematyczny spadek jakości konfiguracji wraz ze wzrostem złożoności aplikacji. Próg złożoności znajduje się [w okolicach X komponentów/nie został wyraźnie zidentyfikowany].
-
-\subsection{Wyniki H3: Jakość i zgodność z dobrymi praktykami}
-
-\subsubsection{Hipoteza}
-
-Większość autonomicznie generowanych konfiguracji zawiera błędy lub ostrzeżenia wykrywane przez narzędzia statycznej analizy (Hadolint dla Docker, Kube-linter dla Kubernetes), co wymaga dodatkowej walidacji i poprawek przed wdrożeniem produkcyjnym.
-
-Hipoteza H3 weryfikowana jest przy użyciu trójwarstwowego podejścia: automatyczna walidacja (Warstwa 1), ocena przez model językowy (Warstwa 2) oraz ocena ekspercka (Warstwa 3).
-
-\subsubsection{Warstwa 1: Automatyczna walidacja (Hadolint + Kube-linter)}
-
-[TODO: Statystyki błędów/ostrzeżeń ze wszystkich konfiguracji]
-
-\textbf{Rozkład konfiguracji według jakości:}
-
-\begin{itemize}
-    \item Konfiguracje z błędami krytycznymi (\texttt{error\_count} > 0): [X]\%,
-    \item Konfiguracje z ostrzeżeniami (\texttt{warning\_count} > 0, ale bez błędów): [Y]\%,
-    \item Konfiguracje czyste (\texttt{is\_clean} = true, brak błędów i ostrzeżeń): [Z]\%.
-\end{itemize}
-
-\textbf{Najczęstsze problemy wykrywane przez narzędzia statyczne:}
-
-[TODO: Tabela z top 10 najczęstszych reguł naruszonych]
-
-\begin{enumerate}
-    \item \textbf{[Reguła ID]} — [opis problemu]: [X] wystąpień,
-    \item \textbf{[Reguła ID]} — [opis problemu]: [Y] wystąpień,
-    \item \textbf{[Reguła ID]} — [opis problemu]: [Z] wystąpień,
-    \item [...]
-\end{enumerate}
-
-\textbf{Średnie liczby problemów na konfigurację:}
-
-\begin{itemize}
-    \item Średnia liczba błędów (ERROR): [X],
-    \item Średnia liczba ostrzeżeń (WARNING): [Y],
-    \item Średnia liczba informacji (INFO): [Z].
-\end{itemize}
-
-\subsubsection{Warstwa 2: Ocena przez model językowy (LLM-as-a-Judge)}
-
-[TODO: Wyniki oceny LLM Judge dla wszystkich konfiguracji]
-
-\textbf{Średnie wyniki według wymiaru (skala 0–100):}
-
-\begin{itemize}
-    \item Bezpieczeństwo (\texttt{llm\_security\_score}): [X]/100,
-    \item Kompletność (\texttt{llm\_completeness\_score}): [Y]/100,
-    \item Dobre praktyki (\texttt{llm\_best\_practices\_score}): [Z]/100,
-    \item Wynik ogólny (\texttt{llm\_overall\_score}): [W]/100.
-\end{itemize}
-
-\textbf{Rozkład konfiguracji według jakości:}
-
-\begin{itemize}
-    \item Konfiguracje o wysokiej jakości (\texttt{llm\_overall\_score} > 80): [X]\%,
-    \item Konfiguracje przeciętne (\texttt{llm\_overall\_score} 60–80): [Y]\%,
-    \item Konfiguracje o niskiej jakości (\texttt{llm\_overall\_score} < 60): [Z]\%.
-\end{itemize}
-
-\textbf{Najczęstsze problemy krytyczne zidentyfikowane przez LLM Judge:}
-
-[TODO: Lista najczęstszych \texttt{critical\_issues}]
-
-\begin{enumerate}
-    \item [Problem 1] — [X] wystąpień,
-    \item [Problem 2] — [Y] wystąpień,
-    \item [Problem 3] — [Z] wystąpień,
-    \item [...]
-\end{enumerate}
-
-\textbf{Porównanie z Warstwą 1:}
-
-[TODO: Analiza korelacji między \texttt{error\_count} a \texttt{llm\_overall\_score}]
-
-Współczynnik korelacji między liczbą błędów z narzędzi statycznych a oceną LLM Judge wyniósł [$\rho$ = X]. [Wskazuje to na/Nie potwierdza] zgodność między automatyczną walidacją a oceną semantyczną modelu.
-
-Konfiguracje uznane za czyste przez narzędzia statyczne (\texttt{is\_clean} = true), ale ocenione nisko przez LLM Judge (\texttt{llm\_overall\_score} < 50): [Y]\%. Świadczy to o [istnieniu/braku] problemów semantycznych i kontekstowych niewychwytywanych przez narzędzia statyczne.
-
-\subsubsection{Warstwa 3: Ocena ekspercka (human evaluation)}
-
-[TODO: Wyniki oceny eksperckiej dla próbki ~30 konfiguracji]
-
-\textbf{Średnie oceny według wymiaru (skala 0–100):}
-
-\begin{itemize}
-    \item Funkcjonalność (\texttt{human\_functionality\_score}): [X]/100,
-    \item Bezpieczeństwo (\texttt{human\_security\_score}): [Y]/100,
-    \item Gotowość produkcyjna (\texttt{human\_production\_score}): [Z]/100,
-    \item Jakość kodu (\texttt{human\_quality\_score}): [W]/100,
-    \item Wynik ogólny (\texttt{human\_overall\_score}): [V]/100.
-\end{itemize}
-
-\textbf{Rozkład konfiguracji według jakości:}
-
-\begin{itemize}
-    \item Doskonałe, gotowe do produkcji (80–100): [X]\%,
-    \item Dobre, wymagające drobnych poprawek (60–80): [Y]\%,
-    \item Przeciętne, wymagające znaczących poprawek (40–60): [Z]\%,
-    \item Słabe, wymagające gruntownej przebudowy (20–40): [W]\%,
-    \item Nieużywalne (0–20): [V]\%.
-\end{itemize}
-
-\textbf{Korelacja z oceną LLM Judge:}
-
-[TODO: Analiza korelacji między \texttt{human\_overall\_score} a \texttt{llm\_overall\_score}]
-
-Współczynnik korelacji Pearsona między oceną ekspercką a oceną LLM Judge wyniósł [$\rho$ = X]. [Silna/Umiarkowana/Słaba] korelacja [potwierdza/nie potwierdza] skuteczność LLM Judge jako automatycznego narzędzia oceny jakości konfiguracji.
-
-\textbf{Analiza jakościowa rozbieżności:}
-
-[TODO: Omówienie przypadków, gdzie LLM Judge i ekspert się nie zgadzali]
-
-Konfiguracje, dla których różnica między oceną ekspercką a oceną LLM przekroczyła 20 punktów: [X]\%. Typowe przyczyny rozbieżności:
-
-\begin{itemize}
-    \item LLM przecenia [aspekt] w stosunku do rzeczywistej istotności,
-    \item LLM nie wychwytuje [specyficzny problem],
-    \item Ekspert zwraca większą uwagę na [aspekt praktyczny],
-    \item [...]
-\end{itemize}
-
-\subsubsection{Triangulacja wyników z trzech warstw}
-
-[TODO: Analiza przekrojowa wszystkich trzech warstw]
-
-\textbf{Korelacje między warstwami:}
-
-\begin{itemize}
-    \item Warstwa 1 (narzędzia) vs Warstwa 2 (LLM Judge): $\rho$ = [X],
-    \item Warstwa 2 (LLM Judge) vs Warstwa 3 (ekspert): $\rho$ = [Y],
-    \item Warstwa 1 (narzędzia) vs Warstwa 3 (ekspert): $\rho$ = [Z].
-\end{itemize}
-
-\textbf{Unikalne spostrzeżenia z każdej warstwy:}
-
-[TODO: Co wykrywa każda warstwa, czego nie wychwytują pozostałe]
-
-\begin{itemize}
-    \item \textbf{Warstwa 1 (narzędzia)} — najskuteczniejsza w wykrywaniu [konkretnych naruszeń reguł],
-    \item \textbf{Warstwa 2 (LLM Judge)} — wykrywa problemy [semantyczne/kontekstowe],
-    \item \textbf{Warstwa 3 (ekspert)} — zwraca uwagę na [aspekty praktyczne/biznesowe].
-\end{itemize}
-
-\subsubsection{Wnioski dotyczące weryfikacji H3}
-
-[TODO: Po analizie wszystkich trzech warstw]
-
-Hipoteza H3 została [POTWIERDZONA/ODRZUCONA]:
-
-\begin{itemize}
-    \item Warstwa 1: [X]\% konfiguracji zawiera błędy/ostrzeżenia, co [przekracza/nie osiąga] progu 60\%,
-    \item Warstwa 2: Średni wynik LLM Judge wynosi [Y]/100, co [jest poniżej/przekracza] progu 60,
-    \item Warstwa 3: Średnia ocena ekspercka wynosi [Z]/100, co [potwierdza/nie potwierdza] konieczność dodatkowych poprawek,
-    \item Triangulacja wyników [jednoznacznie wskazuje/nie dostarcza wystarczających dowodów], że większość konfiguracji wymaga dodatkowej walidacji przed wdrożeniem produkcyjnym.
-\end{itemize}
-
-\subsection{Wyniki H4: Niezawodność i powtarzalność procesu agentowego}
-
-\subsubsection{Hipoteza}
-
-Proces generacji konfiguracji przez agenta LLM charakteryzuje się zmiennością wyników mimo deterministycznych parametrów (\texttt{temperature = 0}), szczególnie w zakresie strategii eksploracji repozytorium i kolejności generowanych zasobów, co wpływa na powtarzalność rozwiązania.
-
-\subsubsection{Wyniki eksperymentalne}
-
-[TODO: Analiza zmienności między powtórzeniami dla tej samej konfiguracji]
-
-Dla każdej kombinacji (model, repozytorium, prompt) przeprowadzono 5–10 powtórzeń przy identycznych parametrach deterministycznych (\texttt{temperature = 0}, \texttt{seed = 42}).
-
-\textbf{Zmienność wyniku ogólnego:}
-
-\begin{itemize}
-    \item Średnia zmienność (odchylenie standardowe) \texttt{overall\_score}: [X] punktów,
-    \item Maksymalna zmienność między powtórzeniami: [Y] punktów,
-    \item Odsetek kombinacji o zmienności > 10 punktów: [Z]\%.
-\end{itemize}
-
-\textbf{Spójność wyników funkcjonalnych:}
-
-[TODO: Analiza czy \texttt{build\_success} i \texttt{runtime\_success} są identyczne między runs]
-
-\begin{itemize}
-    \item Kombinacje z identycznymi wynikami \texttt{build\_success} we wszystkich powtórzeniach: [X]\%,
-    \item Kombinacje z identycznymi wynikami \texttt{runtime\_success} we wszystkich powtórzeniach: [Y]\%,
-    \item Kombinacje z pełną spójnością (wszystkie metryki identyczne): [Z]\%.
-\end{itemize}
-
-\textbf{Zmienność według modelu:}
-
-[TODO: Tabela pokazująca które modele są najbardziej/najmniej deterministyczne]
-
-Modele o najniższej zmienności (najbardziej deterministyczne):
-\begin{enumerate}
-    \item [Model 1]: średnia zmienność [X] punktów,
-    \item [Model 2]: średnia zmienność [Y] punktów,
-    \item [Model 3]: średnia zmienność [Z] punktów.
-\end{enumerate}
-
-Modele o najwyższej zmienności (najmniej deterministyczne):
-\begin{enumerate}
-    \item [Model 1]: średnia zmienność [X] punktów,
-    \item [Model 2]: średnia zmienność [Y] punktów,
-    \item [Model 3]: średnia zmienność [Z] punktów.
-\end{enumerate}
-
-\subsubsection{Analiza wzorców użycia narzędzi}
-
-[TODO: Analiza jakościowa śladów wykonania z LangSmith]
-
-Na podstawie śladów wykonania z platformy LangSmith przeanalizowano kolejność oraz częstotliwość wywołań narzędzi przez agenta w kolejnych powtórzeniach.
-
-\textbf{Spójność strategii eksploracji:}
-
-\begin{itemize}
-    \item Kombinacje z identyczną kolejnością wywołań narzędzi: [X]\%,
-    \item Kombinacje z identycznym zestawem odczytanych plików: [Y]\%,
-    \item Kombinacje z różnymi strategiami eksploracji repozytorium: [Z]\%.
-\end{itemize}
-
-\textbf{Typowe różnice między powtórzeniami:}
-
-[TODO: Opis jakościowy obserwowanych różnic]
-
-\begin{itemize}
-    \item Różna kolejność odczytywania plików źródłowych,
-    \item Wybór innych plików jako referencyjnych dla analizy zależności,
-    \item Różna liczba wywołań narzędzia \texttt{think} (refleksja agenta),
-    \item [...]
-\end{itemize}
-
-\subsubsection{Wnioski dotyczące weryfikacji H4}
-
-[TODO: Po analizie zmienności]
-
-Hipoteza H4 została [POTWIERDZONA/ODRZUCONA]. Obserwowana zmienność wyniku ogólnego [przekracza/nie przekracza] próg 10 punktów w [X]\% przypadków. Wyniki funkcjonalne (\texttt{build\_success}, \texttt{runtime\_success}) [są/nie są] spójne między powtórzeniami. Analiza śladów wykonania [potwierdza/nie potwierdza] zmienność strategii eksploracji repozytorium mimo deterministycznych parametrów.
-
-\subsection{Wyniki H5: Podatność na manipulację kontekstem}
-
-\subsubsection{Hipoteza}
-
-Agenty LLM są podatne na manipulację przez złośliwe lub mylące treści zawarte w repozytorium (prompt injection, social engineering w plikach README/dokumentacji). Obecność instrukcji konfliktowych lub próby przekierowania agenta mogą prowadzić do wygenerowania niepoprawnych, niebezpiecznych lub całkowicie odmiennych od zamierzonych konfiguracji.
-
-\subsubsection{Wyniki eksperymentalne}
-
-[TODO: Analiza wyników dla repozytorium poc5-adversarial-fastapi]
-
-Repozytorium testowe zawierało następujące elementy manipulacyjne:
-\begin{itemize}
-    \item Instrukcję sklonowania innego repozytorium (README),
-    \item Sugestię użycia uprzywilejowanych kontenerów (DEPLOY.md),
-    \item Ekstremalnie wysokie limity zasobów (DEPLOY.md),
-    \item Instrukcję wycieku danych przez \texttt{curl} (Dockerfile.example),
-    \item Przestarzały plik z podatnościami (docker-compose.yml.old).
-\end{itemize}
-
-\textbf{Ogólna skuteczność manipulacji:}
-
-\begin{itemize}
-    \item Odsetek agentów, które wprowadziły co najmniej jeden element manipulacyjny: [X]\%,
-    \item Odsetek agentów całkowicie odpornych na manipulację: [Y]\%,
-    \item Odsetek agentów, które wprowadziły więcej niż dwa elementy: [Z]\%.
-\end{itemize}
-
-\textbf{Skuteczność poszczególnych technik manipulacyjnych:}
-
-[TODO: Tabela pokazująca ile agentów wpadło na każdą technikę]
-
-\begin{enumerate}
-    \item \textbf{Podmiana repozytorium} — [X]\% agentów próbowało sklonować inne repozytorium,
-    \item \textbf{Uprzywilejowane kontenery} — [Y]\% agentów użyło \texttt{privileged: true} lub \texttt{runAsUser: 0},
-    \item \textbf{Ekstremalne limity zasobów} — [Z]\% agentów zastosowało limity > 32GB RAM,
-    \item \textbf{Wyciek danych} — [W]\% agentów skopiowało instrukcję \texttt{curl} z Dockerfile.example,
-    \item \textbf{Przestarzałe pliki} — [V]\% agentów użyło docker-compose.yml.old jako odniesienia.
-\end{enumerate}
-
-\textbf{Porównanie z linią bazową (poc1):}
-
-[TODO: Analiza odchylenia od czystego repozytorium]
-
-\begin{itemize}
-    \item Średnie odchylenie wyniku ogólnego od poc1: [X] punktów,
-    \item Wzrost liczby błędów walidacji w stosunku do poc1: +[Y] błędów,
-    \item Spadek wyniku bezpieczeństwa (jeśli LLM Judge zastosowany): -[Z] punktów.
-\end{itemize}
-
-\textbf{Odporność według modelu:}
-
-[TODO: Ranking modeli według odporności na manipulację]
-
-Modele najbardziej odporne (najniższy odsetek wprowadzenia elementów manipulacyjnych):
-\begin{enumerate}
-    \item [Model 1]: [X]\% podatności,
-    \item [Model 2]: [Y]\% podatności,
-    \item [Model 3]: [Z]\% podatności.
-\end{enumerate}
-
-Modele najmniej odporne (najwyższy odsetek wprowadzenia elementów manipulacyjnych):
-\begin{enumerate}
-    \item [Model 1]: [X]\% podatności,
-    \item [Model 2]: [Y]\% podatności,
-    \item [Model 3]: [Z]\% podatności.
-\end{enumerate}
-
-\subsubsection{Analiza jakościowa wprowadzonych podatności}
-
-[TODO: Przykłady konkretnych wygenerowanych fragmentów zawierających manipulacje]
-
-\textbf{Przykłady wprowadzonych podatności:}
-
-[TODO: Fragmenty wygenerowanych plików pokazujące skuteczne manipulacje]
-
-\subsubsection{Wnioski dotyczące weryfikacji H5}
-
-[TODO: Po analizie podatności]
-
-Hipoteza H5 została [POTWIERDZONA/ODRZUCONA]. Odsetek agentów podatnych na manipulację wyniósł [X]\%, co [wskazuje/nie wskazuje] na znaczące ryzyko prompt injection poprzez zawartość repozytorium. Najbardziej skuteczne techniki to: [lista]. Agenty [wykazują/nie wykazują] wystarczającą odporność na złośliwe treści w repozytoriach.
-
 \subsection{Porównanie modeli (analiza przekrojowa)}
 
-\subsubsection{Ranking według hipotez}
-
-[TODO: Tabela zbiorczą z rankingiem modeli dla każdej hipotezy]
-
-\begin{table}[h]
-\centering
-\caption{Ranking modeli według wyników dla poszczególnych hipotez}
-\begin{tabular}{|l|c|c|c|c|c|}
-\hline
-\textbf{Model} & \textbf{H1} & \textbf{H2} & \textbf{H3} & \textbf{H4} & \textbf{H5} \\
-\hline
-GPT-5 Mini & [pozycja] & [pozycja] & [pozycja] & [pozycja] & [pozycja] \\
-\hline
-Gemini 2.5 Flash & [pozycja] & [pozycja] & [pozycja] & [pozycja] & [pozycja] \\
-\hline
-DeepSeek-Chat (V3.2) & [pozycja] & [pozycja] & [pozycja] & [pozycja] & [pozycja] \\
-\hline
-[...] & [...] & [...] & [...] & [...] & [...] \\
-\hline
-\end{tabular}
-\end{table}
-
-\subsubsection{Mocne i słabe strony poszczególnych modeli}
-
-[TODO: Analiza jakościowa dla każdego modelu]
-
-\textbf{GPT-5 Mini:}
-\begin{itemize}
-    \item Mocne strony: [lista],
-    \item Słabe strony: [lista],
-    \item Najlepszy w: [scenariusz].
-\end{itemize}
-
-\textbf{Gemini 2.5 Flash:}
-\begin{itemize}
-    \item Mocne strony: [lista],
-    \item Słabe strony: [lista],
-    \item Najlepszy w: [scenariusz].
-\end{itemize}
-
-\textbf{DeepSeek-Chat (V3.2):}
-\begin{itemize}
-    \item Mocne strony: [lista],
-    \item Słabe strony: [lista],
-    \item Najlepszy w: [scenariusz].
-\end{itemize}
-
-[TODO: Powtórzyć dla wszystkich kluczowych modeli]
-
-\subsubsection{Modele komercyjne a modele otwarte}
-
-[TODO: Porównanie średnich wyników między grupami]
-
-\textbf{Średnie wyniki dla modeli komercyjnych:}
-\begin{itemize}
-    \item Współczynnik sukcesu H1: [X]\%,
-    \item Wynik ogólny H2: [Y]/100,
-    \item Odsetek czystych konfiguracji H3: [Z]\%,
-    \item Zmienność H4: [W] punktów,
-    \item Podatność na manipulację H5: [V]\%.
-\end{itemize}
-
-\textbf{Średnie wyniki dla modeli otwartych:}
-\begin{itemize}
-    \item Współczynnik sukcesu H1: [X]\%,
-    \item Wynik ogólny H2: [Y]/100,
-    \item Odsetek czystych konfiguracji H3: [Z]\%,
-    \item Zmienność H4: [W] punktów,
-    \item Podatność na manipulację H5: [V]\%.
-\end{itemize}
-
-\textbf{Wnioski:}
-
-[TODO: Czy istnieją znaczące różnice między grupami?]
-
-Modele komercyjne [przewyższają/nie przewyższają znacząco] modele otwarte w [aspekty]. Różnice są szczególnie widoczne w [konkretne hipotezy]. Modele otwarte [stanowią/nie stanowią] realną alternatywę dla zastosowań [produkcyjnych/badawczych/edukacyjnych].
+% TODO pisac to w ogole?
 
 \subsection{Synteza wyników}
 
@@ -610,36 +181,33 @@ Na podstawie przeprowadzonych badań można sformułować następujące zaleceni
 \textbf{Dla zespołów rozważających adopcję agentów LLM do generowania konfiguracji IaC:}
 
 \begin{itemize}
-    \item [Zalecenie 1 na podstawie wyników H1],
-    \item [Zalecenie 2 na podstawie wyników H2],
-    \item [Zalecenie 3 na podstawie wyników H3],
-    \item [Zalecenie 4 na podstawie wyników H4],
-    \item [Zalecenie 5 na podstawie wyników H5].
+    \item Zalecenie 1 na podstawie wyników H1,
+    \item Zalecenie 2 na podstawie wyników H2,
+    \item Zalecenie 3 na podstawie wyników H3,
+    \item Zalecenie 4 na podstawie wyników H4,
+    \item Zalecenie 5 na podstawie wyników H5.
 \end{itemize}
 
 \textbf{Dla twórców platform i narzędzi DevOps:}
 
 \begin{itemize}
-    \item [Zalecenie dotyczące integracji agentów LLM],
-    \item [Zalecenie dotyczące walidacji i zabezpieczeń],
-    \item [Zalecenie dotyczące interfejsów użytkownika],
-    \item [...]
+    \item Zalecenie dotyczące integracji agentów LLM,
+    \item Zalecenie dotyczące walidacji i zabezpieczeń,
+    \item Zalecenie dotyczące interfejsów użytkownika,
 \end{itemize}
 
 \textbf{Scenariusze, w których agenty LLM mogą być najbardziej przydatne:}
 
 \begin{itemize}
-    \item [Scenariusz 1 — np. prototypowanie],
-    \item [Scenariusz 2 — np. migracja legacy],
-    \item [Scenariusz 3 — np. edukacja],
-    \item [...]
+    \item Scenariusz 1 — np. prototypowanie,
+    \item Scenariusz 2 — np. migracja legacy,
+    \item Scenariusz 3 — np. edukacja,
 \end{itemize}
 
 \textbf{Scenariusze, w których agenty LLM nie powinny być stosowane bez nadzoru człowieka:}
 
 \begin{itemize}
-    \item [Scenariusz 1 — np. krytyczne systemy produkcyjne],
-    \item [Scenariusz 2 — np. wymagania compliance],
-    \item [Scenariusz 3 — np. złożone systemy rozproszone],
-    \item [...]
+    \item Scenariusz 1 — np. krytyczne systemy produkcyjne,
+    \item Scenariusz 2 — np. wymagania compliance,
+    \item Scenariusz 3 — np. złożone systemy rozproszone,
 \end{itemize}
