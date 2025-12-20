@@ -13,20 +13,19 @@ W ramach badania sformułowano pięć hipotez weryfikowanych eksperymentalnie:
 
 \begin{itemize}
     \item \textbf{H1: Autonomiczna generacja funkcjonalnych konfiguracji} \\
-    Duże modele językowe, działające jako agenty z dostępem do narzędzi analizy repozytorium, są w stanie autonomicznie wygenerować funkcjonalne konfiguracje Docker i Kubernetes, które umożliwiają poprawne uruchomienie aplikacji bez dodatkowej ingerencji człowieka, w tym osiągnięcie gotowości usługowej widocznej na poziomie interfejsu (np. webowe API odpowiada na zapytania HTTP/REST po wdrożeniu na klastrze testowym).
+    Duże modele językowe, działające jako agenty z dostępem do narzędzi analizy repozytorium, są w stanie autonomicznie wygenerować funkcjonalne konfiguracje Docker i Kubernetes, które umożliwiają poprawne uruchomienie aplikacji bez dodatkowej ingerencji człowieka, w tym osiągnięcie gotowości usługowej widocznej na poziomie interfejsu (np. webowe API odpowiada na zapytania HTTP po wdrożeniu na klastrze testowym).
 
     \item \textbf{H2: Ograniczenia złożonościowe} \\
-    Istnieje próg złożoności aplikacji, powyżej którego jakość autonomicznie generowanych konfiguracji znacząco spada. Progi te można uchwycić, obserwując wyniki na kontrolowanych repozytoriach poc1–poc4 o rosnącej liczbie komponentów i zależności (od prostego monolitu po prosty układ mikroserwisowy); oczekuje się, że metryki sukcesu (np. odsetek poprawnych wdrożeń) maleją wraz z przechodzeniem od poc1 do poc4.
+    Istnieje próg złożoności aplikacji, powyżej którego jakość autonomicznie generowanych konfiguracji znacząco spada. Progi te można uchwycić, obserwując wyniki na kontrolowanych repozytoriach o rosnącej liczbie komponentów i zależności (od prostego monolitu po prosty układ mikroserwisowy); oczekuje się, że metryki sukcesu (np. odsetek poprawnych wdrożeń) maleją wraz ze wzrostem złożoności.
 
     \item \textbf{H3: Jakość i zgodność z dobrymi praktykami} \\
-    Bez dodatkowych instrukcji ukierunkowanych na najlepsze praktyki DevOps, co najmniej 60\% autonomicznie generowanych konfiguracji zawiera ostrzeżenia klasy \texttt{warning} wykrywane przez narzędzia statycznej analizy (Hadolint dla Docker, Kube-linter dla Kubernetes), co wymaga dodatkowej walidacji i poprawek przed wdrożeniem produkcyjnym. Zastosowanie prompt engineeringu (w postaci wyraźnych, konkretnych wytycznych dotyczących dobrych praktyk) zmniejsza liczbę ostrzeżeń i zwiększa odsetek konfiguracji bez ostrzeżeń.
-    % TODO: Doprecyzować warianty promptów i metryki porównawcze dla H3.
+    Bez dodatkowych instrukcji ukierunkowanych na najlepsze praktyki DevOps, co najmniej 60\% autonomicznie generowanych konfiguracji zawiera błędy lub ostrzeżenia wykrywane przez narzędzia statycznej analizy (Hadolint dla Docker, Kube-linter dla Kubernetes), co wymaga dodatkowej walidacji i poprawek przed wdrożeniem produkcyjnym. Zastosowanie prompt engineeringu (w postaci wyraźnych, konkretnych wytycznych dotyczących dobrych praktyk) zmniejsza liczbę ostrzeżeń i zwiększa odsetek konfiguracji bez ostrzeżeń.
 
     \item \textbf{H4: Niezawodność i powtarzalność procesu agentowego} \\
-    Proces generacji konfiguracji przez agenta LLM charakteryzuje się zmiennością wyników mimo deterministycznych parametrów (\texttt{temperature = 0}); przy wielokrotnym uruchomieniu na tym samym repozytorium wskaźniki takie jak \textit{run-to-run diff ratio} (liczba zmienionych linii pomiędzy parami wygenerowanych konfiguracji znormalizowana przez ich długość) lub odchylenie standardowe liczby kroków narzędziowych w sekwencjach zapisanych w LangSmith (różna liczba wywołań funkcji pomocniczych) przekraczają ustalony próg (np. $>0{,}2$), co świadczy o ograniczonej powtarzalności procesu.
+    Proces generacji konfiguracji przez agenta LLM charakteryzuje się zmiennością wyników mimo deterministycznych parametrów (\texttt{temperature = 0}, stały seed); przy wielokrotnym uruchomieniu na tym samym repozytorium wskaźniki takie jak \textit{run-to-run diff ratio} (liczba zmienionych linii pomiędzy parami wygenerowanych konfiguracji znormalizowana przez ich długość) lub odchylenie standardowe liczby kroków narzędziowych w sekwencjach zapisanych w LangSmith (różna liczba wywołań funkcji pomocniczych) przekraczają ustalony próg (np. $>0{,}2$), co świadczy o ograniczonej powtarzalności procesu.
 
     \item \textbf{H5: Podatność na manipulację kontekstem} \\
-    Agenty LLM są podatne na manipulację przez złośliwe lub mylące treści zawarte w repozytorium (prompt injection, social engineering w plikach README/dokumentacji): w specjalnie spreparowanym repozytorium (np. poc5-jailbreak-fastapi) co najmniej jedna trzecia przebiegów prowadzi do wygenerowania konfiguracji odbiegających od oczekiwań (np. pominięcie krytycznych usług, wstrzyknięcie dodatkowych kontenerów) lub zawierających intencjonalnie szkodliwe instrukcje, co dokumentuje wpływ manipulacji kontekstem na wynik końcowy.
+    Agenty LLM są podatne na manipulację przez złośliwe lub mylące treści zawarte w repozytorium (prompt injection, social engineering w plikach README/dokumentacji): w specjalnie spreparowanym repozytorium co najmniej 30\% przebiegów prowadzi do wygenerowania konfiguracji odbiegających od oczekiwań (np. pominięcie krytycznych usług, wstrzyknięcie dodatkowych kontenerów) lub zawierających intencjonalnie szkodliwe instrukcje, co dokumentuje wpływ manipulacji kontekstem na wynik końcowy.
 \end{itemize}
 
 \bigskip
@@ -80,9 +79,9 @@ Agent dysponuje zestawem jedenastu funkcji umożliwiających interakcję z repoz
 Ze względu na długość, pełna treść prompta znajduje się w załączniku~\ref{att:prompt}. Prompt zawiera:
 \begin{itemize}
     \item kontekst działania agenta i jego specjalizację,
-    \item szczegółowy opis dostępnych narzędzi i zasad ich użycia,
-    \item reguły nazewnictwa (np. generowanie hostów Ingress jako \texttt{<repo-name>.rasztabiga.me}),
-    \item dobre praktyki DevOps dla Docker (non-root, odpowiedni base image) i Kubernetes (health probes, StatefulSets vs Deployments, ConfigMaps/Secrets),
+    \item opis oczekiwanego sposobu pracy (klonowanie repozytorium, analiza kodu i zależności oraz generacja plików konfiguracyjnych),
+    \item reguły nazewnictwa (m.in. host Ingress w formacie \texttt{<repository-name>.{domain\_suffix}}; nazwa repozytorium jest zamieniana na małe litery i musi spełniać reguły RFC 1123),
+    \item wytyczne wdrożeniowe dla Docker i Kubernetes (m.in. dobór obrazu bazowego, zgodność portów, \texttt{imagePullPolicy: IfNotPresent}, requests/limits, health checks, zasoby typu Deployment/StatefulSet oraz ConfigMap/Secret/PVC dla wykrytych zależności),
     \item format strukturalnego wyjścia (JSON z listą obrazów Docker, manifestów K8s oraz test endpoint).
 \end{itemize}
 
@@ -106,7 +105,7 @@ Po wygenerowaniu konfiguracji przez agenta, następuje automatyczna ewaluacja sk
 \begin{enumerate}
     \item Weryfikacja syntaktyczna \texttt{Dockerfile} (np. \texttt{docker build --check}),
     \item Statyczna analiza \texttt{Dockerfile} (Hadolint),
-    \item Budowa obrazów Docker,
+    \item Budowa obrazów Docker oraz publikacja do lokalnego rejestru,
     \item Weryfikacja syntaktyczna manifestów Kubernetes (np. \texttt{kubectl apply --dry-run=server}),
     \item Statyczna analiza manifestów Kubernetes (Kube-linter),
     \item Aplikowanie manifestów do klastra Kubernetes (MicroK8s) w osobnej przestrzeni nazw dla przebiegu,
@@ -121,7 +120,7 @@ Modułowa architektura umożliwia łatwe dodawanie nowych kroków walidacji. Wyw
 \begin{itemize}
     \item \textbf{Klaster Kubernetes}: MicroK8s jako środowisko docelowe dla manifestów,
     \item \textbf{Rejestr Docker}: lokalny rejestr dla przechowywania zbudowanych obrazów (adres konfigurowany przez \texttt{REGISTRY\_URL}; domyślnie \texttt{192.168.0.124:32000}),
-    \item \textbf{Tracking}: LangSmith dla śledzenia wszystkich interakcji agenta z modelem (ścieżki wywołań narzędzi, prompty, odpowiedzi).
+    \item \textbf{Śledzenie}: LangSmith do inspekcji przebiegów agenta, w tym wywołań narzędzi, promptów i odpowiedzi.
 \end{itemize}
 
 \subsubsection{Parametry generacji}
@@ -138,7 +137,7 @@ Wszystkie testowane modele otrzymują identyczny prompt oraz to samo repozytoriu
 
 \subsubsection{Hipoteza}
 
-Duże modele językowe, działające jako agenty z dostępem do narzędzi analizy repozytorium, są w stanie autonomicznie wygenerować funkcjonalne konfiguracje Docker i Kubernetes, które umożliwiają poprawne uruchomienie aplikacji bez dodatkowej ingerencji człowieka.
+Duże modele językowe, działające jako agenty z dostępem do narzędzi analizy repozytorium, są w stanie autonomicznie wygenerować funkcjonalne konfiguracje Docker i Kubernetes, które umożliwiają poprawne uruchomienie aplikacji bez dodatkowej ingerencji człowieka, w tym osiągnięcie gotowości usługowej widocznej na poziomie interfejsu (np. webowe API odpowiada na zapytania HTTP/REST po wdrożeniu na klastrze testowym).
 
 \subsubsection{Strategia testowania}
 
@@ -279,4 +278,4 @@ Przebiegi eksperymentów rejestrują metryki w dwóch formatach:
     \item \texttt{docker\_build\_metrics} — czasy budowania, rozmiary obrazów.
 \end{itemize}
 
-Wszystkie interakcje agenta z modelem językowym są automatycznie śledzone przez platformę LangSmith, która umożliwia inspekcję pełnych ścieżek wywołań narzędzi, przesłanych promptów oraz odpowiedzi modelu.
+Interakcje agenta z modelem językowym mogą być śledzone przez platformę LangSmith (po włączeniu mechanizmu tracingu), co umożliwia inspekcję ścieżek wywołań narzędzi, przesłanych promptów oraz odpowiedzi modelu.
