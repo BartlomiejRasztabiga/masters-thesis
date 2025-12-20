@@ -7,48 +7,7 @@ W niniejszym rozdziale przedstawiono wyniki przeprowadzonych eksperymentów bada
 
 \subsection{Przegląd przeprowadzonych eksperymentów}
 
-Eksperymenty przeprowadzono zgodnie z metodologią opisaną w rozdziale 4, wykorzystując system orkiestracji umożliwiający automatyczne wykonanie serii testów dla różnych kombinacji modeli, repozytoriów i wariantów konfiguracji. Wszystkie przebiegi zrealizowano w kontrolowanych warunkach z wykorzystaniem klastra MicroK8s oraz lokalnego rejestru obrazów Docker.
-
-\subsubsection{Badane modele językowe}
-
-Testowano następujące modele językowe (zgodnie z konfiguracją \texttt{experiments/h1.yaml}):
-
-\textbf{Modele komercyjne:}
-\begin{itemize}
-    \item \textbf{OpenAI}: GPT-5 Mini,
-    \item \textbf{Google}: Gemini 2.5 Flash.
-\end{itemize}
-
-\textbf{Modele otwarte:}
-\begin{itemize}
-    \item \textbf{DeepSeek}: DeepSeek-Chat (V3.2) — uruchamiany przez dedykowane API dostawcy.
-\end{itemize}
-
-\subsubsection{Zbiory danych}
-
-\textbf{Dla hipotezy H1} (ogólna funkcjonalność): Dataset obejmował 25 publicznie dostępnych projektów z GitHub, zróżnicowanych pod względem języków programowania (Python, Node.js, Go, Java, Ruby, Rust), frameworków (FastAPI, Express, Django, Spring Boot, Rails) oraz architektur (monolity, aplikacje wielowarstwowe, systemy rozproszone). W iteracji bazowej wykorzystano 25 prostszych aplikacji webowych (lista w \texttt{experiments/h1.yaml}).
-
-\textbf{Dla hipotez H2–H5} (szczegółowa analiza): Wykorzystano pięć kontrolowanych repozytoriów testowych:
-\begin{itemize}
-    \item \textbf{poc1-fastapi} — aplikacja bezstanowa bez zależności,
-    \item \textbf{poc2-fastapi} — aplikacja ze stanową bazą danych PostgreSQL,
-    \item \textbf{poc3-fastapi} — architektura trójwarstwowa (frontend + backend + baza danych),
-    \item \textbf{poc4-fastapi} — prosty system mikroserwisowy (3 serwisy + baza + kolejka),
-    \item \textbf{poc5-adversarial-fastapi} — repozytorium z elementami manipulacyjnymi (prompt injection, błędne praktyki).
-\end{itemize}
-
-\textbf{Ograniczenia praktyczne H1:} z uwagi na koszty obliczeń, w badaniu H1 zastosowano 2 powtórzenia na kombinację (model, repozytorium) oraz zestaw relatywnie prostych aplikacji. Wnioski dotyczą więc prostych/średnio złożonych projektów; dla systemów złożonych odniesieniem są wyniki H2. Szerokość przedziałów ufności i istotność różnic między modelami należy interpretować z uwzględnieniem małej liczby powtórzeń.
-
-\subsubsection{Podsumowanie przebiegów}
-
-[TODO: Wypełnić po przeprowadzeniu eksperymentów]
-
-\begin{itemize}
-    \item Łączna liczba przebiegów eksperymentalnych: [X],
-    \item Średni czas generacji konfiguracji: [Y] sekund,
-    \item Średnie zużycie tokenów na przebieg: [Z] tokenów,
-    \item Ogólny współczynnik sukcesu (budowa + uruchomienie): [W]\%.
-\end{itemize}
+Eksperymenty przeprowadzono zgodnie z metodologią opisaną w rozdziale 4, wykorzystując system orkiestracji umożliwiający automatyczne wykonanie serii testów dla różnych kombinacji modeli, repozytoriów i wariantów konfiguracji. Szczegóły zbiorów danych, środowiska wykonawczego oraz metryk znajdują się w rozdziale 4.
 
 \subsection{Wyniki H1: Autonomiczna generacja funkcjonalnych konfiguracji}
 
@@ -56,15 +15,15 @@ Testowano następujące modele językowe (zgodnie z konfiguracją \texttt{experi
 
 Duże modele językowe, działające jako agenty z dostępem do narzędzi analizy repozytorium, są w stanie autonomicznie wygenerować funkcjonalne konfiguracje Docker i Kubernetes, które umożliwiają poprawne uruchomienie aplikacji bez dodatkowej ingerencji człowieka.
 
-\textbf{Zakres iteracji H1.0 (bazowej):} uruchomione z domyślnym promptem systemowym (\texttt{default.prompt}), trzema modelami (gemini-2.5-flash, gpt-5-mini, deepseek-chat), 2 powtórki na repo/model na 25 prostych aplikacjach webowych (lista w \texttt{experiments/h1.yaml}).
+\textbf{Zakres iteracji H1.0 (bazowej):} uruchomione z domyślnym promptem systemowym (\texttt{default.prompt}), trzema modelami (gemini-2.5-flash, gpt-5-mini, deepseek-chat), 2 powtórki na repo/model na 25 prostych aplikacjach webowych (lista w pliku konfiguracyjnym eksperymentu).
 
-\subsubsection{Wyniki eksperymentalne}
+\subsubsection{Wyniki ilościowe}
 
-[TODO: Tabela ze współczynnikiem sukcesu per model na zbiorze GitHub: end-to-end (build \& k8s\_apply \& runtime) oraz per etap]
+% TODO: Tabela/wykres success rate per model + per etap (build/apply/runtime).
 
 \textbf{Współczynnik sukcesu ogólny:}
 
-[TODO: Wartość procentowa] projektów zostało pomyślnie uruchomionych w klastrze Kubernetes przy użyciu autonomicznie wygenerowanych konfiguracji (sukces = build \& k8s\_apply \& runtime 2xx). Przy niskim odsetku sukcesów E2E raportowane są także wskaźniki per etap.
+% TODO: Wartość procentowa i krótki komentarz.
 
 \textbf{Per etap (kaskada):}
 \begin{itemize}
@@ -75,7 +34,7 @@ Duże modele językowe, działające jako agenty z dostępem do narzędzi analiz
 
 \textbf{Rozbicie według języka programowania:}
 
-[TODO: Tabela lub wykres pokazujący współczynnik sukcesu dla różnych języków]
+% TODO: Tabela lub wykres.
 
 \begin{itemize}
     \item Python: [X]\% sukcesu,
@@ -88,126 +47,124 @@ Duże modele językowe, działające jako agenty z dostępem do narzędzi analiz
 
 \textbf{Rozbicie według frameworka:}
 
-[TODO: Analiza dla popularnych frameworków]
+% TODO: Analiza dla popularnych frameworków.
+
+\subsubsection{Analiza etapowa i warunkowa}
+
+% TODO: Spadek skuteczności na etapach potoku (build -> apply -> runtime).
+
+\subsubsection{Analiza przekrojowa (języki/frameworki)}
+
+% TODO: Rozbicie skuteczności wg języka i frameworka.
 
 \subsubsection{Typowe problemy i tryby awarii}
 
-[TODO: Analiza najczęstszych przyczyn niepowodzeń]
-
-Najczęstsze problemy napotkane podczas generacji konfiguracji dla rzeczywistych projektów:
+% TODO: Lista najczęstszych przyczyn niepowodzeń + przykłady.
 
 \begin{itemize}
     \item \textbf{Błędna identyfikacja punktu wejścia aplikacji} — [X]\% przypadków,
-    \item \textbf{Pominiecie zależności systemowych} — [Y]\% przypadków,
+    \item \textbf{Pominięcie zależności systemowych} — [Y]\% przypadków,
     \item \textbf{Niepoprawna konfiguracja zmiennych środowiskowych} — [Z]\% przypadków,
     \item \textbf{Błędy w definiowaniu portów i protokołów sieciowych} — [W]\% przypadków,
     \item \textbf{Brak obsługi inicjalizacji bazy danych} — [V]\% przypadków.
 \end{itemize}
 
-\subsubsection{Wnioski dotyczące weryfikacji H1}
+\subsubsection{Werdykt dla H1}
 
-[TODO: Po analizie wyników]
+% TODO: Wniosek, czy H1 potwierdzona (z progami z rozdziału 4).
 
-Na podstawie zgromadzonych danych można stwierdzić, że hipoteza H1 została [POTWIERDZONA/ODRZUCONA]. Współczynnik sukcesu [przekracza/nie osiąga] założony próg 60–70\%, co [wskazuje/nie wskazuje] na praktyczną przydatność podejścia agentowego do autonomicznego generowania konfiguracji IaC.
+Na podstawie zgromadzonych danych można stwierdzić, że hipoteza H1 została [POTWIERDZONA/ODRZUCONA]. Współczynnik sukcesu [przekracza/nie osiąga] założony próg, co [wskazuje/nie wskazuje] na praktyczną przydatność podejścia agentowego do autonomicznego generowania konfiguracji IaC.
 
-\subsection{Porównanie modeli (analiza przekrojowa)}
+\subsection{Wyniki H2: Ograniczenia złożonościowe}
 
-% TODO pisac to w ogole?
+\subsubsection{Hipoteza}
+
+% TODO: Wstaw treść hipotezy H2 (skrótowo).
+
+\subsubsection{Wyniki ilościowe}
+
+% TODO: Wykres success rate vs. poziom złożoności (repozytoria kontrolowane).
+
+\subsubsection{Trend złożoności}
+
+% TODO: Opis trendu spadku skuteczności i punktu załamania.
+
+\subsubsection{Werdykt dla H2}
+
+% TODO: Wniosek z odniesieniem do kryteriów z rozdziału 4.
+
+\subsection{Wyniki H3: Jakość i zgodność z dobrymi praktykami}
+
+\subsubsection{Hipoteza}
+
+% TODO: Wstaw treść hipotezy H3 (skrótowo).
+
+\subsubsection{Wyniki ilościowe}
+
+% TODO: Liczba ostrzeżeń Hadolint/Kube-linter (bazowy prompt vs. prompt best practices).
+
+\subsubsection{Wpływ prompt engineeringu}
+
+% TODO: Porównanie jakości konfiguracji przed/po wzmocnieniu prompta.
+
+\subsubsection{Werdykt dla H3}
+
+% TODO: Wniosek z odniesieniem do progów z rozdziału 4.
+
+\subsection{Wyniki H4: Niezawodność i powtarzalność procesu agentowego}
+
+\subsubsection{Hipoteza}
+
+% TODO: Wstaw treść hipotezy H4 (skrótowo).
+
+\subsubsection{Wyniki ilościowe}
+
+% TODO: run-to-run diff ratio + zmienność liczby kroków narzędziowych.
+
+\subsubsection{Analiza powtarzalności}
+
+% TODO: Wpływ deterministycznych parametrów (temperature=0, seed).
+
+\subsubsection{Werdykt dla H4}
+
+% TODO: Wniosek z odniesieniem do progów z rozdziału 4.
+
+\subsection{Wyniki H5: Podatność na manipulację kontekstem}
+
+\subsubsection{Hipoteza}
+
+% TODO: Wstaw treść hipotezy H5 (skrótowo).
+
+\subsubsection{Wyniki ilościowe}
+
+% TODO: Odsetek przebiegów z odchyleniami od oczekiwań.
+
+\subsubsection{Przykłady manipulacji}
+
+% TODO: Krótkie studia przypadków (prompt injection, myląca dokumentacja).
+
+\subsubsection{Werdykt dla H5}
+
+% TODO: Wniosek z odniesieniem do progów z rozdziału 4.
+
+\subsection{Porównanie modeli}
+
+% TODO: Analiza przekrojowa modeli (skuteczność, jakość, powtarzalność).
 
 \subsection{Synteza wyników}
 
 \subsubsection{Podsumowanie weryfikacji hipotez}
 
-[TODO: Tabela zbiorcza z werdyktem dla każdej hipotezy]
+% TODO: Tabela zbiorcza z werdyktem dla H1–H5 i krótkim uzasadnieniem.
 
-\begin{table}[h]
-\centering
-\caption{Podsumowanie weryfikacji hipotez badawczych}
-\begin{tabular}{|l|c|p{8cm}|}
-\hline
-\textbf{Hipoteza} & \textbf{Werdykt} & \textbf{Uzasadnienie} \\
-\hline
-H1: Autonomiczna generacja & [TAK/NIE] & [Krótkie uzasadnienie na podstawie współczynnika sukcesu] \\
-\hline
-H2: Ograniczenia złożonościowe & [TAK/NIE] & [Krótkie uzasadnienie na podstawie trendu] \\
-\hline
-H3: Jakość i dobre praktyki & [TAK/NIE] & [Krótkie uzasadnienie na podstawie triangulacji] \\
-\hline
-H4: Niezawodność i powtarzalność & [TAK/NIE] & [Krótkie uzasadnienie na podstawie zmienności] \\
-\hline
-H5: Podatność na manipulację & [TAK/NIE] & [Krótkie uzasadnienie na podstawie odsetka podatności] \\
-\hline
-\end{tabular}
-\end{table}
+\subsubsection{Kluczowe wnioski}
 
-\subsubsection{Kluczowe odkrycia}
-
-[TODO: Lista najważniejszych wniosków z całego badania]
-
-\begin{enumerate}
-    \item \textbf{[Odkrycie 1]} — [szczegółowy opis],
-    \item \textbf{[Odkrycie 2]} — [szczegółowy opis],
-    \item \textbf{[Odkrycie 3]} — [szczegółowy opis],
-    \item \textbf{[Odkrycie 4]} — [szczegółowy opis],
-    \item \textbf{[Odkrycie 5]} — [szczegółowy opis].
-\end{enumerate}
+% TODO: 3–6 punktów najważniejszych obserwacji.
 
 \subsubsection{Ograniczenia badania}
 
-Przeprowadzone badanie podlega następującym ograniczeniom:
-
-\begin{itemize}
-    \item \textbf{Ograniczony zakres języków programowania} — eksperymenty koncentrowały się głównie na aplikacjach napisanych w [języki], co może ograniczać uogólnienie wyników na inne języki programowania,
-
-    \item \textbf{Kontrolowane repozytoria testowe} — repozytoria poc1–poc5 zostały specjalnie przygotowane dla celów eksperymentalnych i mogą nie odzwierciedlać pełnej złożoności rzeczywistych projektów produkcyjnych,
-
-    \item \textbf{Ograniczona próbka dla oceny eksperckiej} — ze względu na pracochłonność, ocena ekspercka (H3 Warstwa 3) objęła jedynie [X] konfiguracji, co może wpływać na reprezentatywność wyników,
-
-    \item \textbf{Specyficzne środowisko wykonawcze} — wszystkie testy przeprowadzono w środowisku MicroK8s, co może różnić się od innych dystrybucji Kubernetes (np. EKS, GKE, AKS) pod względem zachowania i wymagań konfiguracyjnych,
-
-    \item \textbf{Konkretna wersja prompta} — wyniki mogą zależeć od szczegółowej treści i struktury prompta systemowego użytego do instruowania agenta,
-
-    \item \textbf{Brak testów z rzeczywistym ruchem produkcyjnym} — walidacja działania aplikacji ograniczała się do sprawdzenia dostępności punktów końcowych, bez symulacji rzeczywistego obciążenia i długotrwałej eksploatacji,
-
-    \item \textbf{Konkretne wersje modeli} — wyniki odnoszą się do konkretnych wersji modeli językowych dostępnych w momencie przeprowadzania eksperymentów i mogą się różnić dla nowszych wersji.
-\end{itemize}
+% TODO: Wypunktuj ograniczenia wyników (zbieżne z threats to validity).
 
 \subsubsection{Implikacje praktyczne}
 
-[TODO: Wnioski dla praktyków DevOps i inżynierów platform]
-
-Na podstawie przeprowadzonych badań można sformułować następujące zalecenia praktyczne:
-
-\textbf{Dla zespołów rozważających adopcję agentów LLM do generowania konfiguracji IaC:}
-
-\begin{itemize}
-    \item Zalecenie 1 na podstawie wyników H1,
-    \item Zalecenie 2 na podstawie wyników H2,
-    \item Zalecenie 3 na podstawie wyników H3,
-    \item Zalecenie 4 na podstawie wyników H4,
-    \item Zalecenie 5 na podstawie wyników H5.
-\end{itemize}
-
-\textbf{Dla twórców platform i narzędzi DevOps:}
-
-\begin{itemize}
-    \item Zalecenie dotyczące integracji agentów LLM,
-    \item Zalecenie dotyczące walidacji i zabezpieczeń,
-    \item Zalecenie dotyczące interfejsów użytkownika,
-\end{itemize}
-
-\textbf{Scenariusze, w których agenty LLM mogą być najbardziej przydatne:}
-
-\begin{itemize}
-    \item Scenariusz 1 — np. prototypowanie,
-    \item Scenariusz 2 — np. migracja legacy,
-    \item Scenariusz 3 — np. edukacja,
-\end{itemize}
-
-\textbf{Scenariusze, w których agenty LLM nie powinny być stosowane bez nadzoru człowieka:}
-
-\begin{itemize}
-    \item Scenariusz 1 — np. krytyczne systemy produkcyjne,
-    \item Scenariusz 2 — np. wymagania compliance,
-    \item Scenariusz 3 — np. złożone systemy rozproszone,
-\end{itemize}
+% TODO: Zalecenia dla praktyków i twórców narzędzi DevOps.
