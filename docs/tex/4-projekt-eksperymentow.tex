@@ -175,7 +175,13 @@ Testy H1 opierają się na \textbf{rzeczywistych, publicznie dostępnych projekt
 
 W analizie dodatkowo raportowany jest spadek skuteczności na kolejnych etapach potoku walidacyjnego (build → apply → runtime) oraz wskaźniki warunkowe (apply | build, runtime | apply), aby wskazać typowe miejsca, w których występują niepowodzenia.
 
-\textbf{Przedziały ufności:} dla wskaźników proporcji (success rate, metryki per etap i warunkowe) stosowane są 95\% przedziały ufności wyznaczane metodą Cloppera–Pearsona, która daje „dokładne” (konserwatywne) granice dla rozkładu dwumianowego i jest rekomendowana przy niewielkiej liczbie prób~\cite{clopper_pearson_1934}.
+\textbf{Przedziały ufności:}
+Dla wskaźników opartych na proporcjach (takich jak ogólny współczynnik sukcesu, metryki dla poszczególnych etapów oraz metryki warunkowe) wyznaczane są \textbf{95\% przedziały ufności metodą Wilsona} \cite{wilson_probable_nodate}.
+Przedział ufności określa zakres wartości, w którym -- przy założonym poziomie ufności -- znajduje się rzeczywista wartość mierzonego parametru (np.\ prawdopodobieństwo sukcesu agenta), przy założeniu wielokrotnego powtarzania eksperymentu.
+
+Metoda Wilsona stanowi ulepszenie klasycznego przedziału ufności opartego na przybliżeniu normalnym (tzw.\ przedziału Walda), który przy niewielkiej liczbie obserwacji lub wartościach proporcji bliskich 0 lub 1 może prowadzić do niestabilnych i zbyt wąskich przedziałów.
+Przedziały Wilsona charakteryzują się lepszymi własnościami statystycznymi, w szczególności dokładniejszym pokryciem deklarowanego poziomu ufności, oraz zawsze mieszczą się w logicznym zakresie $[0,1]$.
+Z tego względu metoda Wilsona jest powszechnie rekomendowana w literaturze jako standardowa metoda wyznaczania przedziałów ufności dla proporcji, zwłaszcza w analizach opartych na ograniczonej liczbie prób.
 
 \subsubsection{Kryteria weryfikacji}
 
