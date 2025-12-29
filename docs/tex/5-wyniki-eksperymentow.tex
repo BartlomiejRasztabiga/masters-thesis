@@ -1,8 +1,6 @@
 \clearpage % Rozdziały zaczynamy od nowej strony.
 \section{Wyniki eksperymentów}
 
-% TODO tu skonczylem
-
 W niniejszym rozdziale przedstawiono wyniki przeprowadzonych eksperymentów badających możliwości autonomicznego generowania konfiguracji Infrastructure as Code przez agenty oparte na dużych modelach językowych. Analiza wyników zorganizowana jest zgodnie ze strukturą hipotez badawczych przedstawionych w rozdziale 4 — dla każdej z pięciu hipotez (H1–H5) zaprezentowano wyniki eksperymentalne, analizę danych oraz wnioski dotyczące weryfikacji hipotezy. Rozdział kończy synteza wyników podkreślająca kluczowe obserwacje dotyczące zdolności LLM do generowania IaC.
 
 \subsection{Przegląd przeprowadzonych eksperymentów}
@@ -13,13 +11,11 @@ Eksperymenty przeprowadzono zgodnie z metodologią opisaną w rozdziale 4, wykor
 
 \subsubsection{Wyniki ilościowe}
 
-% TODO: Dodać tabelę/wykres success rate ogólny + 95% CI.
-
 \textbf{Współczynnik sukcesu ogólny:}
 
 Łącznie 94/150 przebiegów zakończyło się sukcesem end-to-end, co daje 62{,}7\% (95\% CI: 54{,}7\%--70{,}0\%). Oznacza to, że w ponad 60\% przypadków agent był w stanie wygenerować konfigurację IaC umożliwiającą poprawne zbudowanie, wdrożenie i uruchomienie aplikacji testowej.
 
-\subsubsection{Analiza etapowa i warunkowa}
+\textbf{Analiza etapowa i warunkowa:}
 
 % TODO: Dodać wykres kaskady etapów.
 
@@ -37,9 +33,7 @@ Eksperymenty przeprowadzono zgodnie z metodologią opisaną w rozdziale 4, wykor
     \label{tab:h1-stages}
 \end{table}
 
-\subsubsection{Rozbicie per model}
-
-% TODO: Dodać tabelę/wykres success rate per model.
+\textbf{Rozbicie per model:}
 
 \begin{table}[h]
     \centering
@@ -53,9 +47,7 @@ Eksperymenty przeprowadzono zgodnie z metodologią opisaną w rozdziale 4, wykor
     \label{tab:h1-models}
 \end{table}
 
-\subsubsection{Rozbicie per repozytorium}
-
-% TODO: Dodać tabelę/wykres success rate per repozytorium.
+\textbf{Rozbicie per repozytorium:}
 
 \begin{table}[h]
     \centering
@@ -95,25 +87,26 @@ Eksperymenty przeprowadzono zgodnie z metodologią opisaną w rozdziale 4, wykor
 
 % TODO: Lista najczęstszych przyczyn niepowodzeń + przykłady.
 
-\begin{itemize}
-    \item \textbf{Błędna identyfikacja punktu wejścia aplikacji} — [X]\% przypadków,
-    \item \textbf{Pominięcie zależności systemowych} — [Y]\% przypadków,
-    \item \textbf{Niepoprawna konfiguracja zmiennych środowiskowych} — [Z]\% przypadków,
-    \item \textbf{Błędy w definiowaniu portów i protokołów sieciowych} — [W]\% przypadków,
-    \item \textbf{Brak obsługi inicjalizacji bazy danych} — [V]\% przypadków.
-\end{itemize}
+% \begin{itemize}
+%     \item \textbf{Błędna identyfikacja punktu wejścia aplikacji} — [X]\% przypadków,
+%     \item \textbf{Pominięcie zależności systemowych} — [Y]\% przypadków,
+%     \item \textbf{Niepoprawna konfiguracja zmiennych środowiskowych} — [Z]\% przypadków,
+%     \item \textbf{Błędy w definiowaniu portów i protokołów sieciowych} — [W]\% przypadków,
+%     \item \textbf{Brak obsługi inicjalizacji bazy danych} — [V]\% przypadków.
+% \end{itemize}
 
 \subsubsection{Werdykt dla H1}
 
-% TODO: Wniosek, czy H1 potwierdzona (z progami z rozdziału 4).
-
-Na podstawie zgromadzonych danych można stwierdzić, że hipoteza H1 została potwierdzona. Współczynnik sukcesu 62{,}7\% przekracza założony próg 60\%, co wskazuje na praktyczną przydatność podejścia agentowego do autonomicznego generowania konfiguracji IaC.
+Na podstawie kryteriów z rozdziału 4 hipoteza H1 została potwierdzona. Spełnienie warunków przedstawia się następująco:
+\begin{itemize}
+    \item end-to-end success rate: 62{,}7\% (próg 60\%),
+    \item skuteczność etapów: build 78{,}7\% (próg 75\%), apply 77{,}7\% (próg 75\%), runtime 62{,}7\% (próg 60\%),
+    \item metryki warunkowe: apply $|$ build 97{,}5\% (próg 95\%), runtime $|$ apply 81{,}7\% (próg 80\%),
+    \item repozytoria z sukcesem $\geq$ 50\%: 16 z 25 (wymagane $\geq$ 50\% zbioru).
+\end{itemize}
+W konsekwencji można uznać, że agenty LLM są w stanie autonomicznie generować funkcjonalne konfiguracje IaC w badanym zakresie.
 
 \subsection{Wyniki H2: Ograniczenia złożonościowe}
-
-\subsubsection{Hipoteza}
-
-% TODO: Wstaw treść hipotezy H2 (skrótowo).
 
 \subsubsection{Wyniki ilościowe}
 
@@ -129,10 +122,6 @@ Na podstawie zgromadzonych danych można stwierdzić, że hipoteza H1 została p
 
 \subsection{Wyniki H3: Jakość i zgodność z dobrymi praktykami}
 
-\subsubsection{Hipoteza}
-
-% TODO: Wstaw treść hipotezy H3 (skrótowo).
-
 \subsubsection{Wyniki ilościowe}
 
 % TODO: Liczba ostrzeżeń Hadolint/Kube-linter (bazowy prompt vs. prompt best practices).
@@ -147,10 +136,6 @@ Na podstawie zgromadzonych danych można stwierdzić, że hipoteza H1 została p
 
 \subsection{Wyniki H4: Niezawodność i powtarzalność procesu agentowego}
 
-\subsubsection{Hipoteza}
-
-% TODO: Wstaw treść hipotezy H4 (skrótowo).
-
 \subsubsection{Wyniki ilościowe}
 
 % TODO: run-to-run diff ratio + zmienność liczby kroków narzędziowych.
@@ -164,10 +149,6 @@ Na podstawie zgromadzonych danych można stwierdzić, że hipoteza H1 została p
 % TODO: Wniosek z odniesieniem do progów z rozdziału 4.
 
 \subsection{Wyniki H5: Podatność na manipulację kontekstem}
-
-\subsubsection{Hipoteza}
-
-% TODO: Wstaw treść hipotezy H5 (skrótowo).
 
 \subsubsection{Wyniki ilościowe}
 
