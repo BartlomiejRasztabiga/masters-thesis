@@ -213,9 +213,23 @@ Weryfikacja H2 wykorzystuje kontrolowany zestaw pięciu repozytoriów PoC o rosn
     \item \textbf{POC1:} pojedyncza aplikacja FastAPI (monolit), brak bazy danych i usług zewnętrznych, prosta struktura kodu.
     \item \textbf{POC2:} aplikacja FastAPI z relacyjną bazą danych (PostgreSQL), wymagane zmienne środowiskowe i inicjalizacja schematów.
     \item \textbf{POC3:} architektura trójwarstwowa (frontend React + backend FastAPI + PostgreSQL), zależności między warstwami, sieć i wolumeny w konfiguracji.
-    \item \textbf{POC4:} prosty układ mikroserwisowy (3 usługi FastAPI), baza danych per serwis, broker komunikatów RabbitMQ, współdzielone biblioteki i zwiększona liczba zależności między usługami.
-    \item \textbf{POC5:} rozszerzony układ mikroserwisowy (3 usługi FastAPI + 1 usługa Node.js), baza danych per serwis, RabbitMQ oraz Redis, dodatkowe mechanizmy uruchomieniowe (frontend czekający na zdrowie usług przez \texttt{/health}).
+    \item \textbf{POC4:} układ mikroserwisowy (frontend React + 3 usługi FastAPI), baza danych per serwis, broker komunikatów RabbitMQ, współdzielone biblioteki i zwiększona liczba zależności między usługami.
+    \item \textbf{POC5:} rozszerzony układ mikroserwisowy (frontend React + 3 usługi FastAPI + 1 usługa Node.js), baza danych per serwis, RabbitMQ oraz Redis, dodatkowe mechanizmy uruchomieniowe (frontend czekający na zdrowie usług przez \texttt{/health}).
 \end{itemize}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcccc}
+        \textbf{Repozytorium} & \textbf{Poziom} & \textbf{Usługi} & \textbf{Bazy} & \textbf{Zależności} \\
+        POC1 & 1 & 1 & 0 & 0 \\
+        POC2 & 2 & 1 & 1 & 0 \\
+        POC3 & 3 & 2 & 1 & 0 \\
+        POC4 & 4 & 4 & 3 & 1 \\
+        POC5 & 5 & 5 & 4 & 2 \\
+    \end{tabular}
+    \caption{Metryki złożoności repozytoriów PoC użytych w H2}
+    \label{tab:h2-complexity}
+\end{table}
 
 % TODO wybrac modele, wieksze?
 
@@ -227,14 +241,15 @@ Weryfikacja H2 obejmuje dwie grupy metryk:
 \begin{itemize}
     \item \textbf{Metryki złożoności repozytorium}:
     \begin{itemize}
-        \item \textbf{Poziom złożoności} (1–5) — przypisany zgodnie z POC1–POC5,
-        \item \textbf{Liczba usług/kontenerów} — liczba uruchamianych komponentów aplikacyjnych,
-        \item \textbf{Liczba baz danych} — liczba niezależnych magazynów danych,
-        \item \textbf{Liczba zależności infrastrukturalnych} — komponenty inne niż bazy (np. broker).
+        \item \textbf{Poziom złożoności} (1–5),
+        \item \textbf{Liczba usług},
+        \item \textbf{Liczba baz danych},
+        \item \textbf{Liczba zależności infrastrukturalnych}.
     \end{itemize}
+    Wartości metryk dla POC1--POC5 zestawiono w tabeli~\ref{tab:h2-complexity}.
     \item \textbf{Metryki skuteczności}:
     \begin{itemize}
-        \item end-to-end success rate (build \& apply \& runtime) per repozytorium i per poziom złożoności,
+        \item end-to-end success rate (build \& apply \& runtime) per repozytorium,
         \item skuteczność etapów (build, apply, runtime) analogicznie do H1.
     \end{itemize}
 \end{itemize}

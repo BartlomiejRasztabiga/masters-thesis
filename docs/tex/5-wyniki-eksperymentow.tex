@@ -154,34 +154,100 @@ W konsekwencji można uznać, że agenty LLM są w stanie autonomicznie generowa
 
 \subsubsection{Wyniki ilościowe}
 
+\textbf{Wynik ogólny:}
+
+Łącznie 15/45 przebiegów zakończyło się sukcesem end-to-end, co daje 33{,}3\% (95\% CI: 21{,}4\%--47{,}9\%).
+
+\textbf{Analiza etapowa i warunkowa:}
+
+Zestawienie skuteczności etapów oraz metryk warunkowych znajduje się w tabeli~\ref{tab:h2-stages}.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lccc}
+        \textbf{Etap} & \textbf{Sukcesy} & \textbf{Skuteczność} & \textbf{95\% CI} \\
+        Build & 32/45 & 71{,}1\% & 56{,}6\%--82{,}3\% \\
+        K8s apply & 24/42 & 57{,}1\% & 42{,}2\%--70{,}9\% \\
+        apply $|$ build & 24/32 & 75{,}0\% & 57{,}9\%--86{,}7\% \\
+        Runtime & 15/45 & 33{,}3\% & 21{,}4\%--47{,}9\% \\
+        runtime $|$ apply & 15/24 & 62{,}5\% & 42{,}7\%--78{,}8\% \\
+    \end{tabular}
+    \caption{Skuteczność etapów w H2}
+    \label{tab:h2-stages}
+\end{table}
+
+\textbf{Rozbicie per model:}
+
+Wyniki dla poszczególnych modeli przedstawiono w tabeli~\ref{tab:h2-models}.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lccc}
+        \textbf{Model} & \textbf{Sukcesy} & \textbf{Skuteczność} & \textbf{95\% CI} \\
+        gemini-2.5-flash & 3/15 & 20{,}0\% & 7{,}0\%--45{,}2\% \\
+        gpt-5-mini & 7/15 & 46{,}7\% & 24{,}8\%--69{,}9\% \\
+        deepseek-chat & 5/15 & 33{,}3\% & 15{,}2\%--58{,}3\% \\
+    \end{tabular}
+    \caption{Skuteczność per model w H2}
+    \label{tab:h2-models}
+\end{table}
+
 \textbf{Rozbicie per repozytorium:}
 
-Wyniki dla repozytoriów POC1--POC4 zestawiono w tabeli~\ref{tab:h2-repos}.
+Wyniki dla repozytoriów POC1--POC5 zestawiono w tabeli~\ref{tab:h2-repos}.
 
 \begin{table}[h]
     \centering
     \begin{tabular}{lccc}
         \textbf{Repozytorium} & \textbf{Sukcesy} & \textbf{Skuteczność} & \textbf{95\% CI} \\
         poc1-fastapi & 9/9 & 100{,}0\% & 70{,}1\%--100{,}0\% \\
-        poc2-fastapi & 4/9 & 44{,}4\% & 18{,}9\%--73{,}3\% \\
-        poc3-fastapi & 4/9 & 44{,}4\% & 18{,}9\%--73{,}3\% \\
-        poc4-fastapi & 3/9 & 33{,}3\% & 12{,}1\%--64{,}6\% \\
+        poc2-fastapi & 3/9 & 33{,}3\% & 12{,}1\%--64{,}6\% \\
+        poc3-fastapi & 2/9 & 22{,}2\% & 6{,}3\%--54{,}7\% \\
+        poc4-fastapi & 1/9 & 11{,}1\% & 2{,}0\%--43{,}5\% \\
+        poc5 & 0/9 & 0{,}0\% & 0{,}0\%--29{,}9\% \\
     \end{tabular}
     \caption{Skuteczność per repozytorium w H2}
     \label{tab:h2-repos}
 \end{table}
 
-Wraz ze wzrostem złożoności widać istotny spadek skuteczności: od 100{,}0\% dla POC1 do 33{,}3\% dla POC4.
+Zestawienie skuteczności etapów per repozytorium znajduje się w tabeli~\ref{tab:h2-repo-stages}.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lccc}
+        \textbf{Repozytorium} & \textbf{Build} & \textbf{Apply} & \textbf{Runtime} \\
+        poc1-fastapi & 9/9 (100{,}0\%) & 9/9 (100{,}0\%) & 9/9 (100{,}0\%) \\
+        poc2-fastapi & 9/9 (100{,}0\%) & 7/9 (77{,}8\%) & 3/9 (33{,}3\%) \\
+        poc3-fastapi & 6/9 (66{,}7\%) & 3/9 (33{,}3\%) & 2/9 (22{,}2\%) \\
+        poc4-fastapi & 6/9 (66{,}7\%) & 4/7 (57{,}1\%) & 1/9 (11{,}1\%) \\
+        poc5 & 2/9 (22{,}2\%) & 1/8 (12{,}5\%) & 0/9 (0{,}0\%) \\
+    \end{tabular}
+    \caption{Skuteczność etapów per repozytorium w H2}
+    \label{tab:h2-repo-stages}
+\end{table}
+
+Wraz ze wzrostem złożoności widać silny spadek skuteczności: od 100{,}0\% dla POC1 do 0{,}0\% dla POC5.
 
 % TODO: Wykres success rate vs. poziom złożoności (repozytoria kontrolowane).
 
 \subsubsection{Trend złożoności}
 
-Dane wskazują na silny trend spadkowy skuteczności wraz ze wzrostem złożoności (korelacja Spearmana $\rho \approx -0{,}95$ dla POC1--POC4). Największy spadek widoczny jest między POC1 i POC2, następnie obserwowany jest plateau na poziomie POC2--POC3, po czym skuteczność spada dalej dla POC4. Wskazuje to na punkt załamania po przekroczeniu prostej architektury wielowarstwowej, gdy dochodzą dodatkowe zależności infrastrukturalne i wzajemne powiązania usług.
+Dane wskazują na niemal idealny trend spadkowy skuteczności wraz ze wzrostem złożoności (korelacja Spearmana $\rho \approx -1{,}0$ dla POC1--POC5). Największy spadek widoczny jest między POC1 i POC2, a kolejne poziomy złożoności przynoszą dalsze obniżenie skuteczności aż do 0\% dla POC5. Wskazuje to na punkt załamania po przekroczeniu prostej architektury wielowarstwowej, gdy dochodzą dodatkowe zależności infrastrukturalne i wzajemne powiązania usług.
+
+\subsubsection{Typowe problemy i tryby awarii}
+
+\begin{itemize}
+    \item \textbf{Nieudane buildy obrazów (Docker buildx):} szczególnie w POC3--POC5 pojawiają się błędy \texttt{npm ci} / \texttt{npm run build} (np. brak \texttt{package-lock.json}, brakujące zależności w etapie build).
+    \item \textbf{Timeouty readiness w Kubernetes:} część wdrożeń nie osiąga gotowości w czasie limitu (np. \texttt{fastapi-app}, \texttt{frontend}, \texttt{users-service}, \texttt{notes-service}, \texttt{analytics-service}, \texttt{audit-service} oraz \texttt{rabbitmq}).
+    \item \textbf{Problemy z registry:} sporadyczne timeouty podczas \texttt{docker push} do lokalnego rejestru, co blokuje dalszy etap wdrożenia.
+    \item \textbf{Błędy struktury odpowiedzi agenta:} pojedyncze przebiegi kończą się błędem walidacji JSON w wyniku narzędzia \texttt{ConfigurationOutput}.
+\end{itemize}
+
+\textbf{Wniosek:} Wraz z rosnącą liczbą usług i zależności infrastrukturalnych spada nie tylko skuteczność końcowa, ale też stabilność wcześniejszych etapów. W prostych repozytoriach (POC1) pipeline przechodzi bez zakłóceń, natomiast w POC3--POC5 rośnie odsetek awarii już na etapie budowy i aplikowania manifestów, a w POC5 brak jest sukcesów runtime. Wskazuje to, że główna bariera leży w koordynacji wielu usług, ich zależności oraz poprawnym zestawieniu konfiguracji środowiskowej.
 
 \subsubsection{Werdykt dla H2}
 
-Na podstawie wyników dla POC1--POC4 hipoteza H2 jest potwierdzona w zakresie dostępnych danych: spełniony jest warunek trendu spadkowego ($\rho \leq -0{,}6$), a różnica skuteczności POC1--POC4 wynosi 66{,}7 p.p. Pełna weryfikacja zgodna z kryteriami z rozdziału 4 wymaga uzupełnienia wyników dla POC5.
+Na podstawie wyników dla POC1--POC5 hipoteza H2 została potwierdzona: spełniony jest warunek trendu spadkowego ($\rho \leq -0{,}6$), a różnica skuteczności POC1--POC5 wynosi 100{,}0 p.p.
 
 \subsection{Wyniki H3: Jakość i zgodność z dobrymi praktykami}
 
