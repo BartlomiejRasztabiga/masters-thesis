@@ -187,40 +187,65 @@ Z tego względu metoda Wilsona jest powszechnie rekomendowana w literaturze jako
 
 % TODO zrewidować progi po uzyskaniu wyników eksperymentu, zmienić też wtedy w rozdziale 5.
 
+
+\textbf{Pozytywna weryfikacja hipotezy}: \textit{łączne spełnienie poniższych progów}:
 \begin{itemize}
-    \item \textbf{Pozytywna weryfikacja hipotezy}: \textit{łączne spełnienie poniższych progów}:
-    \begin{itemize}
-        \item end-to-end success rate (build \& apply \& runtime) co najmniej 60\% na zbiorze H1,
-        \item sukcesy per etap: build $\geq$ 75\%, apply $\geq$ 75\%, runtime $\geq$ 60\%,
-        \item conditional apply $|$ build $\geq$ 95\% oraz conditional runtime $|$ apply $\geq$ 80\% (ogranicza wpływ awarii na wcześniejszych etapach),
-        \item co najmniej połowa repozytoriów osiąga $\geq$ 50\% sukcesu (obniża ryzyko, że wynik jest zawyżony przez kilka „łatwych” projektów),
-    \end{itemize}
+    \item end-to-end success rate (build \& apply \& runtime) co najmniej 60\% na zbiorze H1,
+    \item sukcesy per etap: build $\geq$ 75\%, apply $\geq$ 75\%, runtime $\geq$ 60\%,
+    \item conditional apply $|$ build $\geq$ 95\% oraz conditional runtime $|$ apply $\geq$ 80\% (ogranicza wpływ awarii na wcześniejszych etapach),
+    \item co najmniej połowa repozytoriów osiąga $\geq$ 50\% sukcesu (obniża ryzyko, że wynik jest zawyżony przez kilka „łatwych” projektów),
 \end{itemize}
+
 
 % TODO dodac opis H2-H5
 
 \subsection{Weryfikacja H2: Ograniczenia złożonościowe}
 
-% TODO: Opisz metodykę (kontrolowane repozytoria o rosnącej złożoności),
-% TODO: Zdefiniuj miary złożoności (np. liczba usług, zależności, typ architektury),
-% TODO: Określ metryki sukcesu i progi (spadek success rate vs. poziom złożoności),
-% TODO: Dodaj kryteria weryfikacji (pozytywna/negatywna).
-
 \subsubsection{Hipoteza}
 
-% TODO: Wstaw treść hipotezy H2 (z sekcji hipotez badawczych).
+Istnieje próg złożoności aplikacji, powyżej którego jakość autonomicznie generowanych konfiguracji znacząco spada. Progi te można uchwycić, obserwując wyniki na kontrolowanych repozytoriach o rosnącej liczbie komponentów i zależności (od prostego monolitu po prosty układ mikroserwisowy); oczekuje się, że metryki sukcesu (np. odsetek poprawnych wdrożeń) maleją wraz ze wzrostem złożoności.
 
 \subsubsection{Zbiór danych testowych}
 
-% TODO: Opisz zestaw repozytoriów kontrolowanych i sposób eskalacji złożoności.
+Weryfikacja H2 wykorzystuje kontrolowany zestaw pięciu repozytoriów PoC o rosnącej złożoności (POC1–POC5). Repozytoria zostały zaprojektowane tak, aby stopniowo zwiększać liczbę usług, zależności infrastrukturalnych i powiązań między komponentami, zachowując jednocześnie podobny domenowo przypadek użycia (aplikacja webowa).
+
+\begin{itemize}
+    \item \textbf{POC1:} pojedyncza aplikacja FastAPI (monolit), brak bazy danych i usług zewnętrznych, prosta struktura kodu.
+    \item \textbf{POC2:} aplikacja FastAPI z relacyjną bazą danych (PostgreSQL), wymagane zmienne środowiskowe i inicjalizacja schematów.
+    \item \textbf{POC3:} architektura trójwarstwowa (frontend React + backend FastAPI + PostgreSQL), zależności między warstwami, sieć i wolumeny w konfiguracji.
+    \item \textbf{POC4:} prosty układ mikroserwisowy (3 usługi FastAPI), baza danych per serwis, broker komunikatów RabbitMQ, współdzielone biblioteki i zwiększona liczba zależności między usługami.
+    \item \textbf{POC5:} rozszerzony układ mikroserwisowy (3 usługi FastAPI + 1 usługa Node.js), baza danych per serwis, RabbitMQ oraz Redis, dodatkowe mechanizmy uruchomieniowe (frontend czekający na zdrowie usług przez \texttt{/health}).
+\end{itemize}
+
+% TODO wybrac modele, wieksze?
+
+Każde repozytorium jest uruchamiane dla trzech modeli (\texttt{gemini-2.5-flash}, \texttt{gpt-5-mini}, \texttt{deepseek-chat}) z dwoma powtórzeniami, analogicznie do H1, aby umożliwić porównywalność wyników.
 
 \subsubsection{Metryki}
 
-% TODO: Zdefiniuj metryki złożoności i metryki skuteczności.
+Weryfikacja H2 obejmuje dwie grupy metryk:
+\begin{itemize}
+    \item \textbf{Metryki złożoności repozytorium}:
+    \begin{itemize}
+        \item \textbf{Poziom złożoności} (1–5) — przypisany zgodnie z POC1–POC5,
+        \item \textbf{Liczba usług/kontenerów} — liczba uruchamianych komponentów aplikacyjnych,
+        \item \textbf{Liczba baz danych} — liczba niezależnych magazynów danych,
+        \item \textbf{Liczba zależności infrastrukturalnych} — komponenty inne niż bazy (np. broker).
+    \end{itemize}
+    \item \textbf{Metryki skuteczności}:
+    \begin{itemize}
+        \item end-to-end success rate (build \& apply \& runtime) per repozytorium i per poziom złożoności,
+        \item skuteczność etapów (build, apply, runtime) analogicznie do H1.
+    \end{itemize}
+\end{itemize}
 
 \subsubsection{Kryteria weryfikacji}
+\textbf{Pozytywna weryfikacja hipotezy} zachodzi, gdy:
+\begin{itemize}
+        \item występuje jednoznaczny trend spadkowy skuteczności wraz ze wzrostem poziomu złożoności (ujemna korelacja Spearmana $\rho \leq -0{,}8$),
+    \item różnica end-to-end success rate pomiędzy POC1 i POC5 wynosi co najmniej 40 p.p.
+\end{itemize}
 
-% TODO: Zdefiniuj progi i warunki uznania H2.
 
 \subsection{Weryfikacja H3: Jakość i zgodność z dobrymi praktykami}
 

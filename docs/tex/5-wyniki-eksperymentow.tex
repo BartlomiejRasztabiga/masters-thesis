@@ -17,7 +17,39 @@ Eksperymenty przeprowadzono zgodnie z metodologią opisaną w rozdziale 4, wykor
 
 \textbf{Analiza etapowa i warunkowa:}
 
-% TODO: Dodać wykres kaskady etapów.
+Kaskadę sukcesu między etapami pipeline'u przedstawiono na rysunku~\ref{fig:h1-funnel}. Wartości zbiorcze dla poszczególnych etapów oraz metryk warunkowych zestawiono w tabeli~\ref{tab:h1-stages}.
+
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            bar width=18pt,
+            ymin=0,
+            ymax=160,
+            width=0.9\textwidth,
+            height=6cm,
+            symbolic x coords={Start,Build,Apply,Runtime},
+            xtick=data,
+            ylabel={Liczba przebiegów},
+            nodes near coords,
+            nodes near coords align={vertical},
+            axis x line*=bottom,
+            axis y line*=left,
+            grid=both,
+            major grid style={draw=gray!30},
+        ]
+            \addplot coordinates {
+                (Start,150)
+                (Build,118)
+                (Apply,115)
+                (Runtime,94)
+            };
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Kaskada sukcesu w H1: liczba przebiegów na etapach pipeline'u}
+    \label{fig:h1-funnel}
+\end{figure}
 
 \begin{table}[h]
     \centering
@@ -33,7 +65,11 @@ Eksperymenty przeprowadzono zgodnie z metodologią opisaną w rozdziale 4, wykor
     \label{tab:h1-stages}
 \end{table}
 
+\textbf{Komentarz:} Największy spadek skuteczności następuje między etapem \textit{apply} a \textit{runtime}, co wskazuje, że część konfiguracji przechodzi walidację składniową i wdrożenie, ale zawodzi w uruchomieniu aplikacji. Dodatkowo, zauważalny ubytek pojawia się już na etapie budowy obrazów, co sugeruje, że problemy zależności i kontekstu budowania są istotnym źródłem błędów.
+
 \textbf{Rozbicie per model:}
+
+Porównanie skuteczności modeli znajduje się w tabeli~\ref{tab:h1-models}.
 
 \begin{table}[h]
     \centering
@@ -48,6 +84,8 @@ Eksperymenty przeprowadzono zgodnie z metodologią opisaną w rozdziale 4, wykor
 \end{table}
 
 \textbf{Rozbicie per repozytorium:}
+
+Rozkład skuteczności dla poszczególnych projektów pokazuje tabela~\ref{tab:h1-repos}.
 
 \begin{table}[h]
     \centering
@@ -85,15 +123,21 @@ Eksperymenty przeprowadzono zgodnie z metodologią opisaną w rozdziale 4, wykor
 
 \subsubsection{Typowe problemy i tryby awarii}
 
-% TODO: Lista najczęstszych przyczyn niepowodzeń + przykłady.
+Poniżej zebrano najczęstsze przyczyny niepowodzeń obserwowane w H1:
 
-% \begin{itemize}
-%     \item \textbf{Błędna identyfikacja punktu wejścia aplikacji} — [X]\% przypadków,
-%     \item \textbf{Pominięcie zależności systemowych} — [Y]\% przypadków,
-%     \item \textbf{Niepoprawna konfiguracja zmiennych środowiskowych} — [Z]\% przypadków,
-%     \item \textbf{Błędy w definiowaniu portów i protokołów sieciowych} — [W]\% przypadków,
-%     \item \textbf{Brak obsługi inicjalizacji bazy danych} — [V]\% przypadków.
-% \end{itemize}
+\begin{itemize}
+    \item \textbf{Problemy z zależnościami NPM:} agent używa \texttt{npm ci} lub \texttt{npm ci --omit=dev}, co zawodzi przy braku \texttt{package-lock.json} lub gdy zależności są błędnie oznaczone jako dev (np. brak \texttt{vite} w runtime).
+    \item \textbf{Błędne kopiowanie plików:} próba kopiowania \texttt{package-lock.json}, gdy nie istnieje, oraz kopiowanie z niepoprawnego kontekstu budowania (np. \texttt{COPY back-end/ ./} przy braku katalogu).
+    \item \textbf{Konflikt użytkownika w kontenerze:} błąd \texttt{runAsNonRoot} w Kubernetes przy obrazie uruchamianym jako root.
+    \item \textbf{Read-only filesystem w runtime:} aplikacje oparte o Nginx nie mogą utworzyć katalogów roboczych (np. \texttt{/var/cache/nginx/client\_temp}).
+    \item \textbf{Nieprawidłowe \texttt{imagePullPolicy}:} ustawienie \texttt{Never} uniemożliwia pobranie obrazu.
+    \item \textbf{Nieaktualne obrazy bazowe:} zbyt stary base image powoduje błędy \texttt{apt} podczas budowy.
+    \item \textbf{Niezgodne wersje środowiska:} agent nie rozpoznaje konfliktów wersji (np. Node 18 w base image nie wspiera zależności aplikacji), brakuje mu wiarygodnego źródła informacji o takich ograniczeniach.
+    \item \textbf{Błędny \texttt{test\_endpoint}:} agent wybiera niepoprawny endpoint zdrowia mimo działającej aplikacji pod \texttt{/}.
+    \item \textbf{Błędy importu w Pythonie:} uruchamianie modułów z relatywnymi importami bez pakietu (np. \texttt{ImportError: attempted relative import with no known parent package}).
+\end{itemize}
+
+\textbf{Wniosek:} Dominujące błędy dotyczą środowiska uruchomieniowego i procesu budowy (wersje bazowych obrazów, kontekst kopiowania, zależności), a nie samych manifestów Kubernetes. Oznacza to, że ograniczenia H1 w dużej mierze wynikają z niedoskonałego rozpoznania środowiska aplikacji, a nie z błędów składniowych IaC.
 
 \subsubsection{Werdykt dla H1}
 
@@ -110,15 +154,34 @@ W konsekwencji można uznać, że agenty LLM są w stanie autonomicznie generowa
 
 \subsubsection{Wyniki ilościowe}
 
+\textbf{Rozbicie per repozytorium:}
+
+Wyniki dla repozytoriów POC1--POC4 zestawiono w tabeli~\ref{tab:h2-repos}.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lccc}
+        \textbf{Repozytorium} & \textbf{Sukcesy} & \textbf{Skuteczność} & \textbf{95\% CI} \\
+        poc1-fastapi & 9/9 & 100{,}0\% & 70{,}1\%--100{,}0\% \\
+        poc2-fastapi & 4/9 & 44{,}4\% & 18{,}9\%--73{,}3\% \\
+        poc3-fastapi & 4/9 & 44{,}4\% & 18{,}9\%--73{,}3\% \\
+        poc4-fastapi & 3/9 & 33{,}3\% & 12{,}1\%--64{,}6\% \\
+    \end{tabular}
+    \caption{Skuteczność per repozytorium w H2}
+    \label{tab:h2-repos}
+\end{table}
+
+Wraz ze wzrostem złożoności widać istotny spadek skuteczności: od 100{,}0\% dla POC1 do 33{,}3\% dla POC4.
+
 % TODO: Wykres success rate vs. poziom złożoności (repozytoria kontrolowane).
 
 \subsubsection{Trend złożoności}
 
-% TODO: Opis trendu spadku skuteczności i punktu załamania.
+Dane wskazują na silny trend spadkowy skuteczności wraz ze wzrostem złożoności (korelacja Spearmana $\rho \approx -0{,}95$ dla POC1--POC4). Największy spadek widoczny jest między POC1 i POC2, następnie obserwowany jest plateau na poziomie POC2--POC3, po czym skuteczność spada dalej dla POC4. Wskazuje to na punkt załamania po przekroczeniu prostej architektury wielowarstwowej, gdy dochodzą dodatkowe zależności infrastrukturalne i wzajemne powiązania usług.
 
 \subsubsection{Werdykt dla H2}
 
-% TODO: Wniosek z odniesieniem do kryteriów z rozdziału 4.
+Na podstawie wyników dla POC1--POC4 hipoteza H2 jest potwierdzona w zakresie dostępnych danych: spełniony jest warunek trendu spadkowego ($\rho \leq -0{,}6$), a różnica skuteczności POC1--POC4 wynosi 66{,}7 p.p. Pełna weryfikacja zgodna z kryteriami z rozdziału 4 wymaga uzupełnienia wyników dla POC5.
 
 \subsection{Wyniki H3: Jakość i zgodność z dobrymi praktykami}
 
