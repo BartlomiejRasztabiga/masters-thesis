@@ -264,25 +264,39 @@ Weryfikacja H2 obejmuje dwie grupy metryk:
 
 \subsection{Weryfikacja H3: Jakość i zgodność z dobrymi praktykami}
 
-% TODO: Opisz metodykę (prompt bazowy vs. prompt z dobrymi praktykami),
-% TODO: Zdefiniuj sposób liczenia ostrzeżeń Hadolint/Kube-linter,
-% TODO: Określ metryki jakości i kryteria sukcesu.
+% TODO tu skonczylem
 
 \subsubsection{Hipoteza}
 
-% TODO: Wstaw treść hipotezy H3 (z sekcji hipotez badawczych).
+Bez dodatkowych instrukcji ukierunkowanych na najlepsze praktyki DevOps, co najmniej 60\% autonomicznie generowanych konfiguracji zawiera błędy lub ostrzeżenia wykrywane przez narzędzia statycznej analizy (Hadolint dla Docker, Kube-linter dla Kubernetes), co wymaga dodatkowej walidacji i poprawek przed wdrożeniem produkcyjnym. Zastosowanie prompt engineeringu (w postaci wyraźnych, konkretnych wytycznych dotyczących dobrych praktyk) zmniejsza liczbę ostrzeżeń i zwiększa odsetek konfiguracji bez ostrzeżeń.
+
+H3 sprawdza, czy wzmocnienie prompta o wyraźne wytyczne dobrych praktyk poprawia jakość wygenerowanych konfiguracji IaC mierzoną przez narzędzia statycznej analizy. Porównywane są dwa warianty prompta: bazowy (ten sam co w H1) oraz wariant rozszerzony o checklistę dobrych praktyk dla Dockerfile i Kubernetes (np. bezpieczeństwo użytkownika, wersjonowanie obrazów, zasoby, probe'y, właściwe użycie Secret/ConfigMap).
 
 \subsubsection{Zbiór danych testowych}
 
-% TODO: Opisz zbiór (może H1 lub rozszerzony) i warunki uruchomień.
+H3 wykorzystuje ten sam zbiór repozytoriów co H1 (25 publicznych projektów; załącznik~\ref{att:h1-dataset}). Każde repozytorium uruchamiane jest dla trzech modeli (\texttt{gemini-2.5-flash}, \texttt{gpt-5-mini}, \texttt{deepseek-chat}) w dwóch wariantach prompta (bazowy vs. best practices) i z dwoma powtórzeniami. Analiza jakości wykonywana jest na wygenerowanych plikach \texttt{Dockerfile} oraz manifestach Kubernetes, niezależnie od wyniku runtime.
 
 \subsubsection{Metryki}
 
-% TODO: Liczba ostrzeżeń per plik/repo, odsetek konfiguracji bez ostrzeżeń, itp.
+Metryki jakości oparte są o ostrzeżenia narzędzi statycznych:
+\begin{itemize}
+    \item \textbf{Liczba ostrzeżeń Hadolint} — suma ostrzeżeń per repozytorium (wszystkie wygenerowane \texttt{Dockerfile}).
+    \item \textbf{Liczba ostrzeżeń Kube-linter} — suma ostrzeżeń per repozytorium (wszystkie manifesty Kubernetes).
+    \item \textbf{Łączna liczba ostrzeżeń} — suma ostrzeżeń obu narzędzi per repozytorium i per przebieg.
+    \item \textbf{Odsetek przebiegów z ostrzeżeniami} — udział przebiegów, w których pojawia się co najmniej jedno ostrzeżenie.
+    \item \textbf{Odsetek konfiguracji bez ostrzeżeń} — udział przebiegów bez ostrzeżeń z obu narzędzi.
+\end{itemize}
 
 \subsubsection{Kryteria weryfikacji}
 
-% TODO: Progi dla spadku ostrzeżeń po prompt engineeringu.
+\begin{itemize}
+    \item \textbf{Pozytywna weryfikacja hipotezy} zachodzi, gdy:
+    \begin{itemize}
+        \item w wariancie bazowym co najmniej 60\% przebiegów zawiera ostrzeżenia (Hadolint lub Kube-linter),
+        \item wariant best practices redukuje łączną liczbę ostrzeżeń co najmniej o 20\% (mediana per repozytorium),
+        \item wariant best practices zwiększa odsetek konfiguracji bez ostrzeżeń o co najmniej 15 p.p.
+    \end{itemize}
+\end{itemize}
 
 \subsection{Weryfikacja H4: Niezawodność i powtarzalność procesu agentowego}
 
