@@ -169,7 +169,7 @@ def test_pdf(pdf_file: Path, ref_file: Path):
 # Auxiliary
 def print_help():
     print("Available targets: ")
-    print("    quick all pdf lua clean generate_tests test_pdf")
+    print("    quick all pdf lua slides clean generate_tests test_pdf")
     print("    update_refs_local update_refs_docker")
 
 
@@ -187,6 +187,8 @@ for target in COMMAND_LINE_TARGETS:
         target_pdf(Path("main.tex"), Path("build/pdfs/pdflatex.pdf"))
     elif target == "lua":
         target_lua(Path("main.tex"), Path("build/pdfs/lualatex.pdf"))
+    elif target == "slides":
+        target_pdf(Path("slides.tex"), Path("slides.pdf"))
     elif target == "clean":
         target_clean()
     elif target == "generate_tests":
