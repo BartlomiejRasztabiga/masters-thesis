@@ -24,6 +24,20 @@ main.run.xml
 main.synctex.gz
 main.toc
 
+slides.app
+slides.aux
+slides.bcf
+slides.blg
+slides.fdb_latexmk
+slides.fls
+slides.log
+slides.nav
+slides.out
+slides.pdf
+slides.snm
+slides.synctex.gz
+slides.toc
+
 **/.DS_Store
 .idea
 _minted

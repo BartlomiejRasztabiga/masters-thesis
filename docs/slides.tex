@@ -5,10 +5,10 @@
 \usepackage{lmodern}
 \usepackage[polish]{babel}
 
-\title{Zastosowanie duzych modeli jezykowych (LLM) do generowania konfiguracji Docker i Kubernetes}
+\title{Zastosowanie dużych modeli językowych (LLM) do generowania konfiguracji Docker i Kubernetes}
 \subtitle{Seminarium dyplomowe}
-\author{Bartlomiej Rasztabiga}
-\institute{Politechnika Warszawska, Wydzial EiTI}
+\author{Bartłomiej Rasztabiga}
+\institute{Politechnika Warszawska, Wydział EiTI}
 \date{\the\year}
 
 \begin{document}
@@ -29,38 +29,38 @@
 \begin{frame}{Problem i motywacja}
     \begin{itemize}
         \item IaC przyspiesza DevOps, ale wymaga specjalistycznej wiedzy
-        \item Reczne tworzenie Docker/K8s jest czasochlonne i podatne na bledy
-        \item LLM moga automatyzowac generacje, ale trzeba zbadac skutecznosc i ryzyka
+        \item Ręczne tworzenie Docker/K8s jest czasochłonne i podatne na błędy
+        \item LLM mogą automatyzować generację, ale trzeba zbadać skuteczność i ryzyka
     \end{itemize}
 \end{frame}
 
 \begin{frame}{Cel pracy i hipotezy}
     \begin{itemize}
         \item Cel: ocena autonomicznej generacji konfiguracji IaC przez agenty LLM
-        \item H1: dzialajace konfiguracje end-to-end
-        \item H2: spadek skutecznosci wraz ze zlozonoscia
-        \item H3--H5: jakosc, powtarzalnosc, podatnosc na manipulacje
+        \item H1: działające konfiguracje end-to-end
+        \item H2: spadek skuteczności wraz ze złożonością
+        \item H3--H5: jakość, powtarzalność, podatność na manipulacje
     \end{itemize}
 \end{frame}
 
 \begin{frame}{Stan wiedzy}
     \begin{itemize}
         \item LLM w generowaniu Docker/K8s i IaC
-        \item Podejscia typu ``Don't Train, Just Prompt''
-        \item LLM w naprawie bledow IaC i w bezpieczenstwie
-        \item Wyzwania: halucynacje, zgodnosc, bezpieczenstwo
+        \item Podejścia typu ``Don't Train, Just Prompt''
+        \item LLM w naprawie błędów IaC i w bezpieczeństwie
+        \item Wyzwania: halucynacje, zgodność, bezpieczeństwo
     \end{itemize}
 \end{frame}
 
 \begin{frame}{Luka badawcza}
     \begin{itemize}
         \item Brak kompleksowej oceny end-to-end (build $\rightarrow$ apply $\rightarrow$ runtime)
-        \item Niewystarczajace dane o zlozonosci i powtarzalnosci
-        \item Ograniczone analizy podatnosci na prompt injection
+        \item Niewystarczające dane o złożoności i powtarzalności
+        \item Ograniczone analizy podatności na prompt injection
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Koncepcja rozwiazania}
+\begin{frame}{Koncepcja rozwiązania}
     \begin{itemize}
         \item Agent LLM analizuje repozytorium i generuje Dockerfile + manifesty
         \item Automatyczny pipeline walidacji
@@ -76,86 +76,86 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Narzedzia agenta i prompt}
+\begin{frame}{Narzędzia agenta i prompt}
     \begin{itemize}
-        \item 11 narzedzi (clone, tree, search, read, write, patch)
+        \item 11 narzędzi (clone, tree, search, read, write, patch)
         \item Zasady generacji (imagePullPolicy, probes, requests/limits)
-        \item Wyjscie: JSON z lista obrazow i manifestow
+        \item Wyjście: JSON z listą obrazów i manifestów
     \end{itemize}
 \end{frame}
 
 \begin{frame}{Metodyka i metryki}
     \begin{itemize}
         \item Metryki: build\_success, apply\_success, runtime\_success
-        \item Wskazniki warunkowe (apply$|$build, runtime$|$apply)
-        \item Przedzialy ufnosci Wilsona
+        \item Wskaźniki warunkowe (apply$|$build, runtime$|$apply)
+        \item Przedziały ufności Wilsona
     \end{itemize}
 \end{frame}
 
 \begin{frame}{Zbiory danych}
     \begin{itemize}
-        \item H1: 25 publicznych repozytoriow webowych z GitHuba
-        \item H2--H5: POC1--POC5 o rosnacej zlozonosci
+        \item H1: 25 publicznych repozytoriów webowych z GitHuba
+        \item H2--H5: POC1--POC5 o rosnącej złożoności
         \item POC jailbreak dla H5
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Wyniki H1 -- skutecznosc}
+\begin{frame}{Wyniki H1 -- skuteczność}
     \begin{itemize}
-        \item 94/150 sukcesow end-to-end = 62,7\%
+        \item 94/150 sukcesów end-to-end = 62,7\%
         \item Build 78,7\%, Apply 77,7\%, Runtime 62,7\%
-        \item Najwiekszy spadek na etapie runtime
+        \item Największy spadek na etapie runtime
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Wyniki H1 -- porownanie modeli}
+\begin{frame}{Wyniki H1 -- porównanie modeli}
     \begin{itemize}
         \item GPT-5 Mini: 68,0\% sukcesu
         \item Gemini 2.5 Flash: 62,0\%
         \item DeepSeek-Chat: 58,0\%
-        \item Roznice umiarkowane, brak dominacji jednego modelu
+        \item Różnice umiarkowane, brak dominacji jednego modelu
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Wyniki H2 -- zlozonosc}
+\begin{frame}{Wyniki H2 -- złożoność}
     \begin{itemize}
-        \item Spadek skutecznosci od POC1 do POC5 (100\% $\rightarrow$ 0\%)
+        \item Spadek skuteczności od POC1 do POC5 (100\% $\rightarrow$ 0\%)
         \item Trend silnie ujemny (Spearman $\approx$ -1,0)
-        \item Problemy narastaja przy multi-service i zaleznosciach
+        \item Problemy narastają przy multi-service i zależnościach
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Typowe tryby awarii}
+\begin{frame}{Typowe przyczyny awarii}
     \begin{itemize}
-        \item Bledy build (npm ci, brak lockfile, zle COPY)
+        \item Błędy build (npm ci, brak lockfile, złe COPY)
         \item Konflikty user/root i securityContext
         \item Niepoprawne endpointy zdrowia
-        \item Problemy zaleznosci i wersji runtime
+        \item Problemy zależności i wersji runtime
     \end{itemize}
 \end{frame}
 
 \begin{frame}{H3--H5 -- status i obserwacje}
     \begin{itemize}
-        \item H3: oczekiwane wysokie ostrzezenia bez promptu best-practices
-        \item H4: zmiennosc mimo temperature=0 (do analizy)
+        \item H3: oczekiwane wysokie ostrzeżenia bez promptu best-practices
+        \item H4: zmienność mimo temperature=0 (do analizy)
         \item H5: ryzyko prompt injection w repozytoriach
-        \item Plan: uzupelnienie metryk i przykladow
+        \item Plan: uzupełnienie metryk i przykładów
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Wnioski glowne}
+\begin{frame}{Wnioski główne}
     \begin{itemize}
-        \item Agenty LLM potrafia generowac dzialajace IaC w prostych repo
-        \item Skutecznosc spada gwaltownie przy zlozonosci
-        \item Walidacja i ograniczenie kontekstu sa kluczowe
+        \item Agenty LLM potrafią generować działające IaC w prostych repo
+        \item Skuteczność spada gwałtownie przy złożoności
+        \item Walidacja i ograniczenie kontekstu są kluczowe
     \end{itemize}
 \end{frame}
 
 \begin{frame}{Ograniczenia i dalsze prace}
     \begin{itemize}
-        \item Ograniczona liczba repo i brak pelnych H3--H5
-        \item Potrzeba rozszerzenia datasetu i automatycznej analizy jakosci
-        \item Demonstrator PaaS jako praktyczne zastosowanie wynikow
+        \item Ograniczona liczba repo i brak pełnych H3--H5
+        \item Potrzeba rozszerzenia datasetu i automatycznej analizy jakości
+        \item Demonstrator PaaS jako praktyczne zastosowanie wyników
     \end{itemize}
 \end{frame}
 

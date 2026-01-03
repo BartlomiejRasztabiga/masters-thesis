@@ -121,7 +121,7 @@ Rozkład skuteczności dla poszczególnych projektów pokazuje tabela~\ref{tab:h
     \label{tab:h1-repos}
 \end{table}
 
-\subsubsection{Typowe problemy i tryby awarii}
+\subsubsection{Typowe problemy i przyczyny awarii}
 
 Poniżej zebrano najczęstsze przyczyny niepowodzeń obserwowane w H1:
 
@@ -226,21 +226,52 @@ Zestawienie skuteczności etapów per repozytorium znajduje się w tabeli~\ref{t
     \label{tab:h2-repo-stages}
 \end{table}
 
-Wraz ze wzrostem złożoności widać silny spadek skuteczności: od 100{,}0\% dla POC1 do 0{,}0\% dla POC5.
+Wraz ze wzrostem złożoności widać silny spadek skuteczności: od 100{,}0\% dla POC1 do 0{,}0\% dla POC5, co ilustruje wykres na rysunku~\ref{fig:h2-success-vs-complexity}.
 
-% TODO: Wykres success rate vs. poziom złożoności (repozytoria kontrolowane).
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=0.85\textwidth,
+            height=7cm,
+            ymin=0,
+            ymax=100,
+            xtick={1,2,3,4,5},
+            xticklabels={POC1,POC2,POC3,POC4,POC5},
+            ylabel={Success rate (\%)},
+            xlabel={Poziom złożoności repozytorium},
+            ymajorgrids=true,
+            grid style={dashed,gray!30},
+            legend pos=south west,
+        ]
+            \addplot[
+                color=blue,
+                mark=*,
+                line width=1pt
+            ] coordinates {
+                (1,100.0)
+                (2,33.3)
+                (3,22.2)
+                (4,11.1)
+                (5,0.0)
+            };
+            \addlegendentry{End-to-end success rate}
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Success rate a poziom złożoności (repozytoria kontrolowane)}
+    \label{fig:h2-success-vs-complexity}
+\end{figure}
 
 \subsubsection{Trend złożoności}
 
 Dane wskazują na niemal idealny trend spadkowy skuteczności wraz ze wzrostem złożoności (korelacja Spearmana $\rho \approx -1{,}0$ dla POC1--POC5). Największy spadek widoczny jest między POC1 i POC2, a kolejne poziomy złożoności przynoszą dalsze obniżenie skuteczności aż do 0\% dla POC5. Wskazuje to na punkt załamania po przekroczeniu prostej architektury wielowarstwowej, gdy dochodzą dodatkowe zależności infrastrukturalne i wzajemne powiązania usług.
 
-\subsubsection{Typowe problemy i tryby awarii}
+\subsubsection{Typowe problemy i przyczyny awarii}
+
+% TODO spisac lepsze typowe problemy
 
 \begin{itemize}
-    \item \textbf{Nieudane buildy obrazów (Docker buildx):} szczególnie w POC3--POC5 pojawiają się błędy \texttt{npm ci} / \texttt{npm run build} (np. brak \texttt{package-lock.json}, brakujące zależności w etapie build).
-    \item \textbf{Timeouty readiness w Kubernetes:} część wdrożeń nie osiąga gotowości w czasie limitu (np. \texttt{fastapi-app}, \texttt{frontend}, \texttt{users-service}, \texttt{notes-service}, \texttt{analytics-service}, \texttt{audit-service} oraz \texttt{rabbitmq}).
-    \item \textbf{Problemy z registry:} sporadyczne timeouty podczas \texttt{docker push} do lokalnego rejestru, co blokuje dalszy etap wdrożenia.
-    \item \textbf{Błędy struktury odpowiedzi agenta:} pojedyncze przebiegi kończą się błędem walidacji JSON w wyniku narzędzia \texttt{ConfigurationOutput}.
+    \item TODO
 \end{itemize}
 
 \textbf{Wniosek:} Wraz z rosnącą liczbą usług i zależności infrastrukturalnych spada nie tylko skuteczność końcowa, ale też stabilność wcześniejszych etapów. W prostych repozytoriach (POC1) pipeline przechodzi bez zakłóceń, natomiast w POC3--POC5 rośnie odsetek awarii już na etapie budowy i aplikowania manifestów, a w POC5 brak jest sukcesów runtime. Wskazuje to, że główna bariera leży w koordynacji wielu usług, ich zależności oraz poprawnym zestawieniu konfiguracji środowiskowej.
