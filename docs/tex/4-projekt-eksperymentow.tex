@@ -274,7 +274,7 @@ H3 sprawdza, czy wzmocnienie prompta o wyraźne wytyczne dobrych praktyk poprawi
 
 \subsubsection{Zbiór danych testowych}
 
-H3 wykorzystuje ten sam zbiór repozytoriów co H1 (25 publicznych projektów; załącznik~\ref{att:h1-dataset}). Każde repozytorium uruchamiane jest dla trzech modeli (\texttt{gemini-2.5-flash}, \texttt{gpt-5-mini}, \texttt{deepseek-chat}) w dwóch wariantach prompta (bazowy vs. best practices) i z dwoma powtórzeniami. Analiza jakości wykonywana jest na wygenerowanych plikach \texttt{Dockerfile} oraz manifestach Kubernetes, niezależnie od wyniku runtime; na potrzeby H3 wyłączono aplikowanie manifestów na klaster, aby przyspieszyć walidację.
+H3 wykorzystuje ten sam zbiór repozytoriów co H1 (25 publicznych projektów; załącznik~\ref{att:h1-dataset}). Każde repozytorium uruchamiane jest dla trzech modeli (\texttt{gemini-2.5-flash}, \texttt{gpt-5-mini}, \texttt{deepseek-chat}) w dwóch wariantach prompta (bazowy vs. best practices) i z jednym powtórzeniem. Liczbę powtórzeń ograniczono z 2 do 1 w celu skrócenia czasu eksperymentu. Analiza jakości wykonywana jest na wygenerowanych plikach \texttt{Dockerfile} oraz manifestach Kubernetes, niezależnie od wyniku runtime; na potrzeby H3 wyłączono aplikowanie manifestów na klaster, aby przyspieszyć walidację.
 
 \subsubsection{Metryki}
 

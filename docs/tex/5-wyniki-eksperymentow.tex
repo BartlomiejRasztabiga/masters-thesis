@@ -268,13 +268,18 @@ Dane wskazują na niemal idealny trend spadkowy skuteczności wraz ze wzrostem z
 
 \subsubsection{Typowe problemy i przyczyny awarii}
 
-% TODO spisac lepsze typowe problemy
-
 \begin{itemize}
-    \item TODO
+    \item Błędna składnia sekretów w Kubernetes: niepoprawnie zakodowane pola \texttt{data} (np. \texttt{illegal base64 data}) zamiast poprawnego Base64 lub użycia \texttt{stringData}.
+    \item Niepoprawne polecenie \texttt{COPY} w Dockerfile (np. brak ścieżki docelowej), co kończy się błędem \texttt{At least two arguments are required for COPY}.
+    \item Uruchomienie \texttt{npm ci} bez pliku \texttt{package-lock.json} (lub bez skopiowania lockfile do obrazu), co blokuje instalację zależności.
+    \item Brak nazw portów w \texttt{Service} z wieloma portami, co powoduje walidację \texttt{spec.ports[*].name: Required value}.
+    \item Niezgodna wersja Pythona z adnotacjami typów (np. \texttt{models.User | None} w Pythonie < 3.10), skutkująca \texttt{TypeError}.
+    \item Błędne umieszczenie dyrektywy \texttt{server} w \texttt{nginx.conf} (poza blokiem \texttt{http}), co kończy się \texttt{directive is not allowed here}.
+    \item Brak usługi/bazy w Kubernetes (np. brak \texttt{Service} o nazwie \texttt{notes-db}) lub brak zmiennej środowiskowej z adresem DB, skutkujące \texttt{could not translate host name}.
+    \item Błędne przekazanie zmiennych środowiskowych do bazy (np. literalne \texttt{"\$(POSTGRES\_USER)"}), co daje \texttt{password authentication failed}.
 \end{itemize}
 
-\textbf{Wniosek:} Wraz z rosnącą liczbą usług i zależności infrastrukturalnych spada nie tylko skuteczność końcowa, ale też stabilność wcześniejszych etapów. W prostych repozytoriach (POC1) pipeline przechodzi bez zakłóceń, natomiast w POC3--POC5 rośnie odsetek awarii już na etapie budowy i aplikowania manifestów, a w POC5 brak jest sukcesów runtime. Wskazuje to, że główna bariera leży w koordynacji wielu usług, ich zależności oraz poprawnym zestawieniu konfiguracji środowiskowej.
+\textbf{Wniosek:} Wraz z rosnącą liczbą usług i zależności infrastrukturalnych spada nie tylko skuteczność końcowa, ale też stabilność wcześniejszych etapów. W prostych repozytoriach (POC1) pipeline przechodzi bez zakłóceń, natomiast w POC3--POC5 rośnie odsetek awarii już na etapie budowy i aplikowania manifestów, a w POC5 brak jest sukcesów runtime. Wskazuje to, że główna bariera leży w koordynacji wielu usług, ich zależności oraz poprawnym zestawieniu konfiguracji środowiskowej. Dominujące źródła porażek to błędy walidacyjne manifestów oraz problemy ze spójnością konfiguracji środowiskowej (sekrety, nazwy usług, zmienne), co potwierdza krytyczność etapu integracji.
 
 \subsubsection{Werdykt dla H2}
 
