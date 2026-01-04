@@ -339,7 +339,7 @@ Hipoteza H3 została potwierdzona. W wariancie bazowym odsetek przebiegów z ost
 
 Pomimo deterministycznych parametrów (temperature=0, stały seed) w większości konfiguracji obserwowana jest istotna zmienność wygenerowanych artefaktów (tab.~\ref{tab:h4-repeatability}). Największe różnice występują w bardziej złożonych repozytoriach (POC4 i POC5), gdzie diff ratio przekracza 0{,}6, natomiast POC1 zachowuje względną stabilność (diff ratio poniżej 0{,}35). Wskazuje to, że powtarzalność procesu spada wraz ze wzrostem złożoności wejścia, nawet przy tych samych ustawieniach losowości.
 
-Zmienność liczby kroków narzędziowych jest zazwyczaj umiarkowana (relacja $\sigma/\mu$ na poziomie 6{,}7\%--17{,}8\%), z wyraźnym wyjątkiem dla \texttt{poc4-fastapi} przy modelu gemini, gdzie $\sigma > 0{,}2\mu$. Sugeruje to, że różnice dotyczą głównie treści wygenerowanych plików, a nie samej sekwencji działań agenta.
+Zmienność liczby kroków narzędziowych jest zazwyczaj umiarkowana (odchylenie standardowe stanowi 6{,}7\%--17{,}8\% wartości średniej), z wyraźnym wyjątkiem dla \texttt{poc4-fastapi} przy modelu gemini, gdzie odchylenie standardowe przekracza 20\% średniej. Sugeruje to, że różnice dotyczą głównie treści wygenerowanych plików, a nie samej sekwencji działań agenta.
 
 \textbf{Wyniki zagregowane:} Średni diff ratio dla całego H4 wyniósł 0{,}5632 (mediana 0{,}5501). W ujęciu per model, \texttt{gemini-2.5-flash} osiąga 0{,}5274, a \texttt{deepseek-chat} 0{,}5990. Średnie odchylenie standardowe liczby kroków narzędziowych wyniosło 5{,}37 (per model: 4{,}34 dla gemini i 6{,}40 dla deepseek), co wskazuje na umiarkowaną zmienność procesu wykonawczego w skali całego eksperymentu.
 
