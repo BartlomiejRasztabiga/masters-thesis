@@ -314,15 +314,43 @@ Hipoteza H3 została potwierdzona. W wariancie bazowym odsetek przebiegów z ost
 
 \subsubsection{Wyniki ilościowe}
 
-% TODO: run-to-run diff ratio + zmienność liczby kroków narzędziowych.
+\textbf{Zestawienie per repozytorium i model:} Kluczowe metryki powtarzalności (średni diff ratio oraz zmienność liczby kroków narzędziowych) zestawiono w tabeli~\ref{tab:h4-repeatability}. Wartości dla kroków narzędziowych raportowane są dla tej samej kombinacji repozytorium i modelu, zgodnie z definicją H4.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{llcc}
+        \textbf{Repozytorium} & \textbf{Model} & \textbf{Diff ratio (avg)} & \textbf{Tool steps (avg $\pm$ std)} \\
+        poc1-fastapi & gemini-2.5-flash & 0{,}1682 & 8{,}00 $\pm$ 0{,}63 \\
+        poc1-fastapi & deepseek-chat & 0{,}3484 & 19{,}20 $\pm$ 1{,}47 \\
+        poc2-fastapi & gemini-2.5-flash & 0{,}3945 & 16{,}00 $\pm$ 1{,}87 \\
+        poc2-fastapi & deepseek-chat & 0{,}5301 & 37{,}40 $\pm$ 5{,}64 \\
+        poc3-fastapi & gemini-2.5-flash & 0{,}4383 & 22{,}00 $\pm$ 2{,}92 \\
+        poc3-fastapi & deepseek-chat & 0{,}5501 & 37{,}80 $\pm$ 4{,}12 \\
+        poc4-fastapi & gemini-2.5-flash & 0{,}9908 & 44{,}60 $\pm$ 13{,}72 \\
+        poc4-fastapi & deepseek-chat & 0{,}7661 & 67{,}00 $\pm$ 11{,}93 \\
+        poc5 & gemini-2.5-flash & 0{,}6450 & 38{,}20 $\pm$ 2{,}56 \\
+        poc5 & deepseek-chat & 0{,}8004 & 64{,}00 $\pm$ 8{,}86 \\
+    \end{tabular}
+    \caption{Powtarzalność per repozytorium i model w H4}
+    \label{tab:h4-repeatability}
+\end{table}
 
 \subsubsection{Analiza powtarzalności}
 
-% TODO: Wpływ deterministycznych parametrów (temperature=0, seed).
+Pomimo deterministycznych parametrów (temperature=0, stały seed) w większości konfiguracji obserwowana jest istotna zmienność wygenerowanych artefaktów (tab.~\ref{tab:h4-repeatability}). Największe różnice występują w bardziej złożonych repozytoriach (POC4 i POC5), gdzie diff ratio przekracza 0{,}6, natomiast POC1 zachowuje względną stabilność (diff ratio poniżej 0{,}35). Wskazuje to, że powtarzalność procesu spada wraz ze wzrostem złożoności wejścia, nawet przy tych samych ustawieniach losowości.
+
+Zmienność liczby kroków narzędziowych jest zazwyczaj umiarkowana (relacja $\sigma/\mu$ na poziomie 6{,}7\%--17{,}8\%), z wyraźnym wyjątkiem dla \texttt{poc4-fastapi} przy modelu gemini, gdzie $\sigma > 0{,}2\mu$. Sugeruje to, że różnice dotyczą głównie treści wygenerowanych plików, a nie samej sekwencji działań agenta.
+
+\textbf{Wyniki zagregowane:} Średni diff ratio dla całego H4 wyniósł 0{,}5632 (mediana 0{,}5501). W ujęciu per model, \texttt{gemini-2.5-flash} osiąga 0{,}5274, a \texttt{deepseek-chat} 0{,}5990. Średnie odchylenie standardowe liczby kroków narzędziowych wyniosło 5{,}37 (per model: 4{,}34 dla gemini i 6{,}40 dla deepseek), co wskazuje na umiarkowaną zmienność procesu wykonawczego w skali całego eksperymentu.
 
 \subsubsection{Werdykt dla H4}
 
-% TODO: Wniosek z odniesieniem do progów z rozdziału 4.
+Na podstawie kryteriów z rozdziału 4 hipoteza H4 nie została potwierdzona w swojej pierwotnej, rygorystycznej formie. Spełnienie warunków przedstawia się następująco:
+\begin{itemize}
+    \item średni run-to-run diff ratio $> 0{,}4$ spełniono w 7/10 kombinacji (wymagane: wszystkie),
+    \item odchylenie standardowe liczby kroków narzędziowych przekroczyło 20\% średniej tylko w 1/10 kombinacji.
+\end{itemize}
+Oznacza to, że chociaż w wielu konfiguracjach występuje istotna zmienność wyników, nie jest ona na tyle systematyczna, aby spełnić zaostrzone kryteria weryfikacyjne H4. Jednocześnie obserwowany jest wyraźny wzrost diff ratio wraz ze wzrostem złożoności repozytoriów, co potwierdza trend ograniczonej powtarzalności dla trudniejszych przypadków. Z tego względu hipotezę H4 należy uznać za częściowo potwierdzoną.
 
 \subsection{Wyniki H5: Podatność na manipulację kontekstem}
 

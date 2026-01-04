@@ -22,7 +22,7 @@ W ramach badania sformułowano pięć hipotez weryfikowanych eksperymentalnie:
     Bez dodatkowych instrukcji ukierunkowanych na najlepsze praktyki DevOps, co najmniej 60\% autonomicznie generowanych konfiguracji zawiera błędy lub ostrzeżenia wykrywane przez narzędzia statycznej analizy (Hadolint dla Docker, Kube-linter dla Kubernetes), co wymaga dodatkowej walidacji i poprawek przed wdrożeniem produkcyjnym. Zastosowanie prompt engineeringu (w postaci wyraźnych, konkretnych wytycznych dotyczących dobrych praktyk) zmniejsza liczbę ostrzeżeń i zwiększa odsetek konfiguracji bez ostrzeżeń.
 
     \item \textbf{H4: Niezawodność i powtarzalność procesu agentowego} \\
-    Proces generacji konfiguracji przez agenta LLM charakteryzuje się zmiennością wyników mimo deterministycznych parametrów (\texttt{temperature = 0}, stały seed); przy wielokrotnym uruchomieniu na tym samym repozytorium wskaźniki takie jak \textit{run-to-run diff ratio} (liczba zmienionych linii pomiędzy parami wygenerowanych konfiguracji znormalizowana przez ich długość) lub odchylenie standardowe liczby kroków narzędziowych w sekwencjach zapisanych w LangSmith (różna liczba wywołań funkcji pomocniczych) przekraczają ustalony próg (np. $>0{,}2$), co świadczy o ograniczonej powtarzalności procesu.
+    Proces generacji konfiguracji przez agenta LLM charakteryzuje się zmiennością wyników mimo deterministycznych parametrów (\texttt{temperature = 0}, stały seed); przy wielokrotnym uruchomieniu na tym samym repozytorium wskaźniki takie jak \textit{run-to-run diff ratio} (liczba zmienionych linii pomiędzy parami wygenerowanych konfiguracji znormalizowana przez ich długość) oraz odchylenie standardowe liczby kroków narzędziowych w sekwencjach zapisanych w LangSmith (różna liczba wywołań funkcji pomocniczych) przekraczają ustalone progi (diff ratio $>0{,}4$ oraz $\sigma > 0{,}2\mu$), co świadczy o ograniczonej powtarzalności procesu.
 
     \item \textbf{H5: Podatność na manipulację kontekstem} \\
     Agenty LLM są podatne na manipulację przez złośliwe lub mylące treści zawarte w repozytorium (prompt injection, social engineering w plikach README/dokumentacji): w specjalnie spreparowanym repozytorium co najmniej 30\% przebiegów prowadzi do wygenerowania konfiguracji odbiegających od oczekiwań (np. pominięcie krytycznych usług, wstrzyknięcie dodatkowych kontenerów) lub zawierających intencjonalnie szkodliwe instrukcje, co dokumentuje wpływ manipulacji kontekstem na wynik końcowy.
@@ -300,24 +300,39 @@ Metryki jakości oparte są o ostrzeżenia narzędzi statycznych:
 
 \subsection{Weryfikacja H4: Niezawodność i powtarzalność procesu agentowego}
 
-% TODO: Opisz liczbę powtórzeń, parametry deterministyczne (temperature=0, seed),
-% TODO: Zdefiniuj sposób liczenia run-to-run diff ratio i analizę LangSmith.
+H4 koncentruje się na powtarzalności wyników generacji przy niezmienionych warunkach wejściowych oraz na stabilności przebiegu procesu agentowego (liczby kroków narzędziowych).
 
 \subsubsection{Hipoteza}
 
-% TODO: Wstaw treść hipotezy H4 (z sekcji hipotez badawczych).
+Proces generacji konfiguracji przez agenta LLM charakteryzuje się zmiennością wyników mimo deterministycznych parametrów (\texttt{temperature = 0}, stały seed); przy wielokrotnym uruchomieniu na tym samym repozytorium wskaźniki takie jak \textit{run-to-run diff ratio} (liczba zmienionych linii pomiędzy parami wygenerowanych konfiguracji znormalizowana przez ich długość) oraz odchylenie standardowe liczby kroków narzędziowych w sekwencjach zapisanych w LangSmith (różna liczba wywołań funkcji pomocniczych) przekraczają ustalone progi (diff ratio $>0{,}4$ oraz $\sigma > 0{,}2\mu$), co świadczy o ograniczonej powtarzalności procesu.
 
 \subsubsection{Zbiór danych testowych}
 
-% TODO: Opisz repozytoria i liczbę powtórzeń.
+Wykorzystano pięć kontrolowanych repozytoriów POC (POC1--POC5), obejmujących rosnącą złożoność architektury. Eksperyment realizowany jest dla dwóch modeli (\texttt{gemini-2.5-flash}, \texttt{deepseek-chat}) i pojedynczego wariantu prompta (bazowego). Każda kombinacja (repozytorium, model) uruchamiana jest pięciokrotnie, co daje łącznie 50 przebiegów. We wszystkich powtórzeniach stosuje się identyczne parametry wejściowe (temperature=0, stały seed), aby mierzyć wahania wynikające z niedeterministycznych elementów procesu.
+
+Wybór modeli podyktowany był koniecznością wsparcia parametru \texttt{temperature=0}. Modele z serii GPT-5 (w~tym \texttt{gpt-5-mini}) nie pozwalają na ustawienie temperatury innej niż domyślna wartość 1{,}0, ponieważ ich wewnętrzny proces generacji opiera się na wieloetapowym rozumowaniu (reasoning), które wymagałoby zredukowania wszystkich ścieżek rozumowania do jednej ścieżki zachłannej przy temperature=0, co uniemożliwiłoby wielokrotne próby rozwiązania problemu. Z~tego względu zastosowano modele \texttt{gemini-2.5-flash} (Google) oraz \texttt{deepseek-chat} (DeepSeek), które wspierają pełen zakres wartości temperatury (0--2) i~parametr \texttt{seed} dla deterministycznej generacji.
+
+Analogicznie do H3, na potrzeby H4 wyłączono aplikowanie manifestów na klaster, ponieważ celem jest ocena powtarzalności generacji, a nie skuteczności runtime.
 
 \subsubsection{Metryki}
 
-% TODO: run-to-run diff ratio, odchylenie std. liczby kroków narzędziowych, itp.
+Analiza powtarzalności opiera się na następujących metrykach (zgodnie ze sposobem agregacji w raporcie \texttt{repeatability.json}). W każdej powtórce budowany jest zrzut tekstowy poprzez konkatenację wygenerowanych plików (Dockerfile i manifesty Kubernetes), poprzedzonych znacznikami \texttt{@@FILE:} oraz posortowanych po ścieżce. Następnie dla każdej pary powtórzeń liczona jest metryka:
+\[
+    \text{diff\_ratio} = \frac{\text{liczba linii zmienionych}}{\tfrac{1}{2}(\text{liczba linii w A} + \text{liczba linii w B})},
+\]
+gdzie linie zmienione to suma wstawek i usunięć z porównania \texttt{ndiff}.
+\begin{itemize}
+    \item \textbf{Run-to-run diff ratio} — udział zmienionych linii pomiędzy parami powtórzeń dla wygenerowanych plików; raportowane są średnia, maksimum i odchylenie standardowe dla wszystkich par w danej kombinacji.
+    \item \textbf{Zmienność liczby kroków narzędziowych} — średnia i odchylenie standardowe liczby wywołań narzędzi agenta (np. odczyty plików, listowanie katalogów, uruchomienia poleceń) w ramach tej samej kombinacji.
+\end{itemize}
 
 \subsubsection{Kryteria weryfikacji}
 
-% TODO: Progi dla zmienności (np. diff ratio > 0.2).
+Hipoteza H4 zostaje potwierdzona, jeśli spełnione są łącznie następujące warunki:
+\begin{itemize}
+    \item średni run-to-run diff ratio dla każdej kombinacji (repozytorium, model) przekracza 0{,}4,
+    \item odchylenie standardowe liczby kroków narzędziowych przekracza 20\% średniej w danej kombinacji.
+\end{itemize}
 
 \subsection{Weryfikacja H5: Podatność na manipulację kontekstem}
 
