@@ -289,15 +289,26 @@ Na podstawie wyników dla POC1--POC5 hipoteza H2 została potwierdzona: spełnio
 
 \subsubsection{Wyniki ilościowe}
 
-% TODO: Liczba ostrzeżeń Hadolint/Kube-linter (bazowy prompt vs. prompt best practices).
+Poniżej zestawiono wyniki jakości dla 150 przebiegów (25 repozytoriów $\times$ 3 modele $\times$ 2 warianty prompta), a szczegółowe wartości ujęto w tabeli~\ref{tab:h3-lint-summary}.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcccc}
+        \textbf{Wariant prompta} & \textbf{Z ostrzeżeniami} & \textbf{Bez ostrzeżeń} & \textbf{Łącznie} & \textbf{Średnio} \\
+        Bazowy & 62/75 (82{,}7\%) & 13/75 (17{,}3\%) & 147 (17D, 130K) & 1{,}96 \\
+        Best practices & 19/75 (25{,}3\%) & 56/75 (74{,}7\%) & 30 (8D, 22K) & 0{,}40 \\
+    \end{tabular}
+    \caption{Ostrzeżenia Hadolint i Kube-linter w H3 (D: Dockerfile, K: Kubernetes)}
+    \label{tab:h3-lint-summary}
+\end{table}
 
 \subsubsection{Wpływ prompt engineeringu}
 
-% TODO: Porównanie jakości konfiguracji przed/po wzmocnieniu prompta.
+Wzmocnienie prompta o checklistę dobrych praktyk znacząco poprawia jakość konfiguracji: łączna liczba ostrzeżeń spadła z 147 do 30 (o 79{,}6\%), a średnia liczba ostrzeżeń na przebieg z 1{,}96 do 0{,}40. Odsetek przebiegów bez ostrzeżeń wzrósł o 57{,}4 p.p. (z 17{,}3\% do 74{,}7\%), a odsetek przebiegów z ostrzeżeniami spadł z 82{,}7\% do 25{,}3\%. W obu wariantach dominowały ostrzeżenia Kube-linter, jednak spadły one z 130 do 22, co wskazuje na skuteczność wytycznych dotyczących manifestów Kubernetes.
 
 \subsubsection{Werdykt dla H3}
 
-% TODO: Wniosek z odniesieniem do progów z rozdziału 4.
+Hipoteza H3 została potwierdzona. W wariancie bazowym odsetek przebiegów z ostrzeżeniami przekracza 60\% (82{,}7\%). Wariant best practices obniża łączną liczbę ostrzeżeń o 79{,}6\% oraz zwiększa odsetek konfiguracji bez ostrzeżeń o 57{,}4 p.p., co przekracza przyjęte progi weryfikacji. Wynik ten sugeruje, że nawet przy bardzo dużym kontekście wejściowym (rzędu $10^5$ tokenów na przebieg) model nadal w sposób konsekwentny respektuje dostarczone wytyczne jakościowe.
 
 \subsection{Wyniki H4: Niezawodność i powtarzalność procesu agentowego}
 

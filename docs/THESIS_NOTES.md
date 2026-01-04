@@ -5,7 +5,7 @@
 - **Rozdział 3 – Przegląd narzędzi (`tex/3-przeglad-narzedzi.tex`)**: po przeglądzie; opis modeli i walidacji (Hadolint, Kube-linter) oraz narzędzi uruchomieniowych (Docker/K8s przez `docker`/`kubectl` zamiast SDK) jest spójny z kodem.
 - **Rozdział 4 – Projekt eksperymentów (`tex/4-projekt-eksperymentow.tex`)**: metodologia i weryfikacja opisana szczegółowo dla H1; sekcja H2 (metodyka, metryki, kryteria) uzupełniona i rozszerzona o POC5, w H3 zredukowano liczbę powtórzeń do 1; H3–H5 do uzupełnienia w kolejnej iteracji.
 - **Załączniki (`main.tex`)**: zaktualizowano nazwy i opisy załączników, aby wskazać, że 25 repozytoriów dotyczy H1 i H3.
-- **Rozdział 5 – Wyniki eksperymentów (`tex/5-wyniki-eksperymentow.tex`)**: wyniki per hipoteza, statystyki, walidacja (automatyczna, LLM-as-a-Judge, ekspercka); uzupełniono listę typowych problemów w H2, dalej dodać wykresy/tabele i podsumowanie rozdziału.
+- **Rozdział 5 – Wyniki eksperymentów (`tex/5-wyniki-eksperymentow.tex`)**: wyniki per hipoteza, statystyki, walidacja (automatyczna, LLM-as-a-Judge, ekspercka); uzupełniono listę typowych problemów w H2 oraz wyniki H3 (tabela i wniosek), dalej dodać wykresy/tabele i podsumowanie rozdziału.
 - **Planowane rozdziały [TODO]**:
   - Rozdział 6 – Praktyczne zastosowanie (system PaaS): architektura, funkcje, demonstracja wdrożenia, ograniczenia.
   - Rozdział 7 – Wnioski i dalsze kierunki: podsumowanie weryfikacji H1–H5, ocena użyteczności agentów LLM w DevOps, przyszłe prace.
