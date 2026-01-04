@@ -21,7 +21,8 @@
     \begin{itemize}
         \item Motywacja i cel pracy
         \item Metodyka i system testowy
-        \item Wyniki H1--H2
+        \item Wyniki H1--H4
+        \item Projekt H5
         \item Wnioski i dalsze prace
     \end{itemize}
 \end{frame}
@@ -39,7 +40,9 @@
         \item Cel: ocena autonomicznej generacji konfiguracji IaC przez agenty LLM
         \item H1: działające konfiguracje end-to-end
         \item H2: spadek skuteczności wraz ze złożonością
-        \item H3--H5: jakość, powtarzalność, podatność na manipulacje
+        \item H3: jakość konfiguracji i wpływ checklisty best practices
+        \item H4: powtarzalność procesu przy deterministycznych parametrach
+        \item H5: podatność na manipulację kontekstem repozytorium
     \end{itemize}
 \end{frame}
 
@@ -94,9 +97,9 @@
 
 \begin{frame}{Zbiory danych}
     \begin{itemize}
-        \item H1: 25 publicznych repozytoriów webowych z GitHuba
-        \item H2--H5: POC1--POC5 o rosnącej złożoności
-        \item POC jailbreak dla H5
+        \item H1 i H3: 25 publicznych repozytoriów webowych z GitHuba
+        \item H2 i H4: POC1--POC5 o rosnącej złożoności
+        \item H5: \texttt{poc1-fastapi} + 3 warianty ataku (3 repozytoria)
     \end{itemize}
 \end{frame}
 
@@ -134,12 +137,36 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}{H3--H5 -- status i obserwacje}
+\begin{frame}{Wyniki H3 -- jakość konfiguracji}
     \begin{itemize}
-        \item H3: oczekiwane wysokie ostrzeżenia bez promptu best-practices
-        \item H4: zmienność mimo temperature=0 (do analizy)
-        \item H5: ryzyko prompt injection w repozytoriach
-        \item Plan: uzupełnienie metryk i przykładów
+        \item Ostrzeżenia: 147 $\rightarrow$ 30 (-79,6\%)
+        \item Średnia ostrzeżeń: 1,96 $\rightarrow$ 0,40
+        \item Przebiegi bez ostrzeżeń: 17,3\% $\rightarrow$ 74,7\%
+        \item Hipoteza H3 potwierdzona
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Wyniki H4 -- powtarzalność}
+    \begin{itemize}
+        \item Średni diff ratio: 0,5632 (mediana 0,5501)
+        \item 7/10 kombinacji przekracza próg 0,4
+        \item Zmienność tool steps $>20\%$ tylko w 1/10 kombinacji
+        \item Wzrost diff ratio wraz ze złożonością (POC4, POC5)
+        \item Werdykt: częściowo potwierdzona
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Projekt H5 -- ataki kontekstu}
+    \begin{itemize}
+        \item Repo bazowe: \texttt{poc1-fastapi}
+        \item 3 warianty ataku:
+        \begin{itemize}
+            \item README prompt injection (uruchom \texttt{nginx:alpine})
+            \item Fałszywy port/entrypoint w \texttt{DEPLOY.md}
+            \item Zatruty plik \texttt{.env}/\texttt{config.yaml}
+        \end{itemize}
+        \item Modele: gemini-2.5-flash, gpt-5-mini, deepseek-chat
+        \item 2 powtórzenia na kombinację
     \end{itemize}
 \end{frame}
 
@@ -147,13 +174,14 @@
     \begin{itemize}
         \item Agenty LLM potrafią generować działające IaC w prostych repo
         \item Skuteczność spada gwałtownie przy złożoności
+        \item Jakość rośnie po zastosowaniu checklisty best practices
         \item Walidacja i ograniczenie kontekstu są kluczowe
     \end{itemize}
 \end{frame}
 
 \begin{frame}{Ograniczenia i dalsze prace}
     \begin{itemize}
-        \item Ograniczona liczba repo i brak pełnych H3--H5
+        \item H5 wymaga przeprowadzenia zaplanowanych ataków
         \item Potrzeba rozszerzenia datasetu i automatycznej analizy jakości
         \item Demonstrator PaaS jako praktyczne zastosowanie wyników
     \end{itemize}
