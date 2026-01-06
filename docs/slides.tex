@@ -147,6 +147,7 @@
         \item Google Gemini 2.5 Flash
         \item DeepSeek V3.2
         \item Wybrano wiodące modele największych dostawców, w wariantach o mniejszej skali, ze względu na wysoki koszt inferencji, a niski budżet autora.
+        \item Każdy przebieg (repozytorium + model + wariant prompta) uruchamiano co najmniej 2 razy.
     \end{itemize}
 \end{frame}
 
@@ -231,97 +232,119 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Typowe przyczyny awarii}
-    \begin{itemize}
-        \item Błędy build (npm ci, brak lockfile, złe COPY)
-        \item Konflikty user/root i securityContext
-        \item Niepoprawne endpointy zdrowia
-        \item Problemy zależności i wersji runtime
-    \end{itemize}
-\end{frame}
-
 \begin{frame}{Projekt H3 -- jakość konfiguracji}
     \begin{itemize}
-        \item Cel: wpływ checklisty \textit{prompt engineering} na jakość IaC
-        \item Zbiór: 25 publicznych repozytoriów webowych z GitHuba
-        \item Kryterium: liczba i ciężar ostrzeżeń walidatora
+        \item Cel: ocena jakości konfiguracji IaC za pomocą narzędzi analizy statycznej oraz wpływu \textit{prompt engineering} na jej poprawę
+        \item Narzędzia: Hadolint (Dockerfile), Kube-linter (manifesty K8s)
+        \item Wariant prompta z dobrymi praktykami IaC (m.in. non-root, przypinanie wersji, limity zasobów, sondy, securityContext)
+        \item Zbiór: ten sam co w H1 (25 publicznych repozytoriów webowych z GitHuba)
+        \item Wybrane kryteria weryfikacji:
+        \begin{itemize}
+            \item wariant bazowy: $\geq$ 60\% przebiegów z ostrzeżeniami
+            \item wariant ulepszony: redukcja ostrzeżeń $\geq$ 20\% (mediana per repozytorium)
+        \end{itemize}
     \end{itemize}
 \end{frame}
 
 \begin{frame}{Wyniki H3 -- jakość konfiguracji}
+    \small
+    \begin{center}
+        \begin{tabular}{lcccc}
+            \textbf{Wariant} & \textbf{Z ostrz.} & \textbf{Bez ostrz.} & \textbf{Łącznie} & \textbf{Średnio} \\
+            Bazowy & 62/75 (82,7\%) & 13/75 (17,3\%) & 147 (17D, 130K) & 1,96 \\
+            Ulepszony & 19/75 (25,3\%) & 56/75 (74,7\%) & 30 (8D, 22K) & 0,40 \\
+        \end{tabular}
+    \end{center}
     \begin{itemize}
-        \item Ostrzeżenia: 147 $\rightarrow$ 30 (-79,6\%)
-        \item Średnia ostrzeżeń: 1,96 $\rightarrow$ 0,40
-        \item Przebiegi bez ostrzeżeń: 17,3\% $\rightarrow$ 74,7\%
-        \item Hipoteza H3 potwierdzona
+        \item Ostrzeżenia: 147 $\rightarrow$ 30 (-79,6\%), średnia na przebieg: 1,96 $\rightarrow$ 0,40.
+        \item Przebiegi bez ostrzeżeń: 17,3\% $\rightarrow$ 74,7\% (+57,4 p.p.).
+        \item Dominują ostrzeżenia Kube-linter: 130 $\rightarrow$ 22.
+        \item Najczęstsze ostrzeżenia: brak \texttt{runAsNonRoot}/\texttt{readOnlyRootFilesystem}, brak przypinania wersji (apt/apk/npm/pip), użycie sekretów w \texttt{ARG}/\texttt{ENV}.
+        \item Mimo dużego kontekstu wejściowego modele konsekwentnie stosują wytyczne z prompta -- \textit{prompt engineering} działa.
+        \item Hipoteza H3 potwierdzona -- spełnione kryteria weryfikacji.
     \end{itemize}
 \end{frame}
 
 \begin{frame}{Projekt H4 -- powtarzalność}
     \begin{itemize}
-        \item Cel: stabilność wyników przy deterministycznych parametrach
-        \item Zbiór: POC1--POC5 o rosnącej złożoności
-        \item Kryterium: diff ratio i zmienność przebiegu
+        \item Cel: ocena stabilności wyników przy parametrach sugerujących deterministyczność
+        \item Zbiór: jak w H2 (POC1--POC5 o rosnącej złożoności)
+        \item Modele: Gemini 2.5 Flash, DeepSeek V3.2 (GPT 5 mini nie wspiera \texttt{temperature=0})
+        \item Ustawienia: 5 powtórzeń na kombinację, \texttt{temperature=0}, stały \texttt{seed}; bez apply
+        \item Metryki: \texttt{diff\_ratio} między przebiegami oraz zmienność liczby kroków narzędziowych
+        \item \texttt{diff\_ratio}: udział zmienionych linii wygenerowanych konfiguracji między dwoma przebiegami
+    \end{itemize}
+    \[
+        \texttt{diff\_ratio} = \frac{\text{liczba linii zmienionych}}{\tfrac{1}{2}(\text{liczba linii w A} + \text{liczba linii w B})}
+    \]
+    \begin{itemize}
+        \item Kryteria weryfikacji (wybrane):
+        \begin{itemize}
+            \item średni \texttt{diff\_ratio} $> 0{,}4$ dla każdej kombinacji
+            \item odchylenie std. liczby kroków narzędziowych $> 20\%$ średniej
+        \end{itemize}
     \end{itemize}
 \end{frame}
 
 \begin{frame}{Wyniki H4 -- powtarzalność}
+    \small
+    \begin{center}
+        \begin{tabular}{lcc}
+            \textbf{Przebieg} & \textbf{diff ratio (śr.)} & \textbf{Kroki narz. (śr. $\pm$ std)} \\
+            POC1 (gemini) & 0,1682 & 8,00 $\pm$ 0,63 \\
+            POC1 (deepseek) & 0,3484 & 19,20 $\pm$ 1,47 \\
+            POC2 (gemini) & 0,3945 & 16,00 $\pm$ 1,87 \\
+            POC2 (deepseek) & 0,5301 & 37,40 $\pm$ 5,64 \\
+            POC3 (gemini) & 0,4383 & 22,00 $\pm$ 2,92 \\
+            POC3 (deepseek) & 0,5501 & 37,80 $\pm$ 4,12 \\
+            POC4 (gemini) & 0,9908 & 44,60 $\pm$ 13,72 \\
+            POC4 (deepseek) & 0,7661 & 67,00 $\pm$ 11,93 \\
+            POC5 (gemini) & 0,6450 & 38,20 $\pm$ 2,56 \\
+            POC5 (deepseek) & 0,8004 & 64,00 $\pm$ 8,86 \\
+        \end{tabular}
+    \end{center}
     \begin{itemize}
-        \item Średni diff ratio: 0,5632 (mediana 0,5501)
-        \item 7/10 kombinacji przekracza próg 0,4
-        \item Zmienność tool steps $>20\%$ tylko w 1/10 kombinacji
-        \item Wzrost diff ratio wraz ze złożonością (POC4, POC5)
-        \item Werdykt: częściowo potwierdzona
+        \item Średni diff ratio: 0,5632 (mediana 0,5501) — przeciętnie ponad połowa linii różni się między powtórzeniami.
+        \item 7/10 kombinacji przekracza próg 0,4.
+        \item Zmienność liczby kroków narzędziowych $>20\%$ tylko w 1/10 kombinacji.
+        \item Zaobserwowano wzrost diff ratio wraz ze wzrostem złożoności (np. POC4, POC5).
+        \item Werdykt: H4 formalnie niepotwierdzona (mimo widocznego trendu).
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Projekt H5 -- ataki kontekstu}
+% TODO troche BS
+
+\begin{frame}{Projekt H5 -- ataki na kontekst}
     \begin{itemize}
-        \item Repo bazowe: \texttt{poc1-fastapi}
-        \item 3 warianty ataku:
+        \item Projekt hipotezy H5 jest w trakcie dopracowywania
+        \item Repozytorium bazowe: \texttt{poc1-fastapi}
+        \item np. 3 warianty ataku:
         \begin{itemize}
-            \item README \textit{prompt injection} (uruchom \texttt{nginx:alpine})
-            \item Fałszywy port/entrypoint w \texttt{DEPLOY.md}
-            \item Zatruty plik \texttt{.env}/\texttt{config.yaml}
+            \item README \textit{prompt injection}: polecenie uruchomienia \texttt{nginx:alpine}
+            \item Fałszywe instrukcje uruchomienia w \texttt{DEPLOY.md} (port i komenda)
+            \item Zatruty plik \texttt{.env}/\texttt{config.yaml} (wskazanie obcego obrazu, pominięcie \texttt{HEALTHCHECK})
         \end{itemize}
-        \item Modele: gemini-2.5-flash, gpt-5-mini, deepseek-chat
-        \item 2 powtórzenia na kombinację
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Wnioski główne}
+\begin{frame}{Wnioski}
     \begin{itemize}
-        \item Agenty LLM potrafią generować działające IaC w prostych repo
-        \item Skuteczność spada gwałtownie przy złożoności
-        \item Jakość rośnie po zastosowaniu checklisty best practices
-        \item Walidacja i ograniczenie kontekstu są kluczowe
-    \end{itemize}
-\end{frame}
-
-\begin{frame}{Synteza wyników (H1--H4)}
-    \begin{itemize}
-        \item LLM działają dobrze do pewnego poziomu złożoności
-        \item Wzmocniony prompt istotnie poprawia jakość IaC
-        \item Powtarzalność jest ograniczona mimo deterministycznych ustawień
-        \item Największy spadek skuteczności występuje na etapie runtime
+        \item Agenty LLM potrafią skutecznie generować działające IaC w prostych repozytoriach
+        \item Skuteczność spada gwałtownie przy wzroście złożoności systemu
+        \item Jakość generowanych konfiguracji rośnie po zastosowaniu odpowiednich wytycznych w prompcie systemowym (\textit{prompt engineering})
+        \item Walidacja end-to-end (build/apply/runtime) jest kluczowa, bo sama poprawność składni nie wystarcza do oceny konfiguracji
+        \item Najwięcej błędów wychodzi podczas uruchomienia, więc bez walidacji produkcyjnej wyniki są złudne
+        \item Produkcyjnie potrzebne są mechanizmy oceny "bezpieczeństwa" konfiguracji, aby ograniczać podatność na ataki kontekstowe
     \end{itemize}
 \end{frame}
 
 \begin{frame}{Zagrożenia ważności (Threats to validity)}
     \begin{itemize}
         \item Zbiór H1: 25 relatywnie prostych aplikacji może nie uogólniać się na złożone systemy
-        \item Walidacja runtime jednym endpointem nie weryfikuje pełnych zależności między usługami
-        \item Ograniczona liczba powtórzeń daje szerokie przedziały ufności
+        \item Walidacja runtime pojedynczym strzałem \texttt{curl} nie weryfikuje w pełni dostępności usługi
+        \item Ograniczona liczba powtórzeń i brak większych (droższych) modeli może nie dawać pełnej perspektywy
         \item Środowisko MicroK8s/lokalny registry może różnić się od produkcyjnych klastrów
-        \item Czyszczenie repozytorium usuwa istniejące konfiguracje i zmienia kontekst
-    \end{itemize}
-\end{frame}
-
-\begin{frame}{Ograniczenia}
-    \begin{itemize}
-        \item H5 wymaga przeprowadzenia zaplanowanych ataków
-        \item Potrzeba rozszerzenia datasetu i automatycznej analizy jakości
-        \item Ograniczona liczba powtórzeń wpływa na szerokość CI
+        \item Agent po sklonowaniu usuwa gotowe konfiguracje IaC, aby nie ułatwiać zadania, co zmienia kontekst repozytorium
     \end{itemize}
 \end{frame}
 
