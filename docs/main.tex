@@ -71,12 +71,11 @@
 \abstract
 Celem niniejszej pracy magisterskiej jest zbadanie możliwości autonomicznego generowania konfiguracji infrastruktury jako kodu (IaC) przez agenty oparte na dużych modelach językowych (LLM), ze szczególnym uwzględnieniem plików Dockerfile oraz manifestów Kubernetes. Praca koncentruje się na weryfikacji, czy agenty LLM są w stanie — bez ingerencji człowieka — wygenerować funkcjonalne, bezpieczne i zgodne z dobrymi praktykami konfiguracje wdrożeniowe. Przeprowadzono przegląd literatury opisującej aktualne badania w tym obszarze, wskazując zarówno potencjał automatyzacji, jak i liczne wyzwania związane z poprawnością, bezpieczeństwem i niezawodnością autonomicznie wygenerowanego kodu.
 
-W części badawczej sformułowano pięć hipotez badawczych (H1–H5) dotyczących: autonomicznej generacji funkcjonalnych konfiguracji, ograniczeń złożonościowych, jakości i zgodności z dobrymi praktykami, niezawodności procesu oraz podatności na manipulację kontekstem. Zaprojektowano dedykowany system testowy obejmujący agenta LLM z dostępem do jedenastu narzędzi analizy repozytorium, potok walidacyjny oraz infrastrukturę wykonawczą (MicroK8s). Przeprowadzono serię eksperymentów na rzeczywistych projektach z GitHub oraz pięciu kontrolowanych repozytoriach testowych o rosnącej złożoności. Dla hipotezy H3 zastosowano wielowarstwową walidację jakości: automatyczną analizę statyczną (Hadolint, Kube-linter), ocenę przez model językowy (LLM-as-a-Judge) oraz ocenę ekspercką. Wyniki eksperymentów poddano szczegółowej analizie statystycznej i jakościowej, prowadząc do weryfikacji wszystkich pięciu hipotez oraz sformułowania wniosków dotyczących praktycznej przydatności agentów LLM w kontekście automatyzacji DevOps.
+W części badawczej sformułowano pięć hipotez badawczych (H1–H5) dotyczących: autonomicznej generacji funkcjonalnych konfiguracji, ograniczeń złożonościowych, jakości i zgodności z dobrymi praktykami, niezawodności procesu oraz podatności na manipulację kontekstem. Zaprojektowano dedykowany system testowy obejmujący agenta LLM z dostępem do jedenastu narzędzi analizy repozytorium, potok walidacyjny oraz infrastrukturę wykonawczą (MicroK8s). Przeprowadzono serię eksperymentów na rzeczywistych projektach z GitHub oraz pięciu kontrolowanych repozytoriach testowych o rosnącej złożoności. Dla hipotezy H3 zastosowano automatyczną analizę statyczną jakości (Hadolint, Kube-linter). Wyniki eksperymentów poddano szczegółowej analizie statystycznej i jakościowej, prowadząc do weryfikacji wszystkich pięciu hipotez oraz sformułowania wniosków dotyczących praktycznej przydatności agentów LLM w kontekście automatyzacji DevOps.
 
 % TODO
-[TODO: Finalnie zaprezentowano praktyczne zastosowanie wypracowanych rozwiązań w postaci prototypowego systemu typu Platform as a Service (PaaS) demonstrującego automatyczne wdrażanie aplikacji kontenerowych.]
 
-\keywords Infrastructure as Code, LLM, agenty LLM, Kubernetes, Docker, automatyzacja, bezpieczeństwo, DevOps, weryfikacja hipotez, wielowarstwowa walidacja
+\keywords Infrastructure as Code, LLM, agenty LLM, Kubernetes, Docker, automatyzacja, bezpieczeństwo, DevOps, weryfikacja hipotez
 
 %----------------------------------------
 % Streszczenie po angielsku dla \langpol
@@ -86,12 +85,11 @@ W części badawczej sformułowano pięć hipotez badawczych (H1–H5) dotycząc
 \secondabstract
 The goal of this master's thesis is to investigate the capabilities of autonomous Infrastructure as Code (IaC) configuration generation by agents based on large language models (LLMs), with a particular focus on Dockerfiles and Kubernetes manifests. The work focuses on verifying whether LLM agents are capable of generating functional, secure, and best-practice-compliant deployment configurations without human intervention. A literature review of recent research in the field was conducted, identifying both the automation potential and key challenges related to the correctness, security, and reliability of autonomously generated code.
 
-In the research phase, five research hypotheses (H1–H5) were formulated concerning: autonomous generation of functional configurations, complexity limitations, quality and compliance with best practices, process reliability and repeatability, and susceptibility to context manipulation. A dedicated testing system was designed, comprising an LLM agent with access to eleven repository analysis tools, a validation pipeline, and execution infrastructure (MicroK8s). A series of experiments was conducted on real-world GitHub projects and five controlled test repositories with increasing complexity. For hypothesis H3, a multi-layered quality validation approach was employed: automated static analysis (Hadolint, Kube-linter), LLM-as-a-Judge evaluation, and expert human evaluation. Experimental results were subjected to detailed statistical and qualitative analysis, leading to verification of all five hypotheses and formulation of conclusions regarding the practical utility of LLM agents in DevOps automation context.
+In the research phase, five research hypotheses (H1–H5) were formulated concerning: autonomous generation of functional configurations, complexity limitations, quality and compliance with best practices, process reliability and repeatability, and susceptibility to context manipulation. A dedicated testing system was designed, comprising an LLM agent with access to eleven repository analysis tools, a validation pipeline, and execution infrastructure (MicroK8s). A series of experiments was conducted on real-world GitHub projects and five controlled test repositories with increasing complexity. For hypothesis H3, automated static analysis (Hadolint, Kube-linter) was used to assess configuration quality. Experimental results were subjected to detailed statistical and qualitative analysis, leading to verification of all five hypotheses and formulation of conclusions regarding the practical utility of LLM agents in DevOps automation context.
 
 % TODO
-[TODO: Finally, a practical application of the developed solutions was presented in the form of a prototype Platform as a Service (PaaS) system demonstrating automatic containerized application deployment.]
 
-\secondkeywords Infrastructure as Code, Large Language Models, LLM agents, Kubernetes, Docker, Automation, Security, DevOps, Hypothesis verification, Multi-layered validation
+\secondkeywords Infrastructure as Code, Large Language Models, LLM agents, Kubernetes, Docker, Automation, Security, DevOps, Hypothesis verification
 
 \pagestyle{plain}
 
@@ -132,7 +130,6 @@ In the research phase, five research hypotheses (H1–H5) were formulated concer
 \acronym{LLM}{ang. \emph{Large Language Model}} - duży model językowy
 \acronym{IaC}{ang. \emph{Infrastructure as Code} – infrastruktura jako kod}
 \acronym{K8s}{ang. \emph{Kubernetes} – system orkiestracji kontenerów}
-\acronym{PaaS}{ang. \emph{Platform as a Service} – platforma jako usługa}
 \acronym{CI/CD}{ang. \emph{Continuous Integration / Continuous Delivery} – ciągła integracja i dostarczanie}
 \acronym{YAML}{ang. \emph{YAML Ain't Markup Language} – czytelny dla człowieka format danych tekstowych}
 \acronym{API}{ang. \emph{Application Programming Interface} – interfejs programistyczny}
