@@ -5,6 +5,11 @@
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
 \usepackage[polish]{babel}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usepackage{fancyvrb}
+\usepackage[backend=biber,style=authoryear]{biblatex}
+\addbibresource{bibliografia.bib}
 
 \title{Zastosowanie dużych modeli językowych do generowania konfiguracji Docker i Kubernetes}
 \author{Bartłomiej Rasztabiga}
@@ -23,12 +28,12 @@
 
 \begin{frame}{Agenda}
     \begin{itemize}
-        \item Kontekst i cel pracy
-        \item Hipotezy i luka badawcza
+        \item Motywacja i cel pracy
+        \item Przegląd literatury i luki badawcze
         \item Metodyka i system badawczy
-        \item Wyniki H1--H4
-        \item H5 (projekt/plan)
-        \item Synteza i ograniczenia
+        \item Częściowe wyniki
+        \item Projekt dalszych badań
+        \item Ograniczenia i wnioski, dalsze kierunki
     \end{itemize}
 \end{frame}
 
@@ -66,46 +71,75 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Stan wiedzy}
+\begin{frame}{Przegląd literatury}
     \begin{itemize}
-        \item LLM w generowaniu Docker/K8s i IaC
-        \item Podejścia typu ``Don't Train, Just Prompt''
-        \item LLM w naprawie błędów IaC i w bezpieczeństwie
-        \item Wyzwania: halucynacje, zgodność, bezpieczeństwo
+        \item Generacja IaC: przegląd + Repo2Run \cite{srivatsa_survey_2024,hu_llm-based_2025}
+        \item \textit{Prompt engineering}: ``Don't Train, Just Prompt'' + Ansible Wisdom \cite{kratzke_dont_2024,pujar_invited_2023}
+        \item Walidacja / security: naprawa IaC + GenKubeSec \cite{low_repairing_2024,malul_genkubesec_2024}
+        \item Konwersje Docker Compose $\rightarrow$ K8s: migracja + CloudEval-YAML \cite{ueno_migrating_2024,xu_cloudeval-yaml_2023}
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Luka badawcza}
+\begin{frame}{Luki badawcze}
     \begin{itemize}
-        \item Brak kompleksowej oceny end-to-end (build $\rightarrow$ apply $\rightarrow$ runtime)
-        \item Niewystarczające dane o złożoności i powtarzalności
-        \item Ograniczone analizy podatności na \textit{prompt injection}
+        \item Brak podejść autonomicznych (agent czyta kod źródłowy, nie tylko język naturalny)
+        \item Brak badań nad granicą złożoności systemów dla IaC generowanego przez LLM
+        \item Ograniczona obiektywna oceny jakości (build $\rightarrow$ apply $\rightarrow$ runtime)
+        \item Brak systematycznej oceny powtarzalności procesów agentowych
+        \item Ograniczona analiza bezpieczeństwa i manipulacji kontekstem (np. \textit{prompt injection})
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Koncepcja rozwiązania}
-    \begin{itemize}
-        \item Agent LLM analizuje repozytorium i generuje Dockerfile + manifesty
-        \item Automatyczny pipeline walidacji
-        \item Uruchomienie na klastrze MicroK8s
-    \end{itemize}
-\end{frame}
-
-\begin{frame}{Architektura systemu testowego}
-    \begin{itemize}
-        \item Agent: LangGraph + narzedzia analizy repozytorium
-        \item Walidacja: build, lint, dry-run, apply, test endpoint
-        \item Infrastruktura: Docker + MicroK8s + lokalny registry
-    \end{itemize}
+\begin{frame}{Architektura systemu badawczego}
+    \begin{columns}[T]
+        \column{0.48\textwidth}
+        \begin{itemize}
+            \item Agent z użyciem narzędzi analizuje kod i generuje pliki konfiguracyjne
+            \item Następnie uruchamia się potok walidacyjny: lint $\rightarrow$ build $\rightarrow$ apply
+            \item Walidacja runtime: test dostępności aplikacji przez HTTP (ingress health check)
+            \item MicroK8s zapewnia kontrolowane, powtarzalne środowisko, lokalny rejestr obrazów. Czyszczenie klastra przed każdą iteracją
+            \item System zbiera metryki z każdego etapu eksperymentu
+        \end{itemize}
+        \column{0.52\textwidth}
+        \centering
+        \begin{tikzpicture}[
+            node distance=0.6cm and 0.4cm,
+            box/.style={draw, rounded corners, align=center, font=\footnotesize, minimum width=3.2cm, minimum height=0.7cm}
+        ]
+            \node[box] (repo) {Repozytorium};
+            \node[box, below=of repo] (agent) {Agent LLM\\+ narzędzia};
+            \node[box, below=of agent] (cfg) {Dockerfile\\+ manifesty K8s};
+            \node[box, below=of cfg] (val) {Walidacja\\build/lint/apply/runtime};
+            \node[box, below=of val] (out) {Metryki + raport};
+            \draw[->] (repo) -- (agent);
+            \draw[->] (agent) -- (cfg);
+            \draw[->] (cfg) -- (val);
+            \draw[->] (val) -- (out);
+            \node[font=\footnotesize, right=0.2cm of val] {MicroK8s};
+        \end{tikzpicture}
+    \end{columns}
 \end{frame}
 
 \begin{frame}{Narzędzia agenta i prompt}
     \begin{itemize}
-        \item 11 narzędzi (clone, tree, search, read, write, patch)
-        \item Zasady generacji (imagePullPolicy, probes, requests/limits)
-        \item Wyjście: JSON z listą obrazów i manifestów
+        \item Analiza repo: \texttt{clone\_repo}, \texttt{prepare\_repo\_tree}, \texttt{ls}
+        \item Odczyt i wyszukiwanie: \texttt{get\_file\_content}, \texttt{search\_files}, \texttt{find\_files}
+        \item Zapis i korekty: \texttt{write\_file}, \texttt{patch\_file}
+        \item Pomocnicze: \texttt{base64\_encode}, \texttt{base64\_decode}, \texttt{think}
     \end{itemize}
 \end{frame}
+
+\begin{frame}{Prompt systemowy}
+    \begin{itemize}
+        \item Jedna próba, brak pętli sprzężenia zwrotnego
+        \item Generacja Dockerfile i manifestów K8s dla wszystkich usług
+        \item Wykrywanie zależności zewnętrznych (DB, cache, kolejki)
+        \item Zasady K8s: Nazewnictwo hostów w Ingress, ustawianie requests/limits, securityContext, readiness/liveness probes
+        \item Wyjście: JSON z listą obrazów i manifestów + \texttt{test\_endpoints}
+        \item Pełna treść promptu w załączniku pracy magisterskiej.
+    \end{itemize}
+\end{frame}
+
 
 \begin{frame}{Metodyka i metryki}
     \begin{itemize}
@@ -208,6 +242,16 @@
     \end{itemize}
 \end{frame}
 
+\begin{frame}{Zagrożenia ważności (Threats to validity)}
+    \begin{itemize}
+        \item Zbiór H1: 25 relatywnie prostych aplikacji może nie uogólniać się na złożone systemy
+        \item Walidacja runtime jednym endpointem nie weryfikuje pełnych zależności między usługami
+        \item Ograniczona liczba powtórzeń daje szerokie przedziały ufności
+        \item Środowisko MicroK8s/lokalny registry może różnić się od produkcyjnych klastrów
+        \item Czyszczenie repozytorium usuwa istniejące konfiguracje i zmienia kontekst
+    \end{itemize}
+\end{frame}
+
 \begin{frame}{Ograniczenia}
     \begin{itemize}
         \item H5 wymaga przeprowadzenia zaplanowanych ataków
@@ -222,6 +266,15 @@
         \item Lepsza walidacja runtime dla aplikacji wielousługowych
         \item Integracja z procesami CI/CD i human-in-the-loop
     \end{itemize}
+\end{frame}
+
+\begin{frame}{Dziękuję za uwagę}
+    \centering
+    \large Dziękuję za uwagę i zapraszam do zadawania pytań.
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Bibliografia}
+    \printbibliography
 \end{frame}
 
 \end{document}

@@ -26,6 +26,8 @@ main.toc
 
 slides.app
 slides.aux
+slides.bbl
+slides.bbl-SAVE-ERROR
 slides.bcf
 slides.blg
 slides.fdb_latexmk
@@ -33,6 +35,7 @@ slides.fls
 slides.log
 slides.nav
 slides.out
+slides.run.xml
 slides.pdf
 slides.snm
 slides.synctex.gz
