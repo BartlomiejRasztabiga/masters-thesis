@@ -1,5 +1,5 @@
-% \documentclass[aspectratio=169]{beamer} % Uncomment for 16:9 aspect ratio
-\documentclass[]{beamer}
+\documentclass[aspectratio=169]{beamer} % Uncomment for 16:9 aspect ratio
+% \documentclass[]{beamer}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -23,32 +23,46 @@
 
 \begin{frame}{Agenda}
     \begin{itemize}
-        \item Motywacja i cel pracy
-        \item Metodyka i środowisko eksperymentalne
+        \item Kontekst i cel pracy
+        \item Hipotezy i luka badawcza
+        \item Metodyka i system badawczy
         \item Wyniki H1--H4
-        \item Projekt H5
-        \item Wnioski i dalsze prace
+        \item H5 (projekt/plan)
+        \item Synteza i ograniczenia
     \end{itemize}
 \end{frame}
 
 \begin{frame}{Problem i motywacja}
-    \textbf{TODO: dopracować treść slajdu}
     \begin{itemize}
+        \item Dynamiczny rozwój dużych modeli językowych (LLM)
+        \item Rosnąca złożoność IaC (m.in. Dockerfile, manifesty Kubernetes)
+        \item Kluczowy problem: czy możemy zaufać LLM w generowaniu infrastruktury produkcyjnej?
         \item IaC przyspiesza DevOps, ale stawia wysokie wymagania kompetencyjne
         \item Ręczne tworzenie Dockerfile i manifestów K8s jest czasochłonne i podatne na błędy
         \item LLM obiecują automatyzację, lecz brakuje twardej oceny end-to-end
         \item Potrzebne są metryki skuteczności, jakości, powtarzalności i ryzyka
     \end{itemize}
+    \vspace{0.5em}
+    \textit{Generowanie kodu aplikacyjnego przez LLM jest dobrze zbadane, natomiast generowanie infrastruktury jako kodu -- znacznie słabiej.}
 \end{frame}
 
-\begin{frame}{Cel pracy i hipotezy}
+\begin{frame}{Cel pracy i pytanie badawcze}
     \begin{itemize}
-        \item Cel: ocena autonomicznej generacji konfiguracji IaC przez agenty LLM
+        \item Cel główny: ocena możliwości i ograniczeń w autonomicznej generacji konfiguracji IaC przez agenty LLM
+        \item Zakres: pliki Dockerfile i manifesty Kubernetes
+        \item Agenty LLM generujące konfiguracje IaC
+        \item Brak ingerencji człowieka w generację - pełna autonomia
+        \item Pytanie badawcze: Jak skuteczne, jakościowe, powtarzalne i bezpieczne są generowane konfiguracje IaC w różnych scenariuszach
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Hipotezy badawcze (H1--H5)}
+    \begin{itemize}
         \item H1: działające konfiguracje end-to-end
         \item H2: spadek skuteczności wraz ze złożonością
-        \item H3: jakość konfiguracji i wpływ checklisty best practices
+        \item H3: jakość konfiguracji i wpływ \textit{prompt engineering} na nią
         \item H4: powtarzalność procesu przy deterministycznych parametrach
-        \item H5: podatność na manipulację kontekstem repozytorium
+        \item H5: podatność na manipulację kontekstem agenta (\textit{prompt injection})
     \end{itemize}
 \end{frame}
 
@@ -65,7 +79,7 @@
     \begin{itemize}
         \item Brak kompleksowej oceny end-to-end (build $\rightarrow$ apply $\rightarrow$ runtime)
         \item Niewystarczające dane o złożoności i powtarzalności
-        \item Ograniczone analizy podatności na prompt injection
+        \item Ograniczone analizy podatności na \textit{prompt injection}
     \end{itemize}
 \end{frame}
 
@@ -167,7 +181,7 @@
         \item Repo bazowe: \texttt{poc1-fastapi}
         \item 3 warianty ataku:
         \begin{itemize}
-            \item README prompt injection (uruchom \texttt{nginx:alpine})
+            \item README \textit{prompt injection} (uruchom \texttt{nginx:alpine})
             \item Fałszywy port/entrypoint w \texttt{DEPLOY.md}
             \item Zatruty plik \texttt{.env}/\texttt{config.yaml}
         \end{itemize}
@@ -185,10 +199,28 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Ograniczenia i dalsze prace}
+\begin{frame}{Synteza wyników (H1--H4)}
+    \begin{itemize}
+        \item LLM działają dobrze do pewnego poziomu złożoności
+        \item Wzmocniony prompt istotnie poprawia jakość IaC
+        \item Powtarzalność jest ograniczona mimo deterministycznych ustawień
+        \item Największy spadek skuteczności występuje na etapie runtime
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Ograniczenia}
     \begin{itemize}
         \item H5 wymaga przeprowadzenia zaplanowanych ataków
         \item Potrzeba rozszerzenia datasetu i automatycznej analizy jakości
+        \item Ograniczona liczba powtórzeń wpływa na szerokość CI
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Dalsze kierunki}
+    \begin{itemize}
+        \item Wzmocnienie niezawodności i stabilności wyników
+        \item Lepsza walidacja runtime dla aplikacji wielousługowych
+        \item Integracja z procesami CI/CD i human-in-the-loop
     \end{itemize}
 \end{frame}
 

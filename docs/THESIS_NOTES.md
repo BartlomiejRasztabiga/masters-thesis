@@ -6,6 +6,6 @@
 - **Rozdział 4 – Projekt eksperymentów (`tex/4-projekt-eksperymentow.tex`)**: metodologia i weryfikacja opisana szczegółowo dla H1; sekcja H2 (metodyka, metryki, kryteria) uzupełniona i rozszerzona o POC5, w H3 zredukowano liczbę powtórzeń do 1; opisano projekt H4 (POC1--POC5, 2 modele, 5 powtórzeń) oraz doprecyzowano sposób liczenia \texttt{diff ratio} i próg 0{,}4 na podstawie wyników pilotażowych, H5 do uzupełnienia w kolejnej iteracji.
 - **Załączniki (`main.tex`)**: zaktualizowano nazwy i opisy załączników, aby wskazać, że 25 repozytoriów dotyczy H1 i H3.
 - **Rozdział 5 – Wyniki eksperymentów (`tex/5-wyniki-eksperymentow.tex`)**: wyniki per hipoteza, statystyki, walidacja automatyczna (Hadolint, Kube-linter); uzupełniono listę typowych problemów w H2, wyniki H3 (tabela i wniosek) oraz H4 (powtarzalność, wnioski), dalej dodać wykresy/tabele i podsumowanie rozdziału.
-- **Planowane rozdziały [TODO]**:
+- **Planowany rozdział [TODO]**:
   - Rozdział 6 – Wnioski i dalsze kierunki: podsumowanie weryfikacji H1–H5, ocena użyteczności agentów LLM w DevOps, przyszłe prace.
 - **Dodatki**: abstrakty PL/EN w `main.tex` do aktualizacji po wynikach; bibliografia w `bibliografia.bib` do uzupełnienia o nowe cytowania.
