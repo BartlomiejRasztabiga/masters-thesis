@@ -5,9 +5,9 @@
 \usepackage{lmodern}
 \usepackage[polish]{babel}
 
-\title{Zastosowanie dużych modeli językowych (LLM) do generowania konfiguracji Docker i Kubernetes}
-\subtitle{Seminarium dyplomowe}
+\title{Zastosowanie dużych modeli językowych do generowania konfiguracji Docker i Kubernetes}
 \author{Bartłomiej Rasztabiga}
+\newcommand{\supervisor}{Promotor: dr inż. Mateusz Modrzejewski}
 \institute{Politechnika Warszawska, Wydział EiTI}
 \date{\the\year}
 
@@ -15,12 +15,15 @@
 
 \begin{frame}
     \titlepage
+    \vspace{-1.5em}
+    \centering
+    \supervisor
 \end{frame}
 
 \begin{frame}{Agenda}
     \begin{itemize}
         \item Motywacja i cel pracy
-        \item Metodyka i system testowy
+        \item Metodyka i środowisko eksperymentalne
         \item Wyniki H1--H4
         \item Projekt H5
         \item Wnioski i dalsze prace
@@ -28,10 +31,12 @@
 \end{frame}
 
 \begin{frame}{Problem i motywacja}
+    TODO tu skonczylem
     \begin{itemize}
-        \item IaC przyspiesza DevOps, ale wymaga specjalistycznej wiedzy
-        \item Ręczne tworzenie Docker/K8s jest czasochłonne i podatne na błędy
-        \item LLM mogą automatyzować generację, ale trzeba zbadać skuteczność i ryzyka
+        \item IaC przyspiesza DevOps, ale stawia wysokie wymagania kompetencyjne
+        \item Ręczne tworzenie Dockerfile i manifestów K8s jest czasochłonne i podatne na błędy
+        \item LLM obiecują automatyzację, lecz brakuje twardej oceny end-to-end
+        \item Potrzebne są metryki skuteczności, jakości, powtarzalności i ryzyka
     \end{itemize}
 \end{frame}
 
