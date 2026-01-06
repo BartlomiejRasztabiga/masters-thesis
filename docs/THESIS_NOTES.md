@@ -1,5 +1,6 @@
 # Thesis Structure Notes
 
+- **Prezentacja (`slides.tex`)**: uporządkowano slajdy per hipoteza (projekt $\rightarrow$ wyniki) i przeniesiono opisy zbiorów danych do slajdów projektowych.
 - **Rozdział 1 – Wprowadzenie (`tex/1-wprowadzenie.tex`)**: cel pracy, hipotezy H1–H5, motywacja; TODO zaktualizować listę zagadnień.
 - **Rozdział 2 – Przegląd literatury (`tex/2-przeglad-literatury.tex`)**: przegląd LLM w IaC (Docker, Kubernetes), generowanie, naprawa konfiguracji, bezpieczeństwo, wyzwania; merytorycznie kompletne.
 - **Rozdział 3 – Przegląd narzędzi (`tex/3-przeglad-narzedzi.tex`)**: po przeglądzie; opis modeli i walidacji (Hadolint, Kube-linter) oraz narzędzi uruchomieniowych (Docker/K8s przez `docker`/`kubectl` zamiast SDK) jest spójny z kodem.

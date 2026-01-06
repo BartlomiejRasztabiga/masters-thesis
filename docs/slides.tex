@@ -15,7 +15,7 @@
 \author{Bartłomiej Rasztabiga}
 \newcommand{\supervisor}{Promotor: dr inż. Mateusz Modrzejewski}
 \institute{Instytut Automatyki i Informatyki Stosowanej}
-\date{\the\year}
+\date{9 stycznia 2026}
 
 \begin{document}
 
@@ -136,49 +136,98 @@
         \item Wykrywanie zależności zewnętrznych (DB, cache, kolejki)
         \item Zasady K8s: Nazewnictwo hostów w Ingress, ustawianie requests/limits, securityContext, readiness/liveness probes
         \item Wyjście: JSON z listą obrazów i manifestów + \texttt{test\_endpoints}
-        \item Pełna treść promptu w załączniku pracy magisterskiej.
+        \item Co ważne: brak instrukcji specyficznych dla danych technologii lub "porad", mogących sugerować rozwiązania.
+        \item Razem 6943 znaki. Pełna treść promptu w załączniku pracy magisterskiej.
     \end{itemize}
 \end{frame}
 
-
-\begin{frame}{Metodyka i metryki}
+\begin{frame}{Wykorzystane modele}
     \begin{itemize}
-        \item Metryki: build\_success, apply\_success, runtime\_success
-        \item Wskaźniki warunkowe (apply$|$build, runtime$|$apply)
-        \item Przedziały ufności Wilsona
+        \item OpenAI GPT-5 Mini
+        \item Google Gemini 2.5 Flash
+        \item DeepSeek V3.2
+        \item Wybrano wiodące modele największych dostawców, w wariantach o mniejszej skali, ze względu na wysoki koszt inferencji, a niski budżet autora.
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Zbiory danych}
+% TODO kryteria hipotez są z czapy, poprawić potem
+
+\begin{frame}{Projekt H1 -- skuteczność}
     \begin{itemize}
-        \item H1 i H3: 25 publicznych repozytoriów webowych z GitHuba
-        \item H2 i H4: POC1--POC5 o rosnącej złożoności
-        \item H5: \texttt{poc1-fastapi} + 3 warianty ataku (3 repozytoria)
+        \item Cel: czy agent generuje działające konfiguracje IaC
+        \item Zbiór: 25 publicznych repozytoriów webowych z GitHuba
+        \item Wyszukiwanie: \texttt{webapp pushed:>=2025-01-01} + \texttt{topic:webapp}, języki Python/JS/TS/Java/Kotlin/C\#/Go/PHP/Ruby, 0--10 "gwiazdek"
+        \item Z puli 100 repozytoriów wylosowano 25 do analizy
+        \item Wstępna selekcja ręczna pod kątem możliwości budowy i uruchomienia
+        \item Wybrane kryteria weryfikacji H1:
+        \begin{itemize}
+            \item end-to-end $\geq$ 60\%
+            \item apply $|$ build $\geq$ 80\%, runtime $|$ apply $\geq$ 60\%
+        \end{itemize}
     \end{itemize}
 \end{frame}
 
 \begin{frame}{Wyniki H1 -- skuteczność}
+    \small
+    \begin{center}
+        \begin{tabular}{lcc}
+            \textbf{Etap} & \textbf{Sukcesy} & \textbf{Skuteczność} \\
+            Build & 118/150 & 78,7\% \\
+            K8s apply & 115/150 & 76,7\% \\
+            Runtime & 94/150 & 62,7\% \\
+            apply $|$ build & 115/118 & 97,5\% \\
+            runtime $|$ apply & 94/115 & 81,7\% \\
+        \end{tabular}
+    \end{center}
+    \vspace{0.6em}
     \begin{itemize}
-        \item 94/150 sukcesów end-to-end = 62,7\%
-        \item Build 78,7\%, Apply 77,7\%, Runtime 62,7\%
-        \item Największy spadek na etapie runtime
+        \item Największy spadek skuteczności: etap runtime.
+        \item Problemem nie jest składnia manifestów, lecz błędy semantyczne.
+        \item Typowe przyczyny: niepoprawne użycie zmiennych środowiskowych, brak uruchomienia usług zależnych (np. bazy danych),
+        konflikty zależności i wersji środowisk uruchomieniowych.
+        \item Hipoteza H1 potwierdzona -- spełnione kryteria weryfikacji.
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Wyniki H1 -- porównanie modeli}
+\begin{frame}{Projekt H2 -- złożoność}
     \begin{itemize}
-        \item GPT-5 Mini: 68,0\% sukcesu
-        \item Gemini 2.5 Flash: 62,0\%
-        \item DeepSeek-Chat: 58,0\%
-        \item Różnice umiarkowane, brak dominacji jednego modelu
+        \item Cel: wpływ złożoności budowanego systemu na skuteczność agenta
+        \item Zbiór: autorskie repozytoria POC1--POC5 o rosnącej złożoności
+        \item Wybrane kryteria weryfikacji H2:
+        \begin{itemize}
+            \item ujemna korelacja Spearmana $\rho \leq -0{,}6$
+            \item różnica odsetka sukcesów między POC1 a POC5 $\geq$ 40 p.p.
+        \end{itemize}
     \end{itemize}
+    \small
+    \vspace{0.4em}
+    \begin{tabular}{lp{0.72\textwidth}}
+        \textbf{POC1} & FastAPI monolit. \\
+        \textbf{POC2} & FastAPI + PostgreSQL. \\
+        \textbf{POC3} & React + FastAPI + PostgreSQL. \\
+        \textbf{POC4} & React + 3x FastAPI, bazy per serwis, RabbitMQ. \\
+        \textbf{POC5} & React + 3x FastAPI + Node.js, bazy per serwis, RabbitMQ + Redis. \\
+    \end{tabular}
 \end{frame}
 
 \begin{frame}{Wyniki H2 -- złożoność}
+    \small
+    \begin{center}
+        \begin{tabular}{lcc}
+            \textbf{Repozytorium} & \textbf{Sukcesy} & \textbf{Skuteczność} \\
+            POC1 & 9/9 & 100,0\% \\
+            POC2 & 3/9 & 33,3\% \\
+            POC3 & 2/9 & 22,2\% \\
+            POC4 & 1/9 & 11,1\% \\
+            POC5 & 0/9 & 0,0\% \\
+        \end{tabular}
+    \end{center}
     \begin{itemize}
         \item Spadek skuteczności od POC1 do POC5 (100\% $\rightarrow$ 0\%)
-        \item Trend silnie ujemny (Spearman $\approx$ -1,0)
-        \item Problemy narastają przy multi-service i zależnościach
+        \item Trend silnie ujemny (Spearman = -1,0; Pearson $\approx$ -0,89)
+        \item Różnica odsetka sukcesów end-to-end POC1--POC5: 100 p.p.
+        \item Problemy narastają przy wielu usługach i zależnościach (agent gubi kontekst)
+        \item Hipoteza H2 potwierdzona -- spełnione kryteria weryfikacji.
     \end{itemize}
 \end{frame}
 
@@ -191,12 +240,28 @@
     \end{itemize}
 \end{frame}
 
+\begin{frame}{Projekt H3 -- jakość konfiguracji}
+    \begin{itemize}
+        \item Cel: wpływ checklisty \textit{prompt engineering} na jakość IaC
+        \item Zbiór: 25 publicznych repozytoriów webowych z GitHuba
+        \item Kryterium: liczba i ciężar ostrzeżeń walidatora
+    \end{itemize}
+\end{frame}
+
 \begin{frame}{Wyniki H3 -- jakość konfiguracji}
     \begin{itemize}
         \item Ostrzeżenia: 147 $\rightarrow$ 30 (-79,6\%)
         \item Średnia ostrzeżeń: 1,96 $\rightarrow$ 0,40
         \item Przebiegi bez ostrzeżeń: 17,3\% $\rightarrow$ 74,7\%
         \item Hipoteza H3 potwierdzona
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Projekt H4 -- powtarzalność}
+    \begin{itemize}
+        \item Cel: stabilność wyników przy deterministycznych parametrach
+        \item Zbiór: POC1--POC5 o rosnącej złożoności
+        \item Kryterium: diff ratio i zmienność przebiegu
     \end{itemize}
 \end{frame}
 
