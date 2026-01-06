@@ -343,22 +343,28 @@
         \item Zbiór H1: 25 relatywnie prostych aplikacji może nie uogólniać się na złożone systemy
         \item Walidacja runtime pojedynczym strzałem \texttt{curl} nie weryfikuje w pełni dostępności usługi
         \item Ograniczona liczba powtórzeń i brak większych (droższych) modeli może nie dawać pełnej perspektywy
+        \item Brak porównania z konfiguracjami tworzonymi przez człowieka utrudnia ocenę absolutnej jakości
         \item Środowisko MicroK8s/lokalny registry może różnić się od produkcyjnych klastrów
         \item Agent po sklonowaniu usuwa gotowe konfiguracje IaC, aby nie ułatwiać zadania, co zmienia kontekst repozytorium
     \end{itemize}
 \end{frame}
 
+% TODO napisac cos madrego
+
 \begin{frame}{Dalsze kierunki}
     \begin{itemize}
-        \item Wzmocnienie niezawodności i stabilności wyników
-        \item Lepsza walidacja runtime dla aplikacji wielousługowych
+        \item Rozszerzenie walidacji runtime o scenariusze integracyjne i testy zależności między usługami
+        \item Automatyczna ocena "bezpieczeństwa" IaC (reguły semantyczne, zgodność z kodem źródłowym)
+        \item Stabilizacja wyników: standaryzacja kontekstu, wielokrotne generacje i agregacja
+        \item Pełna pętla sprzężenia zwrotnego: agent reaguje na błędy uruchomienia (np. brak zmiennej środowiskowej w logach)
+        \item Wykorzystanie w systemie PaaS do produkcyjnego wdrażania aplikacji na klaster K8s po podaniu linku do repozytorium (\textbf{pierwotny cel pracy})
         \item Integracja z procesami CI/CD i human-in-the-loop
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Dziękuję za uwagę}
+\begin{frame}{}
     \centering
-    \large Dziękuję za uwagę i zapraszam do zadawania pytań.
+    \large Dziękuję za uwagę.
 \end{frame}
 
 \begin{frame}[allowframebreaks]{Bibliografia}
