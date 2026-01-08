@@ -31,8 +31,8 @@
         \item Motywacja i cel pracy
         \item Przegląd literatury i luki badawcze
         \item Metodyka i system badawczy
-        \item Częściowe wyniki
-        \item Projekt dalszych badań
+        \item Eksperymenty i wyniki (H1-H4)
+        \item Projekt dalszych badań (H5)
         \item Ograniczenia i wnioski, dalsze kierunki
     \end{itemize}
 \end{frame}
@@ -41,10 +41,10 @@
     \begin{itemize}
         \item Dynamiczny rozwój dużych modeli językowych (LLM)
         \item Rosnąca złożoność IaC (m.in. Dockerfile, manifesty Kubernetes)
-        \item Kluczowy problem: czy możemy zaufać LLM w generowaniu infrastruktury produkcyjnej?
         \item IaC przyspiesza DevOps, ale stawia wysokie wymagania kompetencyjne
         \item Ręczne tworzenie Dockerfile i manifestów K8s jest czasochłonne i podatne na błędy
         \item LLM obiecują automatyzację, lecz brakuje twardej oceny end-to-end
+        \item Kluczowy problem: czy możemy zaufać LLM w generowaniu infrastruktury produkcyjnej?
         \item Potrzebne są metryki skuteczności, jakości, powtarzalności i ryzyka
     \end{itemize}
     \vspace{0.5em}
@@ -321,30 +321,28 @@
         \item np. 3 warianty ataku:
         \begin{itemize}
             \item README \textit{prompt injection}: polecenie uruchomienia \texttt{nginx:alpine}
-            \item Fałszywe instrukcje uruchomienia w \texttt{DEPLOY.md} (port i komenda)
-            \item Zatruty plik \texttt{.env}/\texttt{config.yaml} (wskazanie obcego obrazu, pominięcie \texttt{HEALTHCHECK})
+            \item Przepuszczalny kontener: poprawna aplikacja, ale \texttt{root} + \texttt{privileged} + \texttt{hostNetwork} + mount \texttt{/var/run/docker.sock}
+            \item Złośliwy sidecar: dodatkowy \texttt{telemetry-agent} z zewnętrznego obrazu
         \end{itemize}
     \end{itemize}
 \end{frame}
 
 \begin{frame}{Wnioski}
     \begin{itemize}
-        \item Agenty LLM potrafią skutecznie generować działające IaC w prostych repozytoriach
-        \item Skuteczność spada gwałtownie przy wzroście złożoności systemu
+        \item Agenty LLM skutecznie generują działające IaC w prostych repozytoriach, ale skuteczność gwałtownie spada przy wzroście złożoności systemu
         \item Jakość generowanych konfiguracji rośnie po zastosowaniu odpowiednich wytycznych w prompcie systemowym (\textit{prompt engineering})
-        \item Walidacja end-to-end (build/apply/runtime) jest kluczowa, bo sama poprawność składni nie wystarcza do oceny konfiguracji
-        \item Najwięcej błędów wychodzi podczas uruchomienia, więc bez walidacji produkcyjnej wyniki są złudne
-        \item Produkcyjnie potrzebne są mechanizmy oceny "bezpieczeństwa" konfiguracji, aby ograniczać podatność na ataki kontekstowe
+        \item Walidacja end-to-end (build/apply/runtime) jest kluczowa -- najwięcej błędów ujawnia się dopiero podczas uruchomienia, a nie przy sprawdzaniu składni
+        \item Produkcyjnie potrzebne są mechanizmy oceny bezpieczeństwa konfiguracji, aby ograniczać podatność na ataki kontekstowe
     \end{itemize}
 \end{frame}
 
 \begin{frame}{Zagrożenia ważności (Threats to validity)}
     \begin{itemize}
         \item Zbiór H1: 25 relatywnie prostych aplikacji może nie uogólniać się na złożone systemy
-        \item Walidacja runtime pojedynczym strzałem \texttt{curl} nie weryfikuje w pełni dostępności usługi
+        \item Walidacja runtime pojedynczym zapytaniem \texttt{curl} nie weryfikuje w pełni dostępności usługi
         \item Ograniczona liczba powtórzeń i brak większych (droższych) modeli może nie dawać pełnej perspektywy
         \item Brak porównania z konfiguracjami tworzonymi przez człowieka utrudnia ocenę absolutnej jakości
-        \item Środowisko MicroK8s/lokalny registry może różnić się od produkcyjnych klastrów
+        \item Środowisko MicroK8s/lokalny rejestr obrazów może różnić się od produkcyjnych klastrów
         \item Agent po sklonowaniu usuwa gotowe konfiguracje IaC, aby nie ułatwiać zadania, co zmienia kontekst repozytorium
     \end{itemize}
 \end{frame}
@@ -358,7 +356,7 @@
         \item Stabilizacja wyników: standaryzacja kontekstu, wielokrotne generacje i agregacja
         \item Pełna pętla sprzężenia zwrotnego: agent reaguje na błędy uruchomienia (np. brak zmiennej środowiskowej w logach)
         \item Wykorzystanie w systemie PaaS do produkcyjnego wdrażania aplikacji na klaster K8s po podaniu linku do repozytorium (\textbf{pierwotny cel pracy})
-        \item Integracja z procesami CI/CD i human-in-the-loop
+        \item Integracja z procesami CI/CD i udziałem człowieka w pętli
     \end{itemize}
 \end{frame}
 
