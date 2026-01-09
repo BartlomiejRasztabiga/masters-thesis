@@ -1,5 +1,4 @@
-\documentclass[aspectratio=169]{beamer} % Uncomment for 16:9 aspect ratio
-% \documentclass[]{beamer}
+\documentclass[aspectratio=169]{beamer}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -30,6 +29,7 @@
     \begin{itemize}
         \item Motywacja i cel pracy
         \item Przegląd literatury i luki badawcze
+        \item Hipotezy badawcze
         \item Metodyka i system badawczy
         \item Eksperymenty i wyniki (H1-H4)
         \item Projekt dalszych badań (H5)
@@ -61,16 +61,6 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Hipotezy badawcze (H1--H5)}
-    \begin{itemize}
-        \item H1: działające konfiguracje end-to-end
-        \item H2: spadek skuteczności wraz ze złożonością
-        \item H3: jakość konfiguracji i wpływ \textit{prompt engineering} na nią
-        \item H4: powtarzalność procesu przy deterministycznych parametrach
-        \item H5: podatność na manipulację kontekstem agenta (\textit{prompt injection})
-    \end{itemize}
-\end{frame}
-
 \begin{frame}{Przegląd literatury}
     \begin{itemize}
         \item Generacja IaC: przegląd + Repo2Run \cite{srivatsa_survey_2024,hu_llm-based_2025}
@@ -82,11 +72,21 @@
 
 \begin{frame}{Luki badawcze}
     \begin{itemize}
-        \item Ograniczona analiza podejść autonomicznych (agent czyta kod źródłowy, nie tylko język naturalny)
-        \item Brak badań nad granicą złożoności systemów dla IaC generowanego przez LLM
-        \item Ograniczona obiektywna oceny jakości (build $\rightarrow$ apply $\rightarrow$ runtime)
-        \item Brak systematycznej oceny powtarzalności procesów agentowych
-        \item Ograniczona analiza bezpieczeństwa i manipulacji kontekstem (np. \textit{prompt injection})
+        \item Niewystarczająco zbadane podejścia autonomiczne (agent czyta kod źródłowy, nie tylko język naturalny)
+        \item Słabo rozpoznana granica złożoności systemów dla IaC generowanego przez LLM
+        \item Ograniczona ocena jakości (build $\rightarrow$ apply $\rightarrow$ runtime)
+        \item Niewystarczająca analiza powtarzalności procesów agentowych
+        \item Słabo udokumentowane aspekty bezpieczeństwa i manipulacji kontekstem (np. \textit{prompt injection})
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Hipotezy badawcze (H1--H5)}
+    \begin{itemize}
+        \item H1: działające konfiguracje end-to-end
+        \item H2: spadek skuteczności wraz ze złożonością
+        \item H3: jakość konfiguracji i wpływ \textit{prompt engineering} na nią
+        \item H4: brak powtarzalności procesu przy deterministycznych parametrach
+        \item H5: podatność na manipulację kontekstem agenta (\textit{prompt injection})
     \end{itemize}
 \end{frame}
 
@@ -150,8 +150,6 @@
         \item Każdy przebieg (repozytorium + model + wariant prompta) uruchamiano co najmniej 2 razy.
     \end{itemize}
 \end{frame}
-
-% TODO kryteria hipotez są z czapy, poprawić potem
 
 \begin{frame}{Projekt H1 -- skuteczność}
     \begin{itemize}
@@ -265,11 +263,11 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Projekt H4 -- powtarzalność}
+\begin{frame}{Projekt H4 -- brak powtarzalności}
     \begin{itemize}
         \item Cel: ocena stabilności wyników przy parametrach sugerujących deterministyczność
         \item Zbiór: jak w H2 (POC1--POC5 o rosnącej złożoności)
-        \item Modele: Gemini 2.5 Flash, DeepSeek V3.2 (GPT 5 mini nie wspiera \texttt{temperature=0})
+        \item Modele: Gemini 2.5 Flash, DeepSeek V3.2 (GPT-5 Mini nie wspiera \texttt{temperature=0})
         \item Ustawienia: 5 powtórzeń na kombinację, \texttt{temperature=0}, stały \texttt{seed}; bez apply
         \item Metryki: \texttt{diff\_ratio} między przebiegami oraz zmienność liczby kroków narzędziowych
         \item \texttt{diff\_ratio}: udział zmienionych linii wygenerowanych konfiguracji między dwoma przebiegami
@@ -278,7 +276,7 @@
         \texttt{diff\_ratio} = \frac{\text{liczba linii zmienionych}}{\tfrac{1}{2}(\text{liczba linii w A} + \text{liczba linii w B})}
     \]
     \begin{itemize}
-        \item Kryteria weryfikacji (wybrane):
+        \item Wybrane kryteria weryfikacji:
         \begin{itemize}
             \item średni \texttt{diff\_ratio} $> 0{,}4$ dla każdej kombinacji
             \item odchylenie std. liczby kroków narzędziowych $> 20\%$ średniej
@@ -286,7 +284,7 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Wyniki H4 -- powtarzalność}
+\begin{frame}{Wyniki H4 -- brak powtarzalności}
     \small
     \begin{center}
         \begin{tabular}{lcc}
@@ -312,13 +310,11 @@
     \end{itemize}
 \end{frame}
 
-% TODO troche BS
-
 \begin{frame}{Projekt H5 -- ataki na kontekst}
     \begin{itemize}
         \item Projekt hipotezy H5 jest w trakcie dopracowywania
         \item Repozytorium bazowe: \texttt{poc1-fastapi}
-        \item np. 3 warianty ataku:
+        \item Przykładowe 3 warianty ataku:
         \begin{itemize}
             \item README \textit{prompt injection}: polecenie uruchomienia \texttt{nginx:alpine}
             \item Przepuszczalny kontener: poprawna aplikacja, ale \texttt{root} + \texttt{privileged} + \texttt{hostNetwork} + mount \texttt{/var/run/docker.sock}
@@ -346,8 +342,6 @@
         \item Agent po sklonowaniu usuwa gotowe konfiguracje IaC, aby nie ułatwiać zadania, co zmienia kontekst repozytorium
     \end{itemize}
 \end{frame}
-
-% TODO napisac cos madrego
 
 \begin{frame}{Dalsze kierunki}
     \begin{itemize}
