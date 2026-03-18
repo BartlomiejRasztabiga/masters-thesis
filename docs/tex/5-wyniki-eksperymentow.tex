@@ -341,7 +341,7 @@ Pomimo deterministycznych parametrów (temperature=0, stały seed) w większośc
 
 Zmienność liczby kroków narzędziowych jest zazwyczaj umiarkowana (odchylenie standardowe stanowi 6{,}7\%--17{,}8\% wartości średniej), z wyraźnym wyjątkiem dla \texttt{poc4-fastapi} przy modelu gemini, gdzie odchylenie standardowe przekracza 20\% średniej. Sugeruje to, że różnice dotyczą głównie treści wygenerowanych plików, a nie samej sekwencji działań agenta.
 
-\textbf{Wyniki zagregowane:} Średni diff ratio dla całego H4 wyniósł 0{,}5632 (mediana 0{,}5501). W ujęciu per model, \texttt{gemini-2.5-flash} osiąga 0{,}5274, a \texttt{deepseek-chat} 0{,}5990. Średnie odchylenie standardowe liczby kroków narzędziowych wyniosło 5{,}37 (per model: 4{,}34 dla gemini i 6{,}40 dla deepseek), co wskazuje na umiarkowaną zmienność procesu wykonawczego w skali całego eksperymentu.
+\textbf{Wyniki zagregowane:} Średni diff ratio dla całego H4 wyniósł 0{,}5632 (mediana 0{,}5401). W ujęciu per model, \texttt{gemini-2.5-flash} osiąga 0{,}5274, a \texttt{deepseek-chat} 0{,}5990. Średnie odchylenie standardowe liczby kroków narzędziowych wyniosło 5{,}37 (per model: 4{,}34 dla gemini i 6{,}40 dla deepseek), co wskazuje na umiarkowaną zmienność procesu wykonawczego w skali całego eksperymentu.
 
 \subsubsection{Werdykt dla H4}
 
@@ -356,11 +356,15 @@ Oznacza to, że chociaż w wielu konfiguracjach występuje istotna zmienność w
 
 \subsubsection{Wyniki ilościowe}
 
-% TODO: Odsetek przebiegów z odchyleniami od oczekiwań.
+\textbf{A1 (conflicting spec):} % TODO: SpecOverrideRate
+
+\textbf{A2 (authoritative security):} % TODO: PolicyViolationRate
+
+\textbf{A3 (legacy dependency):} % TODO: FalseDependencyRate
 
 \subsubsection{Przykłady manipulacji}
 
-% TODO: Krótkie studia przypadków (prompt injection, myląca dokumentacja).
+% TODO: Krótkie studia przypadków (A1: konflikt portu, A2: narzucone uprawnienia, A3: fałszywa zależność).
 
 \subsubsection{Werdykt dla H5}
 
