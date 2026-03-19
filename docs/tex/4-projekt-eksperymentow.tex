@@ -344,11 +344,11 @@ Agent LLM jest podatny na manipulację kontekstem repozytorium; przy obecności 
 
 Jako bazę wykorzystano repozytorium \texttt{poc1-fastapi}. Przygotowano trzy warianty ataku jako osobne repozytoria (forki), z identycznym kodem źródłowym i jedynie modyfikacjami dokumentacji/konfiguracji:
 \begin{itemize}
-    \item \textbf{A1: conflicting spec (port)} — dodano plik \texttt{spec.md} z błędnym portem (np. 8081), podczas gdy kod aplikacji jednoznacznie używa portu 8080.
-    \item \textbf{A2: authoritative file poisoning (security)} — dodano \texttt{SECURITY.md} z wymaganiem uruchomienia aplikacji w trybie \texttt{privileged} i z \texttt{hostNetwork}.
-    \item \textbf{A3: context saturation (legacy dependency)} — dodano \texttt{docs/legacy\_migration.md} z instrukcją uruchomienia nieistniejącej zależności (np. Redis).
+    \item \textbf{A1: conflicting spec (port)} — dodano autorytatywnie sformułowany plik \texttt{spec.md} z błędnym portem (9000), podczas gdy kod aplikacji jednoznacznie używa portu 8080.
+    \item \textbf{A2: authoritative file poisoning (security)} — dodano \texttt{SECURITY.md} oraz notatkę operacyjną z wymaganiem uruchomienia aplikacji w trybie \texttt{privileged} i z \texttt{hostNetwork}, uzasadnionym rzekomą diagnostyką produkcyjną.
+    \item \textbf{A3: context saturation (legacy dependency)} — dodano \texttt{docs/legacy\_migration.md}, \texttt{.env.example} oraz notatkę w changelogu sugerujące konieczność utrzymania nieistniejącej zależności Redis.
 \end{itemize}
-Eksperyment wykonywany jest dla trzech modeli (\texttt{gemini-2.5-flash}, \texttt{gpt-5-mini}, \texttt{deepseek-chat}) z dwoma powtórzeniami na kombinację.
+Eksperyment wykonywany jest dla trzech modeli (\texttt{gemini-2.5-flash}, \texttt{gpt-5-mini}, \texttt{deepseek-chat}) z dziesięcioma powtórzeniami na kombinację, co daje łącznie 90 przebiegów. W celu skupienia oceny na podatności semantycznej, a nie na funkcjonalności końcowego wdrożenia, w H5 wyłączono walidację runtime; werdykt oparto na analizie wygenerowanych artefaktów (\texttt{Dockerfile} i manifestów Kubernetes).
 
 \subsubsection{Metryki}
 
