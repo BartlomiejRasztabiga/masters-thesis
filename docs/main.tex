@@ -71,11 +71,11 @@
 \abstract
 Celem niniejszej pracy magisterskiej jest zbadanie możliwości autonomicznego generowania konfiguracji infrastruktury jako kodu (IaC) przez agenty oparte na dużych modelach językowych (LLM), ze szczególnym uwzględnieniem plików Dockerfile oraz manifestów Kubernetes. Praca koncentruje się na weryfikacji, czy agenty LLM są w stanie — bez ingerencji człowieka — wygenerować funkcjonalne, bezpieczne i zgodne z dobrymi praktykami konfiguracje wdrożeniowe. Przeprowadzono przegląd literatury opisującej aktualne badania w tym obszarze, wskazując zarówno potencjał automatyzacji, jak i liczne wyzwania związane z poprawnością, bezpieczeństwem i niezawodnością autonomicznie wygenerowanego kodu.
 
-W części badawczej sformułowano pięć hipotez badawczych (H1–H5) dotyczących: autonomicznej generacji funkcjonalnych konfiguracji, ograniczeń złożonościowych, jakości i zgodności z dobrymi praktykami, niezawodności procesu oraz podatności na manipulację kontekstem. Zaprojektowano dedykowany system testowy obejmujący agenta LLM z dostępem do jedenastu narzędzi analizy repozytorium, potok walidacyjny oraz infrastrukturę wykonawczą (MicroK8s). Przeprowadzono serię eksperymentów na rzeczywistych projektach z GitHub oraz pięciu kontrolowanych repozytoriach testowych o rosnącej złożoności. Dla hipotezy H3 zastosowano automatyczną analizę statyczną jakości (Hadolint, Kube-linter). Wyniki eksperymentów poddano szczegółowej analizie statystycznej i jakościowej, prowadząc do weryfikacji wszystkich pięciu hipotez oraz sformułowania wniosków dotyczących praktycznej przydatności agentów LLM w kontekście automatyzacji DevOps.
+W części badawczej sformułowano pięć pytań badawczych (RQ1–RQ5) dotyczących: autonomicznej generacji funkcjonalnych konfiguracji, ograniczeń złożonościowych, jakości i zgodności z dobrymi praktykami, niezawodności procesu oraz podatności na manipulację kontekstem. Zaprojektowano dedykowany system testowy obejmujący agenta LLM z dostępem do jedenastu narzędzi analizy repozytorium, potok walidacyjny oraz infrastrukturę wykonawczą (MicroK8s). Przeprowadzono serię eksperymentów na rzeczywistych projektach z GitHub oraz pięciu kontrolowanych repozytoriach testowych o rosnącej złożoności. Dla pytania RQ3 zastosowano automatyczną analizę statyczną jakości (Hadolint, Kube-linter). Wyniki eksperymentów poddano szczegółowej analizie statystycznej i jakościowej, co pozwoliło odpowiedzieć na wszystkie pięć pytań badawczych i sformułować wnioski dotyczące praktycznej przydatności agentów LLM w kontekście automatyzacji DevOps.
 
 % TODO
 
-\keywords Infrastructure as Code, LLM, agenty LLM, Kubernetes, Docker, automatyzacja, bezpieczeństwo, DevOps, weryfikacja hipotez
+\keywords Infrastructure as Code, LLM, agenty LLM, Kubernetes, Docker, automatyzacja, bezpieczeństwo, DevOps, pytania badawcze
 
 %----------------------------------------
 % Streszczenie po angielsku dla \langpol
@@ -85,11 +85,11 @@ W części badawczej sformułowano pięć hipotez badawczych (H1–H5) dotycząc
 \secondabstract
 The goal of this master's thesis is to investigate the capabilities of autonomous Infrastructure as Code (IaC) configuration generation by agents based on large language models (LLMs), with a particular focus on Dockerfiles and Kubernetes manifests. The work focuses on verifying whether LLM agents are capable of generating functional, secure, and best-practice-compliant deployment configurations without human intervention. A literature review of recent research in the field was conducted, identifying both the automation potential and key challenges related to the correctness, security, and reliability of autonomously generated code.
 
-In the research phase, five research hypotheses (H1–H5) were formulated concerning: autonomous generation of functional configurations, complexity limitations, quality and compliance with best practices, process reliability and repeatability, and susceptibility to context manipulation. A dedicated testing system was designed, comprising an LLM agent with access to eleven repository analysis tools, a validation pipeline, and execution infrastructure (MicroK8s). A series of experiments was conducted on real-world GitHub projects and five controlled test repositories with increasing complexity. For hypothesis H3, automated static analysis (Hadolint, Kube-linter) was used to assess configuration quality. Experimental results were subjected to detailed statistical and qualitative analysis, leading to verification of all five hypotheses and formulation of conclusions regarding the practical utility of LLM agents in DevOps automation context.
+In the research phase, five research questions (RQ1–RQ5) were formulated concerning: autonomous generation of functional configurations, complexity limitations, quality and compliance with best practices, process reliability and repeatability, and susceptibility to context manipulation. A dedicated testing system was designed, comprising an LLM agent with access to eleven repository analysis tools, a validation pipeline, and execution infrastructure (MicroK8s). A series of experiments was conducted on real-world GitHub projects and five controlled test repositories with increasing complexity. For RQ3, automated static analysis (Hadolint, Kube-linter) was used to assess configuration quality. Experimental results were subjected to detailed statistical and qualitative analysis, which made it possible to answer all five research questions and formulate conclusions regarding the practical utility of LLM agents in the context of DevOps automation.
 
 % TODO
 
-\secondkeywords Infrastructure as Code, Large Language Models, LLM agents, Kubernetes, Docker, Automation, Security, DevOps, Hypothesis verification
+\secondkeywords Infrastructure as Code, Large Language Models, LLM agents, Kubernetes, Docker, Automation, Security, DevOps, Research questions
 
 \pagestyle{plain}
 
@@ -275,7 +275,7 @@ BEFORE submitting your final JSON output, verify:
 \appendix{Prompt \texttt{best\_practises} wykorzystywany w eksperymencie}
 \label{att:prompt-best-practises}
 
-Poniżej przedstawiono pełną treść prompta \texttt{best\_practises} używanego w wariancie eksperymentu H3.
+Poniżej przedstawiono pełną treść prompta \texttt{best\_practises} używanego w wariancie eksperymentu RQ3.
 
 \begin{minted}[breaklines=true, fontsize=\small, linenos, frame=lines]{text}
 You are an expert in web application deployment, specializing in Docker containerization and Kubernetes orchestration.
@@ -411,10 +411,10 @@ Quality guardrails:
 
 \end{minted}
 
-\appendix{Zbiór repozytoriów testowych do H1 i H3}
+\appendix{Zbiór repozytoriów testowych do RQ1 i RQ3}
 \label{att:h1-dataset}
 
-W tabeli przedstawiono 25 repozytoriów wykorzystanych w eksperymentach H1 i H3.
+W tabeli przedstawiono 25 repozytoriów wykorzystanych w eksperymentach RQ1 i RQ3.
 
 \begin{tabular}{r l}
 1 & \url{https://github.com/sankeer28/Math-PDF-Generator-Web.git} \\
@@ -444,10 +444,10 @@ W tabeli przedstawiono 25 repozytoriów wykorzystanych w eksperymentach H1 i H3.
 25 & \url{https://github.com/mmumshad/simple-webapp-flask} \\
 \end{tabular}
 
-\appendix{Zbiór repozytoriów testowych do H2, H4 i H5}
+\appendix{Zbiór repozytoriów testowych do RQ2, RQ4 i RQ5}
 \label{att:h2-h5-dataset}
 
-\textbf{H2 i H4:} kontrolowane repozytoria PoC o rosnącej złożoności:
+\textbf{RQ2 i RQ4:} kontrolowane repozytoria PoC o rosnącej złożoności:
 
 \begin{tabular}{r l}
 1 & \url{https://github.com/run-rasztabiga-me/poc1-fastapi} \\
@@ -457,7 +457,7 @@ W tabeli przedstawiono 25 repozytoriów wykorzystanych w eksperymentach H1 i H3.
 5 & \url{https://github.com/run-rasztabiga-me/poc5} \\
 \end{tabular}
 
-\textbf{H5:} repozytorium z prompt injection:
+\textbf{RQ5:} repozytoria z manipulacją kontekstem:
 
 \begin{tabular}{r l}
 1 & \url{https://github.com/run-rasztabiga-me/poc1-fastapi-spec} \\

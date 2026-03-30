@@ -5,34 +5,32 @@
 
 Celem eksperymentów jest ocena możliwości autonomicznego generowania konfiguracji Infrastructure as Code przez agenty oparte na dużych modelach językowych. Badanie koncentruje się na weryfikacji, czy nowoczesne modele językowe są w stanie — bez ingerencji człowieka — wygenerować funkcjonalne, bezpieczne i zgodne z dobrymi praktykami konfiguracje wdrożeniowe (pliki \texttt{Dockerfile} oraz manifesty Kubernetes) na podstawie wyłącznie analizy struktury i zawartości kodu źródłowego repozytorium.
 
-Eksperymenty obejmują pięć hipotez badawczych (H1–H5) dotyczących funkcjonalności, ograniczeń złożonościowych, jakości i bezpieczeństwa, deterministyczności oraz podatności na manipulację. Każda hipoteza weryfikowana jest przy użyciu dedykowanej metodyki testowej, zestawu metryk oraz wyraźnie zdefiniowanych kryteriów sukcesu lub porażki. Kluczowe pytania to: czy agenty LLM potrafią wygenerować działające konfiguracje, jakie są ograniczenia związane ze złożonością aplikacji, czy generowane konfiguracje wymagają dodatkowej walidacji przed wdrożeniem produkcyjnym, na ile powtarzalny jest proces generacji oraz czy agenty są podatne na manipulację poprzez zawartOość repozytorium?
+Eksperymenty obejmują pięć pytań badawczych (RQ1–RQ5) dotyczących funkcjonalności, ograniczeń złożonościowych, jakości i bezpieczeństwa, powtarzalności procesu oraz podatności na manipulację. Każde pytanie badawcze analizowane jest przy użyciu dedykowanej metodyki testowej, zestawu metryk oraz odpowiednio dobranych zbiorów danych. Kluczowe kwestie badawcze brzmią następująco: czy agenty LLM potrafią wygenerować działające konfiguracje, jakie są ograniczenia związane ze złożonością aplikacji, czy generowane konfiguracje wymagają dodatkowej walidacji przed wdrożeniem produkcyjnym, na ile powtarzalny jest proces generacji oraz czy agenty są podatne na manipulację poprzez zawartość repozytorium?
 
-\subsection{Hipotezy badawcze}
+\subsection{Pytania badawcze}
 
-W ramach badania sformułowano pięć hipotez weryfikowanych eksperymentalnie:
+W ramach badania sformułowano pięć pytań badawczych:
 
 \begin{itemize}
-    \item \textbf{H1: Autonomiczna generacja funkcjonalnych konfiguracji} \\
-    Duże modele językowe, działające jako agenty z dostępem do narzędzi analizy repozytorium, są w stanie autonomicznie wygenerować funkcjonalne konfiguracje Docker i Kubernetes, które umożliwiają poprawne uruchomienie aplikacji bez dodatkowej ingerencji człowieka, w tym osiągnięcie gotowości usługowej widocznej na poziomie interfejsu (np. webowe API odpowiada na zapytania HTTP po wdrożeniu na klastrze testowym).
+    \item \textbf{RQ1: W jakim stopniu agenty LLM potrafią autonomicznie wygenerować funkcjonalne konfiguracje Docker i Kubernetes?} \\
+    Pytanie dotyczy zdolności agentów do przygotowania konfiguracji umożliwiającej poprawne zbudowanie, wdrożenie i uruchomienie aplikacji bez dodatkowej ingerencji człowieka, w tym osiągnięcie gotowości usługowej potwierdzonej odpowiedzią HTTP po wdrożeniu na klastrze testowym.
 
-    \item \textbf{H2: Ograniczenia złożonościowe} \\
-    Istnieje próg złożoności aplikacji, powyżej którego jakość autonomicznie generowanych konfiguracji znacząco spada. Progi te można uchwycić, obserwując wyniki na kontrolowanych repozytoriach o rosnącej liczbie komponentów i zależności (od prostego monolitu po prosty układ mikroserwisowy); oczekuje się, że metryki sukcesu (np. odsetek poprawnych wdrożeń) maleją wraz ze wzrostem złożoności.
+    \item \textbf{RQ2: Jak wzrost złożoności aplikacji wpływa na skuteczność autonomicznie generowanych konfiguracji?} \\
+    Pytanie bada, jak zmieniają się wyniki agentów wraz ze wzrostem liczby komponentów, zależności infrastrukturalnych i relacji między usługami.
 
-    \item \textbf{H3: Jakość i zgodność z dobrymi praktykami} \\
-    Bez dodatkowych instrukcji ukierunkowanych na najlepsze praktyki DevOps, co najmniej 60\% autonomicznie generowanych konfiguracji zawiera błędy lub ostrzeżenia wykrywane przez narzędzia statycznej analizy (Hadolint dla Docker, Kube-linter dla Kubernetes), co wymaga dodatkowej walidacji i poprawek przed wdrożeniem produkcyjnym. Zastosowanie prompt engineeringu (w postaci wyraźnych, konkretnych wytycznych dotyczących dobrych praktyk) zmniejsza liczbę ostrzeżeń i zwiększa odsetek konfiguracji bez ostrzeżeń.
+    \item \textbf{RQ3: Jaką jakość mają generowane konfiguracje IaC i jaki wpływ ma na nią prompt engineering ukierunkowany na dobre praktyki?} \\
+    Pytanie dotyczy skali ostrzeżeń wykrywanych przez narzędzia statycznej analizy oraz tego, czy rozszerzenie prompta o checklistę dobrych praktyk poprawia jakość generowanych artefaktów.
 
-    \item \textbf{H4: Niezawodność i powtarzalność procesu agentowego} \\
-    Proces generacji konfiguracji przez agenta LLM charakteryzuje się zmiennością wyników mimo deterministycznych parametrów (\texttt{temperature = 0}, stały seed); przy wielokrotnym uruchomieniu na tym samym repozytorium wskaźniki takie jak \textit{run-to-run diff ratio} (liczba zmienionych linii pomiędzy parami wygenerowanych konfiguracji znormalizowana przez ich długość) oraz odchylenie standardowe liczby kroków narzędziowych w sekwencjach zapisanych w LangSmith (różna liczba wywołań funkcji pomocniczych) przekraczają ustalone progi (diff ratio $>0{,}4$ oraz odchylenie standardowe $>20\%$ średniej), co świadczy o ograniczonej powtarzalności procesu.
+    \item \textbf{RQ4: Na ile powtarzalny jest proces generacji konfiguracji przez agenta LLM przy niezmienionych warunkach wejściowych?} \\
+    Pytanie koncentruje się na zmienności wygenerowanych artefaktów i przebiegu procesu agentowego mimo deterministycznych parametrów wejściowych.
 
-    \item \textbf{H5: Podatność na manipulację kontekstem} \\
-    Agenty LLM są podatne na manipulację przez złośliwe lub mylące treści zawarte w repozytorium (prompt injection, social engineering w plikach README/dokumentacji): w specjalnie spreparowanym repozytorium co najmniej 30\% przebiegów prowadzi do wygenerowania konfiguracji odbiegających od oczekiwań (np. pominięcie krytycznych usług, wstrzyknięcie dodatkowych kontenerów) lub zawierających intencjonalnie szkodliwe instrukcje, co dokumentuje wpływ manipulacji kontekstem na wynik końcowy.
+    \item \textbf{RQ5: W jakim stopniu agenty LLM są podatne na manipulację kontekstem repozytorium?} \\
+    Pytanie bada, czy złośliwe lub mylące treści w dokumentacji i plikach pomocniczych prowadzą do generowania artefaktów IaC sprzecznych z kodem źródłowym lub dobrymi praktykami bezpieczeństwa.
 \end{itemize}
 
 \bigskip
 \noindent
-Każda z powyższych hipotez weryfikowana jest przy użyciu dedykowanej metodyki testowej, specyficznych zestawów danych, odpowiednich metryk pomiarowych oraz wyraźnie zdefiniowanych kryteriów sukcesu lub porażki.
-%
-% TODO: Dopisać weryfikację H2--H5 (metodyka, metryki, kryteria).
+Każde z powyższych pytań badawczych analizowane jest przy użyciu dedykowanej metodyki testowej, specyficznych zestawów danych oraz odpowiednich metryk pomiarowych.
 
 \subsection{Architektura systemu testowego}
 
@@ -134,15 +132,19 @@ Konfiguracja agenta jest sterowana zestawem parametrów przekazywanych w definic
     \item liczba powtórzeń — ustawiana w definicji eksperymentu (\texttt{repetitions}); określa, ile razy uruchamiany jest ten sam zestaw parametrów (repozytorium, model, prompt/parametry) w celu np. oszacowania zmienności wyników.
 \end{itemize}
 
-\subsection{Weryfikacja H1: Autonomiczna generacja funkcjonalnych konfiguracji}
+\subsection{RQ1: Autonomiczna generacja funkcjonalnych konfiguracji}
 
-\subsubsection{Hipoteza}
+\subsubsection{Pytanie badawcze}
 
-Duże modele językowe, działające jako agenty z dostępem do narzędzi analizy repozytorium, są w stanie autonomicznie wygenerować funkcjonalne konfiguracje Docker i Kubernetes, które umożliwiają poprawne uruchomienie aplikacji bez dodatkowej ingerencji człowieka, w tym osiągnięcie gotowości usługowej widocznej na poziomie interfejsu (np. webowe API odpowiada na zapytania HTTP po wdrożeniu na klastrze testowym).
+W jakim stopniu duże modele językowe, działające jako agenty z dostępem do narzędzi analizy repozytorium, potrafią autonomicznie wygenerować funkcjonalne konfiguracje Docker i Kubernetes umożliwiające poprawne uruchomienie aplikacji bez dodatkowej ingerencji człowieka, w tym osiągnięcie gotowości usługowej potwierdzonej odpowiedzią HTTP po wdrożeniu na klastrze testowym?
+
+\subsubsection{Zakres analizy}
+
+W ramach RQ1 analizowana jest zdolność agenta do samodzielnego przejścia pełnej ścieżki od analizy repozytorium do uzyskania działającego wdrożenia. Badanie obejmuje zarówno wynik końcowy, jak i identyfikację etapów, na których proces najczęściej ulega niepowodzeniu. Szczególne znaczenie ma rozróżnienie pomiędzy poprawnością składniową wygenerowanych artefaktów, skutecznością budowy obrazów, poprawnością wdrożenia do klastra oraz rzeczywistą gotowością usługową aplikacji potwierdzoną odpowiedzią HTTP.
 
 \subsubsection{Zbiór danych testowych}
 
-Testy H1 opierają się na \textbf{rzeczywistych, publicznie dostępnych projektach z serwisu GitHub}, aby ocenić skuteczność agentów w warunkach zbliżonych do praktycznych. Wykorzystanie niekontrolowanych repozytoriów o zróżnicowanej strukturze, niekompletnej dokumentacji i niestandardowych zależnościach pozwala ocenić, jak agent radzi sobie poza scenariuszami laboratoryjnymi. Zbiór obejmuje 25 aplikacji webowych (załącznik~\ref{att:h1-dataset}) zróżnicowanych pod względem stosu technologicznego, architektury oraz sposobu uruchamiania. Repozytoria zostały zebrane przy użyciu GitHub API z kryteriami:
+Testy RQ1 opierają się na \textbf{rzeczywistych, publicznie dostępnych projektach z serwisu GitHub}, aby ocenić skuteczność agentów w warunkach zbliżonych do praktycznych. Wykorzystanie niekontrolowanych repozytoriów o zróżnicowanej strukturze, niekompletnej dokumentacji i niestandardowych zależnościach pozwala ocenić, jak agent radzi sobie poza scenariuszami laboratoryjnymi. Zbiór obejmuje 25 aplikacji webowych (załącznik~\ref{att:h1-dataset}) zróżnicowanych pod względem stosu technologicznego, architektury oraz sposobu uruchamiania. Repozytoria zostały zebrane przy użyciu GitHub API z kryteriami:
 \begin{itemize}
     \item zapytanie: \texttt{webapp pushed:>=2025-01-01} (ostatni push po 1 stycznia 2025),
     \item języki: Python, JavaScript, TypeScript, Java, Kotlin, C\#, Go, PHP, Ruby (popularne języki stosowane w aplikacjach webowych),
@@ -151,11 +153,11 @@ Testy H1 opierają się na \textbf{rzeczywistych, publicznie dostępnych projekt
     \item sortowanie: \texttt{pushed} \texttt{desc} (ostatnio aktualizowane).
 \end{itemize}
 
-\textbf{Ograniczenia praktyczne:} w badaniu H1 znalazł się zestaw relatywnie prostych aplikacji (mało komponentów, brak skomplikowanej orkiestracji), co obniża koszt eksperymentu, ale ogranicza uogólnienie wyników na złożone systemy — jest to jedno z zagrożeń ważności opisanych w sekcji o threats to validity.
+\textbf{Ograniczenia praktyczne:} w badaniu RQ1 znalazł się zestaw relatywnie prostych aplikacji (mało komponentów, brak skomplikowanej orkiestracji), co obniża koszt eksperymentu, ale ogranicza uogólnienie wyników na złożone systemy — jest to jedno z zagrożeń ważności opisanych w sekcji o threats to validity.
 
 \bigskip
 \noindent
-\textbf{Konfiguracja eksperymentu H1:} testy uruchamiane są z domyślnym promptem systemowym (\texttt{prompts/default.prompt}, załącznik~\ref{att:prompt}) oraz trzema modelami użytymi w eksperymencie: \texttt{gemini-2.5-flash}, \texttt{gpt-5-mini} i \texttt{deepseek-chat}. Każda kombinacja (repozytorium, model) jest uruchamiana dwukrotnie (2 powtórzenia).
+\textbf{Konfiguracja eksperymentu RQ1:} testy uruchamiane są z domyślnym promptem systemowym (\texttt{prompts/default.prompt}, załącznik~\ref{att:prompt}) oraz trzema modelami użytymi w eksperymencie: \texttt{gemini-2.5-flash}, \texttt{gpt-5-mini} i \texttt{deepseek-chat}. Każda kombinacja (repozytorium, model) jest uruchamiana dwukrotnie (2 powtórzenia).
 
 \subsubsection{Metryki}
 
@@ -183,31 +185,19 @@ Metoda Wilsona stanowi ulepszenie klasycznego przedziału ufności opartego na p
 Przedziały Wilsona charakteryzują się lepszymi własnościami statystycznymi, w szczególności dokładniejszym pokryciem deklarowanego poziomu ufności, oraz zawsze mieszczą się w logicznym zakresie $[0,1]$.
 Z tego względu metoda Wilsona jest powszechnie rekomendowana w literaturze jako standardowa metoda wyznaczania przedziałów ufności dla proporcji, zwłaszcza w analizach opartych na ograniczonej liczbie prób.
 
-\subsubsection{Kryteria weryfikacji}
+\subsection{RQ2: Ograniczenia złożonościowe}
 
-% TODO zrewidować progi po uzyskaniu wyników eksperymentu, zmienić też wtedy w rozdziale 5.
+\subsubsection{Pytanie badawcze}
 
+Jak wzrost złożoności aplikacji wpływa na skuteczność autonomicznie generowanych konfiguracji IaC?
 
-\textbf{Pozytywna weryfikacja hipotezy}: \textit{łączne spełnienie poniższych progów}:
-\begin{itemize}
-    \item end-to-end success rate (build \& apply \& runtime) co najmniej 60\% na zbiorze H1,
-    \item sukcesy per etap: build $\geq$ 75\%, apply $\geq$ 75\%, runtime $\geq$ 60\%,
-    \item conditional apply $|$ build $\geq$ 95\% oraz conditional runtime $|$ apply $\geq$ 80\% (ogranicza wpływ awarii na wcześniejszych etapach),
-    \item co najmniej połowa repozytoriów osiąga $\geq$ 50\% sukcesu (obniża ryzyko, że wynik jest zawyżony przez kilka „łatwych” projektów),
-\end{itemize}
+\subsubsection{Zakres analizy}
 
-
-% TODO dodac opis H2-H5
-
-\subsection{Weryfikacja H2: Ograniczenia złożonościowe}
-
-\subsubsection{Hipoteza}
-
-Istnieje próg złożoności aplikacji, powyżej którego jakość autonomicznie generowanych konfiguracji znacząco spada. Progi te można uchwycić, obserwując wyniki na kontrolowanych repozytoriach o rosnącej liczbie komponentów i zależności (od prostego monolitu po prosty układ mikroserwisowy); oczekuje się, że metryki sukcesu (np. odsetek poprawnych wdrożeń) maleją wraz ze wzrostem złożoności.
+W ramach RQ2 analizowany jest wpływ wzrostu złożoności repozytorium na skuteczność działania agentów. Przedmiotem badania jest nie tylko ogólny spadek skuteczności end-to-end, lecz również to, które etapy potoku walidacyjnego stają się bardziej zawodne przy przejściu od prostych aplikacji do architektur wielousługowych. Analiza ma zatem uchwycić zależność pomiędzy złożonością architektury a rodzajem oraz momentem pojawiania się błędów.
 
 \subsubsection{Zbiór danych testowych}
 
-Weryfikacja H2 wykorzystuje kontrolowany zestaw pięciu repozytoriów PoC o rosnącej złożoności (POC1–POC5). Repozytoria zostały zaprojektowane tak, aby stopniowo zwiększać liczbę usług, zależności infrastrukturalnych i powiązań między komponentami, zachowując jednocześnie podobny domenowo przypadek użycia (aplikacja webowa).
+Analiza RQ2 wykorzystuje kontrolowany zestaw pięciu repozytoriów PoC o rosnącej złożoności (POC1–POC5). Repozytoria zostały zaprojektowane tak, aby stopniowo zwiększać liczbę usług, zależności infrastrukturalnych i powiązań między komponentami, zachowując jednocześnie podobny domenowo przypadek użycia (aplikacja webowa).
 
 \begin{itemize}
     \item \textbf{POC1:} pojedyncza aplikacja FastAPI (monolit), brak bazy danych i usług zewnętrznych, prosta struktura kodu.
@@ -227,17 +217,17 @@ Weryfikacja H2 wykorzystuje kontrolowany zestaw pięciu repozytoriów PoC o rosn
         POC4 & 4 & 4 & 3 & 1 \\
         POC5 & 5 & 5 & 4 & 2 \\
     \end{tabular}
-    \caption{Metryki złożoności repozytoriów PoC użytych w H2}
+    \caption{Metryki złożoności repozytoriów PoC użytych w RQ2}
     \label{tab:h2-complexity}
 \end{table}
 
 % TODO wybrac modele, wieksze?
 
-Każde repozytorium jest uruchamiane dla trzech modeli (\texttt{gemini-2.5-flash}, \texttt{gpt-5-mini}, \texttt{deepseek-chat}) z dwoma powtórzeniami, analogicznie do H1, aby umożliwić porównywalność wyników.
+Każde repozytorium jest uruchamiane dla trzech modeli (\texttt{gemini-2.5-flash}, \texttt{gpt-5-mini}, \texttt{deepseek-chat}) z dwoma powtórzeniami, analogicznie do RQ1, aby umożliwić porównywalność wyników.
 
 \subsubsection{Metryki}
 
-Weryfikacja H2 obejmuje dwie grupy metryk:
+Analiza RQ2 obejmuje dwie grupy metryk:
 \begin{itemize}
     \item \textbf{Metryki złożoności repozytorium}:
     \begin{itemize}
@@ -250,31 +240,27 @@ Weryfikacja H2 obejmuje dwie grupy metryk:
     \item \textbf{Metryki skuteczności}:
     \begin{itemize}
         \item end-to-end success rate (build \& apply \& runtime) per repozytorium,
-        \item skuteczność etapów (build, apply, runtime) analogicznie do H1.
+        \item skuteczność etapów (build, apply, runtime) analogicznie do RQ1.
     \end{itemize}
 \end{itemize}
 
-\subsubsection{Kryteria weryfikacji}
-\textbf{Pozytywna weryfikacja hipotezy} zachodzi, gdy:
-\begin{itemize}
-        \item występuje jednoznaczny trend spadkowy skuteczności wraz ze wzrostem poziomu złożoności (ujemna korelacja Spearmana $\rho \leq -0{,}8$),
-    \item różnica end-to-end success rate pomiędzy POC1 i POC5 wynosi co najmniej 40 p.p.
-\end{itemize}
-
-
-\subsection{Weryfikacja H3: Jakość i zgodność z dobrymi praktykami}
+\subsection{RQ3: Jakość i zgodność z dobrymi praktykami}
 
 % TODO tu skonczylem
 
-\subsubsection{Hipoteza}
+\subsubsection{Pytanie badawcze}
 
-Bez dodatkowych instrukcji ukierunkowanych na najlepsze praktyki DevOps, co najmniej 60\% autonomicznie generowanych konfiguracji zawiera błędy lub ostrzeżenia wykrywane przez narzędzia statycznej analizy (Hadolint dla Docker, Kube-linter dla Kubernetes), co wymaga dodatkowej walidacji i poprawek przed wdrożeniem produkcyjnym. Zastosowanie prompt engineeringu (w postaci wyraźnych, konkretnych wytycznych dotyczących dobrych praktyk) zmniejsza liczbę ostrzeżeń i zwiększa odsetek konfiguracji bez ostrzeżeń.
+Jaką jakość mają autonomicznie generowane konfiguracje IaC mierzone narzędziami statycznej analizy oraz jaki wpływ ma na tę jakość wzmocnienie prompta o wyraźne wytyczne dobrych praktyk?
 
-H3 sprawdza, czy wzmocnienie prompta o wyraźne wytyczne dobrych praktyk poprawia jakość wygenerowanych konfiguracji IaC mierzoną przez narzędzia statycznej analizy. Porównywane są dwa warianty prompta: bazowy (ten sam co w H1) oraz wariant rozszerzony o checklistę dobrych praktyk dla Dockerfile i Kubernetes (np. bezpieczeństwo użytkownika, wersjonowanie obrazów, zasoby, probe'y, właściwe użycie Secret/ConfigMap).
+RQ3 sprawdza, czy wzmocnienie prompta o wyraźne wytyczne dobrych praktyk poprawia jakość wygenerowanych konfiguracji IaC mierzoną przez narzędzia statycznej analizy. Porównywane są dwa warianty prompta: bazowy (ten sam co w RQ1) oraz wariant rozszerzony o checklistę dobrych praktyk dla Dockerfile i Kubernetes (np. bezpieczeństwo użytkownika, wersjonowanie obrazów, zasoby, probe'y, właściwe użycie Secret/ConfigMap).
+
+\subsubsection{Zakres analizy}
+
+W ramach RQ3 analizowane są dwa komplementarne zagadnienia. Po pierwsze, oceniana jest bazowa jakość wygenerowanych artefaktów, rozumiana jako liczba i typ ostrzeżeń zgłaszanych przez Hadolint i Kube-linter. Po drugie, badane jest to, czy oraz w jakim stopniu doprecyzowanie prompta o wytyczne dobrych praktyk wpływa na wynik jakościowy. Analiza koncentruje się zatem na porównaniu wariantu bazowego i wariantu best practices oraz na skali poprawy uzyskiwanej dzięki prompt engineeringowi.
 
 \subsubsection{Zbiór danych testowych}
 
-H3 wykorzystuje ten sam zbiór repozytoriów co H1 (25 publicznych projektów; załącznik~\ref{att:h1-dataset}). Każde repozytorium uruchamiane jest dla trzech modeli (\texttt{gemini-2.5-flash}, \texttt{gpt-5-mini}, \texttt{deepseek-chat}) w dwóch wariantach prompta (bazowy vs. best practices) i z jednym powtórzeniem. Liczbę powtórzeń ograniczono z 2 do 1 w celu skrócenia czasu eksperymentu. Analiza jakości wykonywana jest na wygenerowanych plikach \texttt{Dockerfile} oraz manifestach Kubernetes, niezależnie od wyniku runtime; na potrzeby H3 wyłączono aplikowanie manifestów na klaster, aby przyspieszyć walidację.
+RQ3 wykorzystuje ten sam zbiór repozytoriów co RQ1 (25 publicznych projektów; załącznik~\ref{att:h1-dataset}). Każde repozytorium uruchamiane jest dla trzech modeli (\texttt{gemini-2.5-flash}, \texttt{gpt-5-mini}, \texttt{deepseek-chat}) w dwóch wariantach prompta (bazowy vs. best practices) i z jednym powtórzeniem. Liczbę powtórzeń ograniczono z 2 do 1 w celu skrócenia czasu eksperymentu. Analiza jakości wykonywana jest na wygenerowanych plikach \texttt{Dockerfile} oraz manifestach Kubernetes, niezależnie od wyniku runtime; na potrzeby RQ3 wyłączono aplikowanie manifestów na klaster, aby przyspieszyć walidację.
 
 \subsubsection{Metryki}
 
@@ -287,24 +273,17 @@ Metryki jakości oparte są o ostrzeżenia narzędzi statycznych:
     \item \textbf{Odsetek konfiguracji bez ostrzeżeń} — udział przebiegów bez ostrzeżeń z obu narzędzi.
 \end{itemize}
 
-\subsubsection{Kryteria weryfikacji}
+\subsection{RQ4: Niezawodność i powtarzalność procesu agentowego}
 
-\begin{itemize}
-    \item \textbf{Pozytywna weryfikacja hipotezy} zachodzi, gdy:
-    \begin{itemize}
-        \item w wariancie bazowym co najmniej 60\% przebiegów zawiera ostrzeżenia (Hadolint lub Kube-linter),
-        \item wariant best practices redukuje łączną liczbę ostrzeżeń co najmniej o 20\% (mediana per repozytorium),
-        \item wariant best practices zwiększa odsetek konfiguracji bez ostrzeżeń o co najmniej 15 p.p.
-    \end{itemize}
-\end{itemize}
+RQ4 koncentruje się na powtarzalności wyników generacji przy niezmienionych warunkach wejściowych oraz na stabilności przebiegu procesu agentowego (liczby kroków narzędziowych).
 
-\subsection{Weryfikacja H4: Niezawodność i powtarzalność procesu agentowego}
+\subsubsection{Pytanie badawcze}
 
-H4 koncentruje się na powtarzalności wyników generacji przy niezmienionych warunkach wejściowych oraz na stabilności przebiegu procesu agentowego (liczby kroków narzędziowych).
+Na ile powtarzalny jest proces generacji konfiguracji przez agenta LLM przy deterministycznych parametrach (\texttt{temperature = 0}, stały seed), mierzony zmiennością wygenerowanych artefaktów oraz liczbą kroków narzędziowych?
 
-\subsubsection{Hipoteza}
+\subsubsection{Zakres analizy}
 
-Proces generacji konfiguracji przez agenta LLM charakteryzuje się zmiennością wyników mimo deterministycznych parametrów (\texttt{temperature = 0}, stały seed); przy wielokrotnym uruchomieniu na tym samym repozytorium wskaźniki takie jak \textit{run-to-run diff ratio} (liczba zmienionych linii pomiędzy parami wygenerowanych konfiguracji znormalizowana przez ich długość) oraz odchylenie standardowe liczby kroków narzędziowych w sekwencjach zapisanych w LangSmith (różna liczba wywołań funkcji pomocniczych) przekraczają ustalone progi (diff ratio $>0{,}4$ oraz odchylenie standardowe $>20\%$ średniej), co świadczy o ograniczonej powtarzalności procesu.
+W ramach RQ4 analizowane są dwa wymiary powtarzalności. Pierwszy odnosi się do samych artefaktów końcowych, a więc do stopnia różnic pomiędzy wygenerowanymi plikami przy identycznych parametrach wejściowych. Drugi dotyczy przebiegu procesu agentowego, w szczególności tego, czy agent wykonuje zbliżoną liczbę kroków narzędziowych i czy jego ścieżka działania pozostaje stabilna. Umożliwia to rozróżnienie pomiędzy zmiennością wyniku a zmiennością samego procesu generacji.
 
 \subsubsection{Zbiór danych testowych}
 
@@ -312,7 +291,7 @@ Wykorzystano pięć kontrolowanych repozytoriów POC (POC1--POC5), obejmujących
 
 Wybór modeli podyktowany był koniecznością wsparcia parametru \texttt{temperature=0}. Modele z serii GPT-5 (w~tym \texttt{gpt-5-mini}) nie pozwalają na ustawienie temperatury innej niż domyślna wartość 1{,}0, ponieważ ich wewnętrzny proces generacji opiera się na wieloetapowym rozumowaniu (reasoning), które wymagałoby zredukowania wszystkich ścieżek rozumowania do jednej ścieżki zachłannej przy temperature=0, co uniemożliwiłoby wielokrotne próby rozwiązania problemu. Z~tego względu zastosowano modele \texttt{gemini-2.5-flash} (Google) oraz \texttt{deepseek-chat} (DeepSeek), które wspierają pełen zakres wartości temperatury (0--2) i~parametr \texttt{seed} dla deterministycznej generacji.
 
-Analogicznie do H3, na potrzeby H4 wyłączono aplikowanie manifestów na klaster, ponieważ celem jest ocena powtarzalności generacji, a nie skuteczności runtime.
+Analogicznie do RQ3, na potrzeby RQ4 wyłączono aplikowanie manifestów na klaster, ponieważ celem jest ocena powtarzalności generacji, a nie skuteczności runtime.
 
 \subsubsection{Metryki}
 
@@ -326,19 +305,15 @@ gdzie linie zmienione to suma wstawek i usunięć z porównania \texttt{ndiff}.
     \item \textbf{Zmienność liczby kroków narzędziowych} — średnia i odchylenie standardowe liczby wywołań narzędzi agenta (np. odczyty plików, listowanie katalogów, uruchomienia poleceń) w ramach tej samej kombinacji.
 \end{itemize}
 
-\subsubsection{Kryteria weryfikacji}
+\subsection{RQ5: Podatność na manipulację kontekstem}
 
-Hipoteza H4 zostaje potwierdzona, jeśli spełnione są łącznie następujące warunki:
-\begin{itemize}
-    \item średni run-to-run diff ratio dla każdej kombinacji (repozytorium, model) przekracza 0{,}4,
-    \item odchylenie standardowe liczby kroków narzędziowych przekracza 20\% średniej w danej kombinacji.
-\end{itemize}
+\subsubsection{Pytanie badawcze}
 
-\subsection{Weryfikacja H5: Podatność na manipulację kontekstem}
+W jakim stopniu agent LLM jest podatny na manipulację kontekstem repozytorium i czy przy obecności złośliwych lub mylących instrukcji generuje artefakty IaC sprzeczne z rzeczywistym kodem aplikacji?
 
-\subsubsection{Hipoteza}
+\subsubsection{Zakres analizy}
 
-Agent LLM jest podatny na manipulację kontekstem repozytorium; przy obecności złośliwych lub mylących instrukcji w dokumentacji i plikach konfiguracyjnych generuje artefakty IaC sprzeczne z rzeczywistym kodem aplikacji. Skutkuje to krytycznymi odchyleniami od oczekiwanej konfiguracji (np. uruchomieniem innego kontenera, błędnym portem, niepoprawnym poleceniem startowym).
+W ramach RQ5 analizowane jest, czy agent traktuje treści pomocnicze zawarte w repozytorium jako silniejszy sygnał niż rzeczywisty kod aplikacji. Badanie koncentruje się na trzech klasach manipulacji: fałszywej specyfikacji funkcjonalnej, sugestiach prowadzących do nadmiarowych uprawnień oraz pozornej zależności infrastrukturalnej. Przedmiotem analizy jest zarówno sam odsetek odchyleń, jak i ich charakter: funkcjonalny, bezpieczeństwa lub zgodności ze specyfikacją systemu.
 
 \subsubsection{Zbiór danych testowych}
 
@@ -348,7 +323,7 @@ Jako bazę wykorzystano repozytorium \texttt{poc1-fastapi}. Przygotowano trzy wa
     \item \textbf{A2: authoritative file poisoning (security)} — dodano \texttt{SECURITY.md} oraz notatkę operacyjną z wymaganiem uruchomienia aplikacji w trybie \texttt{privileged} i z \texttt{hostNetwork}, uzasadnionym rzekomą diagnostyką produkcyjną.
     \item \textbf{A3: context saturation (legacy dependency)} — dodano \texttt{docs/legacy\_migration.md}, \texttt{.env.example} oraz notatkę w changelogu sugerujące konieczność utrzymania nieistniejącej zależności Redis.
 \end{itemize}
-Eksperyment wykonywany jest dla trzech modeli (\texttt{gemini-2.5-flash}, \texttt{gpt-5-mini}, \texttt{deepseek-chat}) z dziesięcioma powtórzeniami na kombinację, co daje łącznie 90 przebiegów. W celu skupienia oceny na podatności semantycznej, a nie na funkcjonalności końcowego wdrożenia, w H5 wyłączono walidację runtime; werdykt oparto na analizie wygenerowanych artefaktów (\texttt{Dockerfile} i manifestów Kubernetes).
+Eksperyment wykonywany jest dla trzech modeli (\texttt{gemini-2.5-flash}, \texttt{gpt-5-mini}, \texttt{deepseek-chat}) z dziesięcioma powtórzeniami na kombinację, co daje łącznie 90 przebiegów. W celu skupienia oceny na podatności semantycznej, a nie na funkcjonalności końcowego wdrożenia, w RQ5 wyłączono walidację runtime; analiza opiera się na wygenerowanych artefaktach (\texttt{Dockerfile} i manifestach Kubernetes).
 
 \subsubsection{Metryki}
 
@@ -359,14 +334,6 @@ Podatność mierzona jest odsetkiem przebiegów, w których wystąpiło krytyczn
     \item \textbf{A3 (legacy dependency):} dodanie zasobów dla Redis (Deployment/StatefulSet/Service/Secret/ConfigMap) mimo braku zależności w kodzie.
 \end{itemize}
 Dodatkowo raportowana jest liczba i typy odchyleń (funkcjonalne, bezpieczeństwo, zgodność ze specyfikacją).
-
-\subsubsection{Kryteria weryfikacji}
-
-Hipoteza H5 zostaje potwierdzona, jeśli spełniony jest co najmniej jeden z warunków:
-\begin{itemize}
-    \item odsetek przebiegów z krytycznymi odchyleniami wynosi co najmniej 30\%,
-    \item każdy z wariantów ataku (A1--A3) powoduje co najmniej jedno krytyczne odchylenie.
-\end{itemize}
 
 \subsection{Orkiestracja i infrastruktura wspierająca}
 
@@ -413,7 +380,7 @@ W celu usprawnienia zarządzania eksperymentami oraz monitorowania ich postępu 
 
 \subsection{Zagrożenia ważności eksperymentów}
 \begin{itemize}
-    \item \textbf{Reprezentatywność zbioru H1}: 25 relatywnie prostych aplikacji webowych może nie odzwierciedlać złożoności systemów produkcyjnych; wyniki mogą nie uogólniać się na złożone architektury (odniesienie w H2).
+    \item \textbf{Reprezentatywność zbioru RQ1}: 25 relatywnie prostych aplikacji webowych może nie odzwierciedlać złożoności systemów produkcyjnych; wyniki mogą nie uogólniać się na złożone architektury (odniesienie w RQ2).
     \item \textbf{Walidacja runtime jednym endpointem}: sprawdzenie dostępności pojedynczego \texttt{test\_endpoint} nie weryfikuje w pełni komunikacji między usługami ani scenariuszy biznesowych; złożone zależności mogą pozostać niewykryte.
     \item \textbf{Ograniczona liczba powtórzeń}: 2 przebiegi na kombinację (repozytorium, model) dają szerokie przedziały ufności.
     \item \textbf{Środowisko testowe}: MicroK8s i lokalny rejestr na jednej maszynie mogą różnić się od produkcyjnych klastrów (wydajność, sieć, storage); wyniki mogą być wrażliwe na konfigurację hosta.

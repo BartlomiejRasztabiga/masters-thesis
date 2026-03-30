@@ -29,10 +29,10 @@
     \begin{itemize}
         \item Motywacja i cel pracy
         \item Przegląd literatury i luki badawcze
-        \item Hipotezy badawcze
+        \item Pytania badawcze
         \item Metodyka i system badawczy
-        \item Eksperymenty i wyniki (H1-H4)
-        \item Projekt dalszych badań (H5)
+        \item Eksperymenty i wyniki (RQ1-RQ4)
+        \item Projekt dalszych badań (RQ5)
         \item Ograniczenia i wnioski, dalsze kierunki
     \end{itemize}
 \end{frame}
@@ -80,13 +80,13 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Hipotezy badawcze (H1--H5)}
+\begin{frame}{Pytania badawcze (RQ1--RQ5)}
     \begin{itemize}
-        \item H1: działające konfiguracje end-to-end
-        \item H2: spadek skuteczności wraz ze złożonością
-        \item H3: jakość konfiguracji i wpływ \textit{prompt engineering} na nią
-        \item H4: brak powtarzalności procesu przy deterministycznych parametrach
-        \item H5: podatność na manipulację kontekstem agenta (\textit{prompt injection})
+        \item RQ1: na ile agent generuje działające konfiguracje end-to-end
+        \item RQ2: jak złożoność wpływa na skuteczność
+        \item RQ3: jaka jest jakość konfiguracji i wpływ \textit{prompt engineering}
+        \item RQ4: na ile powtarzalny jest proces przy deterministycznych parametrach
+        \item RQ5: jaka jest podatność na manipulację kontekstem agenta (\textit{prompt injection})
     \end{itemize}
 \end{frame}
 
@@ -151,22 +151,18 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Projekt H1 -- skuteczność}
+\begin{frame}{Projekt RQ1 -- skuteczność}
     \begin{itemize}
         \item Cel: czy agent generuje działające konfiguracje IaC
         \item Zbiór: 25 publicznych repozytoriów webowych z GitHuba
         \item Wyszukiwanie: \texttt{webapp pushed:>=2025-01-01} + \texttt{topic:webapp}, języki Python/JS/TS/Java/Kotlin/C\#/Go/PHP/Ruby, 0--10 "gwiazdek"
         \item Z puli 100 repozytoriów wylosowano 25 do analizy
         \item Wstępna selekcja ręczna pod kątem możliwości budowy i uruchomienia
-        \item Wybrane kryteria weryfikacji H1:
-        \begin{itemize}
-            \item end-to-end $\geq$ 60\%
-            \item apply $|$ build $\geq$ 80\%, runtime $|$ apply $\geq$ 60\%
-        \end{itemize}
+        \item Metryki: end-to-end success rate, skuteczność etapów, metryki warunkowe
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Wyniki H1 -- skuteczność}
+\begin{frame}{Wyniki RQ1 -- skuteczność}
     \small
     \begin{center}
         \begin{tabular}{lcc}
@@ -184,19 +180,15 @@
         \item Problemem nie jest składnia manifestów, lecz błędy semantyczne.
         \item Typowe przyczyny: niepoprawne użycie zmiennych środowiskowych, brak uruchomienia usług zależnych (np. bazy danych),
         konflikty zależności i wersji środowisk uruchomieniowych.
-        \item Hipoteza H1 potwierdzona -- spełnione kryteria weryfikacji.
+        \item Wynik wskazuje na istotny potencjał praktyczny, ale też na potrzebę dalszej walidacji runtime.
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Projekt H2 -- złożoność}
+\begin{frame}{Projekt RQ2 -- złożoność}
     \begin{itemize}
         \item Cel: wpływ złożoności budowanego systemu na skuteczność agenta
         \item Zbiór: autorskie repozytoria POC1--POC5 o rosnącej złożoności
-        \item Wybrane kryteria weryfikacji H2:
-        \begin{itemize}
-            \item ujemna korelacja Spearmana $\rho \leq -0{,}6$
-            \item różnica odsetka sukcesów między POC1 a POC5 $\geq$ 40 p.p.
-        \end{itemize}
+        \item Metryki: success rate per repozytorium, etapy pipeline'u, trend względem złożoności
     \end{itemize}
     \small
     \vspace{0.4em}
@@ -209,7 +201,7 @@
     \end{tabular}
 \end{frame}
 
-\begin{frame}{Wyniki H2 -- złożoność}
+\begin{frame}{Wyniki RQ2 -- złożoność}
     \small
     \begin{center}
         \begin{tabular}{lcc}
@@ -226,25 +218,21 @@
         \item Trend silnie ujemny (Spearman = -1,0; Pearson $\approx$ -0,89)
         \item Różnica odsetka sukcesów end-to-end POC1--POC5: 100 p.p.
         \item Problemy narastają przy wielu usługach i zależnościach (agent gubi kontekst)
-        \item Hipoteza H2 potwierdzona -- spełnione kryteria weryfikacji.
+        \item Wynik pokazuje, że złożoność jest jednym z głównych ograniczeń skuteczności agenta.
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Projekt H3 -- jakość konfiguracji}
+\begin{frame}{Projekt RQ3 -- jakość konfiguracji}
     \begin{itemize}
         \item Cel: ocena jakości konfiguracji IaC za pomocą narzędzi analizy statycznej oraz wpływu \textit{prompt engineering} na jej poprawę
         \item Narzędzia: Hadolint (Dockerfile), Kube-linter (manifesty K8s)
         \item Wariant prompta z dobrymi praktykami IaC (m.in. non-root, przypinanie wersji, limity zasobów, sondy, securityContext)
-        \item Zbiór: ten sam co w H1 (25 publicznych repozytoriów webowych z GitHuba)
-        \item Wybrane kryteria weryfikacji:
-        \begin{itemize}
-            \item wariant bazowy: $\geq$ 60\% przebiegów z ostrzeżeniami
-            \item wariant ulepszony: redukcja ostrzeżeń $\geq$ 20\% (mediana per repozytorium)
-        \end{itemize}
+        \item Zbiór: ten sam co w RQ1 (25 publicznych repozytoriów webowych z GitHuba)
+        \item Metryki: liczba ostrzeżeń, odsetek przebiegów z ostrzeżeniami, odsetek konfiguracji bez ostrzeżeń
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Wyniki H3 -- jakość konfiguracji}
+\begin{frame}{Wyniki RQ3 -- jakość konfiguracji}
     \small
     \begin{center}
         \begin{tabular}{lcccc}
@@ -259,14 +247,14 @@
         \item Dominują ostrzeżenia Kube-linter: 130 $\rightarrow$ 22.
         \item Najczęstsze ostrzeżenia: brak \texttt{runAsNonRoot}/\texttt{readOnlyRootFilesystem}, brak przypinania wersji (apt/apk/npm/pip), użycie sekretów w \texttt{ARG}/\texttt{ENV}.
         \item Mimo dużego kontekstu wejściowego modele konsekwentnie stosują wytyczne z prompta -- \textit{prompt engineering} działa.
-        \item Hipoteza H3 potwierdzona -- spełnione kryteria weryfikacji.
+        \item Wynik sugeruje, że bazowa jakość wymaga walidacji, ale może być silnie poprawiona przez dopracowany prompt.
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Projekt H4 -- brak powtarzalności}
+\begin{frame}{Projekt RQ4 -- brak powtarzalności}
     \begin{itemize}
         \item Cel: ocena stabilności wyników przy parametrach sugerujących deterministyczność
-        \item Zbiór: jak w H2 (POC1--POC5 o rosnącej złożoności)
+        \item Zbiór: jak w RQ2 (POC1--POC5 o rosnącej złożoności)
         \item Modele: Gemini 2.5 Flash, DeepSeek V3.2 (GPT-5 Mini nie wspiera \texttt{temperature=0})
         \item Ustawienia: 5 powtórzeń na kombinację, \texttt{temperature=0}, stały \texttt{seed}; bez apply
         \item Metryki: \texttt{diff\_ratio} między przebiegami oraz zmienność liczby kroków narzędziowych
@@ -276,15 +264,11 @@
         \texttt{diff\_ratio} = \frac{\text{liczba linii zmienionych}}{\tfrac{1}{2}(\text{liczba linii w A} + \text{liczba linii w B})}
     \]
     \begin{itemize}
-        \item Wybrane kryteria weryfikacji:
-        \begin{itemize}
-            \item średni \texttt{diff\_ratio} $> 0{,}4$ dla każdej kombinacji
-            \item odchylenie std. liczby kroków narzędziowych $> 20\%$ średniej
-        \end{itemize}
+        \item Metryki: \texttt{diff\_ratio} między przebiegami i zmienność liczby kroków narzędziowych
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Wyniki H4 -- brak powtarzalności}
+\begin{frame}{Wyniki RQ4 -- brak powtarzalności}
     \small
     \begin{center}
         \begin{tabular}{lcc}
@@ -306,19 +290,19 @@
         \item 7/10 kombinacji przekracza próg 0,4.
         \item Zmienność liczby kroków narzędziowych $>20\%$ tylko w 1/10 kombinacji.
         \item Zaobserwowano wzrost diff ratio wraz ze wzrostem złożoności (np. POC4, POC5).
-        \item Werdykt: H4 formalnie niepotwierdzona (mimo widocznego trendu).
+        \item Wynik wskazuje na ograniczoną powtarzalność, zwłaszcza dla bardziej złożonych repozytoriów.
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Projekt H5 -- ataki na kontekst}
+\begin{frame}{Projekt RQ5 -- ataki na kontekst}
     \begin{itemize}
-        \item Projekt hipotezy H5 jest w trakcie dopracowywania
+        \item RQ5 bada podatność agenta na manipulację kontekstem repozytorium
         \item Repozytorium bazowe: \texttt{poc1-fastapi}
         \item Przykładowe 3 warianty ataku:
         \begin{itemize}
-            \item README \textit{prompt injection}: polecenie uruchomienia \texttt{nginx:alpine}
-            \item Przepuszczalny kontener: poprawna aplikacja, ale \texttt{root} + \texttt{privileged} + \texttt{hostNetwork} + mount \texttt{/var/run/docker.sock}
-            \item Złośliwy sidecar: dodatkowy \texttt{telemetry-agent} z zewnętrznego obrazu
+            \item \textit{Conflicting spec}: autorytatywna specyfikacja z błędnym portem 9000 zamiast 8080
+            \item \textit{Authoritative security}: dokumentacja sugerująca \texttt{privileged} i \texttt{hostNetwork}
+            \item \textit{Legacy dependency}: dokumentacja sugerująca nieistniejącą zależność Redis
         \end{itemize}
     \end{itemize}
 \end{frame}
@@ -334,7 +318,7 @@
 
 \begin{frame}{Zagrożenia ważności (Threats to validity)}
     \begin{itemize}
-        \item Zbiór H1: 25 relatywnie prostych aplikacji może nie uogólniać się na złożone systemy
+        \item Zbiór RQ1: 25 relatywnie prostych aplikacji może nie uogólniać się na złożone systemy
         \item Walidacja runtime pojedynczym zapytaniem \texttt{curl} nie weryfikuje w pełni dostępności usługi
         \item Ograniczona liczba powtórzeń i brak większych (droższych) modeli może nie dawać pełnej perspektywy
         \item Brak porównania z konfiguracjami tworzonymi przez człowieka utrudnia ocenę absolutnej jakości

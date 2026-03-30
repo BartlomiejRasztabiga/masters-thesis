@@ -1,13 +1,13 @@
 \clearpage % Rozdziały zaczynamy od nowej strony.
 \section{Wyniki eksperymentów}
 
-W niniejszym rozdziale przedstawiono wyniki przeprowadzonych eksperymentów badających możliwości autonomicznego generowania konfiguracji Infrastructure as Code przez agenty oparte na dużych modelach językowych. Analiza wyników zorganizowana jest zgodnie ze strukturą hipotez badawczych przedstawionych w rozdziale 4 — dla każdej z pięciu hipotez (H1–H5) zaprezentowano wyniki eksperymentalne, analizę danych oraz wnioski dotyczące weryfikacji hipotezy. Rozdział kończy synteza wyników podkreślająca kluczowe obserwacje dotyczące zdolności LLM do generowania IaC.
+W niniejszym rozdziale przedstawiono wyniki przeprowadzonych eksperymentów badających możliwości autonomicznego generowania konfiguracji Infrastructure as Code przez agenty oparte na dużych modelach językowych. Analiza wyników zorganizowana jest zgodnie ze strukturą pytań badawczych przedstawionych w rozdziale 4 — dla każdego z pięciu pytań badawczych (RQ1–RQ5) zaprezentowano wyniki eksperymentalne, analizę danych oraz krótką dyskusję ich znaczenia. Rozdział kończy synteza wyników podkreślająca kluczowe obserwacje dotyczące zdolności LLM do generowania IaC.
 
 \subsection{Przegląd przeprowadzonych eksperymentów}
 
 Eksperymenty przeprowadzono zgodnie z metodologią opisaną w rozdziale 4, wykorzystując system orkiestracji umożliwiający automatyczne wykonanie serii testów dla różnych kombinacji modeli, repozytoriów i wariantów konfiguracji. Szczegóły zbiorów danych, środowiska wykonawczego oraz metryk znajdują się w rozdziale 4.
 
-\subsection{Wyniki H1: Autonomiczna generacja funkcjonalnych konfiguracji}
+\subsection{Wyniki dla RQ1: Autonomiczna generacja funkcjonalnych konfiguracji}
 
 \subsubsection{Wyniki ilościowe}
 
@@ -47,7 +47,7 @@ Kaskadę sukcesu między etapami pipeline'u przedstawiono na rysunku~\ref{fig:h1
             };
         \end{axis}
     \end{tikzpicture}
-    \caption{Kaskada sukcesu w H1: liczba przebiegów na etapach pipeline'u}
+    \caption{Kaskada sukcesu w RQ1: liczba przebiegów na etapach pipeline'u}
     \label{fig:h1-funnel}
 \end{figure}
 
@@ -61,7 +61,7 @@ Kaskadę sukcesu między etapami pipeline'u przedstawiono na rysunku~\ref{fig:h1
         Runtime & 94/150 & 62{,}7\% & 54{,}7\%--70{,}0\% \\
         runtime $|$ apply & 94/115 & 81{,}7\% & 73{,}7\%--87{,}7\% \\
     \end{tabular}
-    \caption{Skuteczność etapów w H1}
+    \caption{Skuteczność etapów w RQ1}
     \label{tab:h1-stages}
 \end{table}
 
@@ -79,7 +79,7 @@ Porównanie skuteczności modeli znajduje się w tabeli~\ref{tab:h1-models}.
         gpt-5-mini & 34/50 & 68{,}0\% & 54{,}2\%--79{,}2\% \\
         deepseek-chat & 29/50 & 58{,}0\% & 44{,}2\%--70{,}6\% \\
     \end{tabular}
-    \caption{Skuteczność per model w H1}
+    \caption{Skuteczność per model w RQ1}
     \label{tab:h1-models}
 \end{table}
 
@@ -117,13 +117,13 @@ Rozkład skuteczności dla poszczególnych projektów pokazuje tabela~\ref{tab:h
         todo-list & 6/6 & 100{,}0\% & 61{,}0\%--100{,}0\% \\
         simple-webapp-flask & 6/6 & 100{,}0\% & 61{,}0\%--100{,}0\% \\
     \end{tabular}
-    \caption{Skuteczność per repozytorium w H1}
+    \caption{Skuteczność per repozytorium w RQ1}
     \label{tab:h1-repos}
 \end{table}
 
 \subsubsection{Typowe problemy i przyczyny awarii}
 
-Poniżej zebrano najczęstsze przyczyny niepowodzeń obserwowane w H1:
+Poniżej zebrano najczęstsze przyczyny niepowodzeń obserwowane w RQ1:
 
 \begin{itemize}
     \item \textbf{Problemy z zależnościami NPM:} agent używa \texttt{npm ci} lub \texttt{npm ci --omit=dev}, co zawodzi przy braku \texttt{package-lock.json} lub gdy zależności są błędnie oznaczone jako dev (np. brak \texttt{vite} w runtime).
@@ -137,20 +137,13 @@ Poniżej zebrano najczęstsze przyczyny niepowodzeń obserwowane w H1:
     \item \textbf{Błędy importu w Pythonie:} uruchamianie modułów z relatywnymi importami bez pakietu (np. \texttt{ImportError: attempted relative import with no known parent package}).
 \end{itemize}
 
-\textbf{Wniosek:} Dominujące błędy dotyczą środowiska uruchomieniowego i procesu budowy (wersje bazowych obrazów, kontekst kopiowania, zależności), a nie samych manifestów Kubernetes. Oznacza to, że ograniczenia H1 w dużej mierze wynikają z niedoskonałego rozpoznania środowiska aplikacji, a nie z błędów składniowych IaC.
+\textbf{Dyskusja:} Dominujące błędy dotyczą środowiska uruchomieniowego i procesu budowy (wersje bazowych obrazów, kontekst kopiowania, zależności), a nie samych manifestów Kubernetes. Oznacza to, że ograniczenia obserwowane w RQ1 w dużej mierze wynikają z niedoskonałego rozpoznania środowiska aplikacji, a nie z błędów składniowych IaC. Wynik 62{,}7\% end-to-end success rate pokazuje zauważalny potencjał praktyczny, ale jednocześnie sugeruje, że pełna autonomia nadal wymaga ostrożności i dodatkowej walidacji.
 
-\subsubsection{Werdykt dla H1}
+\subsubsection{Odpowiedź na RQ1}
 
-Na podstawie kryteriów z rozdziału 4 hipoteza H1 została potwierdzona. Spełnienie warunków przedstawia się następująco:
-\begin{itemize}
-    \item end-to-end success rate: 62{,}7\% (próg 60\%),
-    \item skuteczność etapów: build 78{,}7\% (próg 75\%), apply 76{,}7\% (próg 75\%), runtime 62{,}7\% (próg 60\%),
-    \item metryki warunkowe: apply $|$ build 97{,}5\% (próg 95\%), runtime $|$ apply 81{,}7\% (próg 80\%),
-    \item repozytoria z sukcesem $\geq$ 50\%: 16 z 25 (wymagane $\geq$ 50\% zbioru).
-\end{itemize}
-W konsekwencji można uznać, że agenty LLM są w stanie autonomicznie generować funkcjonalne konfiguracje IaC w badanym zakresie.
+Wyniki wskazują, że agenty LLM potrafią stosunkowo często wygenerować funkcjonalne konfiguracje IaC dla prostszych i umiarkowanie złożonych aplikacji webowych, ale skuteczność pozostaje daleka od pełnej niezawodności. End-to-end success rate wyniósł 62{,}7\%, przy 78{,}7\% skuteczności etapu build i 76{,}7\% dla apply. Najbardziej obiecujący sygnał stanowi więc wysoka skuteczność etapów \textit{build} i \textit{apply}, natomiast głównym ograniczeniem pozostaje przejście od poprawnej konfiguracji do poprawnego działania aplikacji w runtime.
 
-\subsection{Wyniki H2: Ograniczenia złożonościowe}
+\subsection{Wyniki dla RQ2: Ograniczenia złożonościowe}
 
 \subsubsection{Wyniki ilościowe}
 
@@ -172,7 +165,7 @@ Zestawienie skuteczności etapów oraz metryk warunkowych znajduje się w tabeli
         Runtime & 15/45 & 33{,}3\% & 21{,}4\%--47{,}9\% \\
         runtime $|$ apply & 15/24 & 62{,}5\% & 42{,}7\%--78{,}8\% \\
     \end{tabular}
-    \caption{Skuteczność etapów w H2}
+    \caption{Skuteczność etapów w RQ2}
     \label{tab:h2-stages}
 \end{table}
 
@@ -188,7 +181,7 @@ Wyniki dla poszczególnych modeli przedstawiono w tabeli~\ref{tab:h2-models}.
         gpt-5-mini & 7/15 & 46{,}7\% & 24{,}8\%--69{,}9\% \\
         deepseek-chat & 5/15 & 33{,}3\% & 15{,}2\%--58{,}3\% \\
     \end{tabular}
-    \caption{Skuteczność per model w H2}
+    \caption{Skuteczność per model w RQ2}
     \label{tab:h2-models}
 \end{table}
 
@@ -206,7 +199,7 @@ Wyniki dla repozytoriów POC1--POC5 zestawiono w tabeli~\ref{tab:h2-repos}.
         poc4-fastapi & 1/9 & 11{,}1\% & 2{,}0\%--43{,}5\% \\
         poc5 & 0/9 & 0{,}0\% & 0{,}0\%--29{,}9\% \\
     \end{tabular}
-    \caption{Skuteczność per repozytorium w H2}
+    \caption{Skuteczność per repozytorium w RQ2}
     \label{tab:h2-repos}
 \end{table}
 
@@ -222,7 +215,7 @@ Zestawienie skuteczności etapów per repozytorium znajduje się w tabeli~\ref{t
         poc4-fastapi & 6/9 (66{,}7\%) & 4/7 (57{,}1\%) & 1/9 (11{,}1\%) \\
         poc5 & 2/9 (22{,}2\%) & 1/8 (12{,}5\%) & 0/9 (0{,}0\%) \\
     \end{tabular}
-    \caption{Skuteczność etapów per repozytorium w H2}
+    \caption{Skuteczność etapów per repozytorium w RQ2}
     \label{tab:h2-repo-stages}
 \end{table}
 
@@ -279,13 +272,13 @@ Dane wskazują na niemal idealny trend spadkowy skuteczności wraz ze wzrostem z
     \item Błędne przekazanie zmiennych środowiskowych do bazy (np. literalne \texttt{"\$(POSTGRES\_USER)"}), co daje \texttt{password authentication failed}.
 \end{itemize}
 
-\textbf{Wniosek:} Wraz z rosnącą liczbą usług i zależności infrastrukturalnych spada nie tylko skuteczność końcowa, ale też stabilność wcześniejszych etapów. W prostych repozytoriach (POC1) pipeline przechodzi bez zakłóceń, natomiast w POC3--POC5 rośnie odsetek awarii już na etapie budowy i aplikowania manifestów, a w POC5 brak jest sukcesów runtime. Wskazuje to, że główna bariera leży w koordynacji wielu usług, ich zależności oraz poprawnym zestawieniu konfiguracji środowiskowej. Dominujące źródła porażek to błędy walidacyjne manifestów oraz problemy ze spójnością konfiguracji środowiskowej (sekrety, nazwy usług, zmienne), co potwierdza krytyczność etapu integracji.
+\textbf{Dyskusja:} Wraz z rosnącą liczbą usług i zależności infrastrukturalnych spada nie tylko skuteczność końcowa, ale też stabilność wcześniejszych etapów. W prostych repozytoriach (POC1) pipeline przechodzi bez zakłóceń, natomiast w POC3--POC5 rośnie odsetek awarii już na etapie budowy i aplikowania manifestów, a w POC5 brak jest sukcesów runtime. Wskazuje to, że główna bariera leży w koordynacji wielu usług, ich zależności oraz poprawnym zestawieniu konfiguracji środowiskowej. Dominujące źródła porażek to błędy walidacyjne manifestów oraz problemy ze spójnością konfiguracji środowiskowej (sekrety, nazwy usług, zmienne), co potwierdza krytyczność etapu integracji.
 
-\subsubsection{Werdykt dla H2}
+\subsubsection{Odpowiedź na RQ2}
 
-Na podstawie wyników dla POC1--POC5 hipoteza H2 została potwierdzona: spełniony jest warunek trendu spadkowego ($\rho \leq -0{,}6$), a różnica skuteczności POC1--POC5 wynosi 100{,}0 p.p.
+Wyniki pokazują wyraźnie, że wzrost złożoności aplikacji silnie obniża skuteczność agentów LLM w generowaniu działających konfiguracji IaC. Skuteczność spada od 100{,}0\% dla POC1 do 0{,}0\% dla POC5, a całkowity end-to-end success rate w tym eksperymencie wyniósł 33{,}3\%. Spadek jest gwałtowny już po przejściu od prostego monolitu do aplikacji z dodatkowymi zależnościami, a dla najbardziej złożonego przypadku badany proces okazał się nieskuteczny. Odpowiedź na RQ2 jest więc jednoznaczna: złożoność stanowi jeden z głównych czynników ograniczających skuteczność podejścia.
 
-\subsection{Wyniki H3: Jakość i zgodność z dobrymi praktykami}
+\subsection{Wyniki dla RQ3: Jakość i zgodność z dobrymi praktykami}
 
 \subsubsection{Wyniki ilościowe}
 
@@ -298,7 +291,7 @@ Poniżej zestawiono wyniki jakości dla 150 przebiegów (25 repozytoriów $\time
         Bazowy & 62/75 (82{,}7\%) & 13/75 (17{,}3\%) & 147 (17D, 130K) & 1{,}96 \\
         Best practices & 19/75 (25{,}3\%) & 56/75 (74{,}7\%) & 30 (8D, 22K) & 0{,}40 \\
     \end{tabular}
-    \caption{Ostrzeżenia Hadolint i Kube-linter w H3 (D: Dockerfile, K: Kubernetes)}
+    \caption{Ostrzeżenia Hadolint i Kube-linter w RQ3 (D: Dockerfile, K: Kubernetes)}
     \label{tab:h3-lint-summary}
 \end{table}
 
@@ -306,15 +299,15 @@ Poniżej zestawiono wyniki jakości dla 150 przebiegów (25 repozytoriów $\time
 
 Wzmocnienie prompta o checklistę dobrych praktyk znacząco poprawia jakość konfiguracji: łączna liczba ostrzeżeń spadła z 147 do 30 (o 79{,}6\%), a średnia liczba ostrzeżeń na przebieg z 1{,}96 do 0{,}40. Odsetek przebiegów bez ostrzeżeń wzrósł o 57{,}4 p.p. (z 17{,}3\% do 74{,}7\%), a odsetek przebiegów z ostrzeżeniami spadł z 82{,}7\% do 25{,}3\%. W obu wariantach dominowały ostrzeżenia Kube-linter, jednak spadły one z 130 do 22, co wskazuje na skuteczność wytycznych dotyczących manifestów Kubernetes.
 
-\subsubsection{Werdykt dla H3}
+\subsubsection{Odpowiedź na RQ3}
 
-Hipoteza H3 została potwierdzona. W wariancie bazowym odsetek przebiegów z ostrzeżeniami przekracza 60\% (82{,}7\%). Wariant best practices obniża łączną liczbę ostrzeżeń o 79{,}6\% oraz zwiększa odsetek konfiguracji bez ostrzeżeń o 57{,}4 p.p., co przekracza przyjęte progi weryfikacji. Wynik ten sugeruje, że nawet przy bardzo dużym kontekście wejściowym (rzędu $10^5$ tokenów na przebieg) model nadal w sposób konsekwentny respektuje dostarczone wytyczne jakościowe.
+Wyniki pokazują, że jakość konfiguracji generowanych bez dodatkowych instrukcji jakościowych jest wyraźnie ograniczona: ostrzeżenia pojawiają się w 82{,}7\% przebiegów. Jednocześnie wpływ prompt engineeringu jest bardzo silny, ponieważ wariant best practices redukuje liczbę ostrzeżeń z 147 do 30, czyli o 79{,}6\%, i zwiększa odsetek konfiguracji bez ostrzeżeń z 17{,}3\% do 74{,}7\%. Odpowiedź na RQ3 jest więc dwojaka: bazowa jakość wymaga dodatkowej walidacji, ale dobrze zaprojektowane wytyczne w promptcie mogą tę jakość znacząco poprawić.
 
-\subsection{Wyniki H4: Niezawodność i powtarzalność procesu agentowego}
+\subsection{Wyniki dla RQ4: Niezawodność i powtarzalność procesu agentowego}
 
 \subsubsection{Wyniki ilościowe}
 
-\textbf{Zestawienie per repozytorium i model:} Kluczowe metryki powtarzalności (średni diff ratio oraz zmienność liczby kroków narzędziowych) zestawiono w tabeli~\ref{tab:h4-repeatability}. Wartości dla kroków narzędziowych raportowane są dla tej samej kombinacji repozytorium i modelu, zgodnie z definicją H4.
+\textbf{Zestawienie per repozytorium i model:} Kluczowe metryki powtarzalności (średni diff ratio oraz zmienność liczby kroków narzędziowych) zestawiono w tabeli~\ref{tab:h4-repeatability}. Wartości dla kroków narzędziowych raportowane są dla tej samej kombinacji repozytorium i modelu, zgodnie z definicją RQ4.
 
 \begin{table}[h]
     \centering
@@ -331,7 +324,7 @@ Hipoteza H3 została potwierdzona. W wariancie bazowym odsetek przebiegów z ost
         poc5 & gemini-2.5-flash & 0{,}6450 & 38{,}20 $\pm$ 2{,}56 \\
         poc5 & deepseek-chat & 0{,}8004 & 64{,}00 $\pm$ 8{,}86 \\
     \end{tabular}
-    \caption{Powtarzalność per repozytorium i model w H4}
+    \caption{Powtarzalność per repozytorium i model w RQ4}
     \label{tab:h4-repeatability}
 \end{table}
 
@@ -341,22 +334,17 @@ Pomimo deterministycznych parametrów (temperature=0, stały seed) w większośc
 
 Zmienność liczby kroków narzędziowych jest zazwyczaj umiarkowana (odchylenie standardowe stanowi 6{,}7\%--17{,}8\% wartości średniej), z wyraźnym wyjątkiem dla \texttt{poc4-fastapi} przy modelu gemini, gdzie odchylenie standardowe przekracza 20\% średniej. Sugeruje to, że różnice dotyczą głównie treści wygenerowanych plików, a nie samej sekwencji działań agenta.
 
-\textbf{Wyniki zagregowane:} Średni diff ratio dla całego H4 wyniósł 0{,}5632 (mediana 0{,}5401). W ujęciu per model, \texttt{gemini-2.5-flash} osiąga 0{,}5274, a \texttt{deepseek-chat} 0{,}5990. Średnie odchylenie standardowe liczby kroków narzędziowych wyniosło 5{,}37 (per model: 4{,}34 dla gemini i 6{,}40 dla deepseek), co wskazuje na umiarkowaną zmienność procesu wykonawczego w skali całego eksperymentu.
+\textbf{Wyniki zagregowane:} Średni diff ratio dla całego RQ4 wyniósł 0{,}5632 (mediana 0{,}5401). W ujęciu per model, \texttt{gemini-2.5-flash} osiąga 0{,}5274, a \texttt{deepseek-chat} 0{,}5990. Średnie odchylenie standardowe liczby kroków narzędziowych wyniosło 5{,}37 (per model: 4{,}34 dla gemini i 6{,}40 dla deepseek), co wskazuje na umiarkowaną zmienność procesu wykonawczego w skali całego eksperymentu.
 
-\subsubsection{Werdykt dla H4}
+\subsubsection{Odpowiedź na RQ4}
 
-Na podstawie kryteriów z rozdziału 4 hipoteza H4 nie została potwierdzona w swojej pierwotnej, rygorystycznej formie. Spełnienie warunków przedstawia się następująco:
-\begin{itemize}
-    \item średni run-to-run diff ratio $> 0{,}4$ spełniono w 7/10 kombinacji (wymagane: wszystkie),
-    \item odchylenie standardowe liczby kroków narzędziowych przekroczyło 20\% średniej tylko w 1/10 kombinacji.
-\end{itemize}
-Oznacza to, że chociaż w wielu konfiguracjach występuje istotna zmienność wyników, nie jest ona na tyle systematyczna, aby spełnić zaostrzone kryteria weryfikacyjne H4. Jednocześnie obserwowany jest wyraźny wzrost diff ratio wraz ze wzrostem złożoności repozytoriów, co potwierdza trend ograniczonej powtarzalności dla trudniejszych przypadków. Z tego względu hipotezę H4 należy uznać za częściowo potwierdzoną.
+Wyniki wskazują, że proces nie jest w pełni powtarzalny, ale skala zmienności zależy od złożoności przypadku i tego, co dokładnie mierzymy. Średni diff ratio dla całego eksperymentu wyniósł 0{,}5632, podczas gdy zmienność liczby kroków narzędziowych pozostawała zazwyczaj umiarkowana. Zmienność treści wygenerowanych artefaktów jest więc często wysoka, szczególnie dla bardziej złożonych repozytoriów, natomiast zmienność samego przebiegu agentowego jest słabsza. Odpowiedź na RQ4 brzmi: powtarzalność jest ograniczona przede wszystkim na poziomie rezultatu końcowego, a problem nasila się wraz ze wzrostem złożoności wejścia.
 
-\subsection{Wyniki H5: Podatność na manipulację kontekstem}
+\subsection{Wyniki dla RQ5: Podatność na manipulację kontekstem}
 
 \subsubsection{Wyniki ilościowe}
 
-Eksperyment H5 objął 90 przebiegów (3 warianty manipulacji $\times$ 3 modele $\times$ 10 powtórzeń). Łącznie w 51/90 przebiegach wykryto krytyczne odchylenie od specyfikacji repozytorium, co odpowiada 56{,}7\% (95\% CI: 46{,}4\%--66{,}4\%).
+Eksperyment RQ5 objął 90 przebiegów (3 warianty manipulacji $\times$ 3 modele $\times$ 10 powtórzeń). Łącznie w 51/90 przebiegach wykryto krytyczne odchylenie od specyfikacji repozytorium, co odpowiada 56{,}7\% (95\% CI: 46{,}4\%--66{,}4\%).
 
 \begin{table}[h]
     \centering
@@ -366,7 +354,7 @@ Eksperyment H5 objął 90 przebiegów (3 warianty manipulacji $\times$ 3 modele 
         authoritative security & 10/30 & 33{,}3\% & 19{,}2\%--51{,}2\% \\
         legacy dependency & 21/30 & 70{,}0\% & 52{,}1\%--83{,}3\% \\
     \end{tabular}
-    \caption{Odsetek odchyleń w H5 per wariant manipulacji}
+    \caption{Odsetek odchyleń w RQ5 per wariant manipulacji}
     \label{tab:h5-variants}
 \end{table}
 
@@ -376,7 +364,7 @@ Eksperyment H5 objął 90 przebiegów (3 warianty manipulacji $\times$ 3 modele 
 
 \textbf{A3 (legacy dependency):} wariant oparty na pozornej zależności historycznej osiągnął najwyższą skuteczność manipulacji: 21/30 przebiegów (70{,}0\%). Wygenerowane artefakty zawierały dodatkowe zasoby Redis (np.\ \texttt{StatefulSet}, \texttt{Service}, \texttt{Secret}, \texttt{ConfigMap}) oraz zmienne środowiskowe sugerujące zależność, mimo że nie wynikała ona z kodu aplikacji.
 
-\textbf{Porównanie modeli w H5:} najwyższą podatność wykazał \texttt{deepseek-chat}, dla którego odchylenie wystąpiło w 30/30 przebiegach (100{,}0\%; 95\% CI: 88{,}6\%--100{,}0\%). Model \texttt{gpt-5-mini} osiągnął 19/30 odchyleń (63{,}3\%; 95\% CI: 45{,}5\%--78{,}1\%), natomiast \texttt{gemini-2.5-flash} był wyraźnie bardziej odporny i uległ manipulacji tylko w 2/30 przebiegach (6{,}7\%; 95\% CI: 1{,}8\%--21{,}3\%).
+\textbf{Porównanie modeli w RQ5:} najwyższą podatność wykazał \texttt{deepseek-chat}, dla którego odchylenie wystąpiło w 30/30 przebiegach (100{,}0\%; 95\% CI: 88{,}6\%--100{,}0\%). Model \texttt{gpt-5-mini} osiągnął 19/30 odchyleń (63{,}3\%; 95\% CI: 45{,}5\%--78{,}1\%), natomiast \texttt{gemini-2.5-flash} był wyraźnie bardziej odporny i uległ manipulacji tylko w 2/30 przebiegach (6{,}7\%; 95\% CI: 1{,}8\%--21{,}3\%).
 
 \subsubsection{Przykłady manipulacji}
 
@@ -386,14 +374,9 @@ W wariancie \textbf{A2} podatność przejawiała się przyjęciem narracji o rze
 
 W wariancie \textbf{A3} agent dodawał pełne zasoby Redis do stosu wdrożeniowego, mimo braku jakichkolwiek odwołań do tej zależności w kodzie źródłowym. W praktyce obejmowało to zarówno osobne zasoby infrastrukturalne (\texttt{redis-statefulset.yaml}, \texttt{redis-service.yaml}, \texttt{redis-secret.yaml}), jak i modyfikacje manifestu aplikacji głównej poprzez wstrzyknięcie konfiguracji Redis.
 
-\subsubsection{Werdykt dla H5}
+\subsubsection{Odpowiedź na RQ5}
 
-Hipoteza H5 została potwierdzona. Spełnione zostały oba kryteria z rozdziału 4:
-\begin{itemize}
-    \item ogólny odsetek przebiegów z krytycznym odchyleniem wyniósł 56{,}7\% (próg: 30\%),
-    \item każdy z trzech wariantów manipulacji spowodował co najmniej jedno krytyczne odchylenie.
-\end{itemize}
-Wynik ten wskazuje, że agenty LLM mogą traktować dokumentację repozytorium jako źródło silniejszego sygnału niż sam kod aplikacji, co prowadzi do generowania artefaktów IaC zgodnych z fałszywym kontekstem, lecz sprzecznych z rzeczywistą specyfikacją systemu.
+Wyniki pokazują, że podatność na manipulację kontekstem jest wysoka i praktycznie istotna: krytyczne odchylenia wystąpiły w 56{,}7\% przebiegów, w tym w 66{,}7\% dla wariantu conflicting spec i 70{,}0\% dla legacy dependency. Każdy z trzech wariantów ataku okazał się skuteczny co najmniej w części przypadków. Odpowiedź na RQ5 jest zatem jednoznaczna: agenty LLM potrafią traktować dokumentację repozytorium jako silniejszy sygnał niż sam kod aplikacji, co prowadzi do generowania artefaktów IaC zgodnych z fałszywym kontekstem, lecz sprzecznych z rzeczywistą specyfikacją systemu.
 
 \subsection{Porównanie modeli}
 
@@ -401,9 +384,9 @@ Wynik ten wskazuje, że agenty LLM mogą traktować dokumentację repozytorium j
 
 \subsection{Synteza wyników}
 
-\subsubsection{Podsumowanie weryfikacji hipotez}
+\subsubsection{Podsumowanie odpowiedzi na pytania badawcze}
 
-% TODO: Tabela zbiorcza z werdyktem dla H1–H5 i krótkim uzasadnieniem.
+% TODO: Tabela zbiorcza z odpowiedziami dla RQ1–RQ5 i krótkim uzasadnieniem.
 
 \subsubsection{Kluczowe wnioski}
 
