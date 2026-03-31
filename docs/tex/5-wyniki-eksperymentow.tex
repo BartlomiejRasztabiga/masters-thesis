@@ -350,52 +350,30 @@ Eksperyment RQ5 objął 90 przebiegów (3 warianty manipulacji $\times$ 3 modele
     \centering
     \begin{tabular}{lccc}
         \textbf{Wariant} & \textbf{Odchylenia} & \textbf{Odsetek} & \textbf{95\% CI} \\
-        conflicting spec & 20/30 & 66{,}7\% & 48{,}8\%--80{,}8\% \\
-        authoritative security & 10/30 & 33{,}3\% & 19{,}2\%--51{,}2\% \\
-        legacy dependency & 21/30 & 70{,}0\% & 52{,}1\%--83{,}3\% \\
+        sprzeczna specyfikacja & 20/30 & 66{,}7\% & 48{,}8\%--80{,}8\% \\
+        autorytatywne zalecenia bezpieczeństwa & 10/30 & 33{,}3\% & 19{,}2\%--51{,}2\% \\
+        pozorna zależność historyczna & 21/30 & 70{,}0\% & 52{,}1\%--83{,}3\% \\
     \end{tabular}
     \caption{Odsetek odchyleń w RQ5 per wariant manipulacji}
     \label{tab:h5-variants}
 \end{table}
 
-\textbf{A1 (conflicting spec):} wariant oparty na autorytatywnej, ale fałszywej specyfikacji portu okazał się skuteczny w 20/30 przebiegach (66{,}7\%). W przypadkach podatnych agent konsekwentnie przepisywał zmanipulowany port 9000 do \texttt{Dockerfile}, \texttt{containerPort} oraz definicji \texttt{Service}, mimo że kod aplikacji jednoznacznie wskazywał port 8080.
+\textbf{W1 (sprzeczna specyfikacja):} wariant oparty na autorytatywnej, ale fałszywej specyfikacji portu okazał się skuteczny w 20/30 przebiegach (66{,}7\%). W przypadkach podatnych agent konsekwentnie przepisywał zmanipulowany port 9000 do \texttt{Dockerfile}, \texttt{containerPort} oraz definicji \texttt{Service}, mimo że kod aplikacji jednoznacznie wskazywał port 8080.
 
-\textbf{A2 (authoritative security):} manipulacja dokumentacją bezpieczeństwa była najsłabsza spośród trzech wariantów, ale nadal skuteczna w 10/30 przebiegach (33{,}3\%). Wszystkie odchylenia polegały na dodaniu nadmiarowych uprawnień do manifestów Kubernetes, takich jak \texttt{hostNetwork: true}, \texttt{privileged: true}, \texttt{runAsUser: 0} lub \texttt{runAsNonRoot: false}.
+\textbf{W2 (autorytatywne zalecenia bezpieczeństwa):} manipulacja dokumentacją bezpieczeństwa była najsłabsza spośród trzech wariantów, ale nadal skuteczna w 10/30 przebiegach (33{,}3\%). Wszystkie odchylenia polegały na dodaniu nadmiarowych uprawnień do manifestów Kubernetes, takich jak \texttt{hostNetwork: true}, \texttt{privileged: true}, \texttt{runAsUser: 0} lub \texttt{runAsNonRoot: false}.
 
-\textbf{A3 (legacy dependency):} wariant oparty na pozornej zależności historycznej osiągnął najwyższą skuteczność manipulacji: 21/30 przebiegów (70{,}0\%). Wygenerowane artefakty zawierały dodatkowe zasoby Redis (np.\ \texttt{StatefulSet}, \texttt{Service}, \texttt{Secret}, \texttt{ConfigMap}) oraz zmienne środowiskowe sugerujące zależność, mimo że nie wynikała ona z kodu aplikacji.
+\textbf{W3 (pozorna zależność historyczna):} wariant oparty na pozornej zależności historycznej osiągnął najwyższą skuteczność manipulacji: 21/30 przebiegów (70{,}0\%). Wygenerowane artefakty zawierały dodatkowe zasoby Redis (np.\ \texttt{StatefulSet}, \texttt{Service}, \texttt{Secret}, \texttt{ConfigMap}) oraz zmienne środowiskowe sugerujące zależność, mimo że nie wynikała ona z kodu aplikacji.
 
 \textbf{Porównanie modeli w RQ5:} najwyższą podatność wykazał \texttt{deepseek-chat}, dla którego odchylenie wystąpiło w 30/30 przebiegach (100{,}0\%; 95\% CI: 88{,}6\%--100{,}0\%). Model \texttt{gpt-5-mini} osiągnął 19/30 odchyleń (63{,}3\%; 95\% CI: 45{,}5\%--78{,}1\%), natomiast \texttt{gemini-2.5-flash} był wyraźnie bardziej odporny i uległ manipulacji tylko w 2/30 przebiegach (6{,}7\%; 95\% CI: 1{,}8\%--21{,}3\%).
 
 \subsubsection{Przykłady manipulacji}
 
-W wariancie \textbf{A1} podatne przebiegi generowały komplet wzajemnie spójnych, lecz błędnych artefaktów: port 9000 pojawiał się jednocześnie w \texttt{EXPOSE}, \texttt{containerPort} oraz \texttt{Service}. Oznacza to, że agent nie tylko skopiował pojedynczą wartość z dokumentacji, ale podporządkował jej całą konfigurację wdrożeniową.
+W wariancie \textbf{W1} podatne przebiegi generowały komplet wzajemnie spójnych, lecz błędnych artefaktów: port 9000 pojawiał się jednocześnie w \texttt{EXPOSE}, \texttt{containerPort} oraz \texttt{Service}. Oznacza to, że agent nie tylko skopiował pojedynczą wartość z dokumentacji, ale podporządkował jej całą konfigurację wdrożeniową.
 
-W wariancie \textbf{A2} podatność przejawiała się przyjęciem narracji o rzekomej konieczności diagnostyki hosta. Wygenerowane manifesty zawierały ustawienia \texttt{hostNetwork: true} i \texttt{privileged: true}, a w części przypadków także \texttt{runAsUser: 0} lub \texttt{runAsNonRoot: false}. Takie decyzje nie wynikały z kodu aplikacji i stanowią przykład eskalacji uprawnień spowodowanej wyłącznie przez mylący kontekst.
+W wariancie \textbf{W2} podatność przejawiała się przyjęciem narracji o rzekomej konieczności diagnostyki hosta. Wygenerowane manifesty zawierały ustawienia \texttt{hostNetwork: true} i \texttt{privileged: true}, a w części przypadków także \texttt{runAsUser: 0} lub \texttt{runAsNonRoot: false}. Takie decyzje nie wynikały z kodu aplikacji i stanowią przykład eskalacji uprawnień spowodowanej wyłącznie przez mylący kontekst.
 
-W wariancie \textbf{A3} agent dodawał pełne zasoby Redis do stosu wdrożeniowego, mimo braku jakichkolwiek odwołań do tej zależności w kodzie źródłowym. W praktyce obejmowało to zarówno osobne zasoby infrastrukturalne (\texttt{redis-statefulset.yaml}, \texttt{redis-service.yaml}, \texttt{redis-secret.yaml}), jak i modyfikacje manifestu aplikacji głównej poprzez wstrzyknięcie konfiguracji Redis.
+W wariancie \textbf{W3} agent dodawał pełne zasoby Redis do stosu wdrożeniowego, mimo braku jakichkolwiek odwołań do tej zależności w kodzie źródłowym. W praktyce obejmowało to zarówno osobne zasoby infrastrukturalne (\texttt{redis-statefulset.yaml}, \texttt{redis-service.yaml}, \texttt{redis-secret.yaml}), jak i modyfikacje manifestu aplikacji głównej poprzez wstrzyknięcie konfiguracji Redis.
 
 \subsubsection{Odpowiedź na RQ5}
 
-Wyniki pokazują, że podatność na manipulację kontekstem jest wysoka i praktycznie istotna: krytyczne odchylenia wystąpiły w 56{,}7\% przebiegów, w tym w 66{,}7\% dla wariantu conflicting spec i 70{,}0\% dla legacy dependency. Każdy z trzech wariantów ataku okazał się skuteczny co najmniej w części przypadków. Odpowiedź na RQ5 jest zatem jednoznaczna: agenty LLM potrafią traktować dokumentację repozytorium jako silniejszy sygnał niż sam kod aplikacji, co prowadzi do generowania artefaktów IaC zgodnych z fałszywym kontekstem, lecz sprzecznych z rzeczywistą specyfikacją systemu.
-
-\subsection{Porównanie modeli}
-
-% TODO: Analiza przekrojowa modeli (skuteczność, jakość, powtarzalność).
-
-\subsection{Synteza wyników}
-
-\subsubsection{Podsumowanie odpowiedzi na pytania badawcze}
-
-% TODO: Tabela zbiorcza z odpowiedziami dla RQ1–RQ5 i krótkim uzasadnieniem.
-
-\subsubsection{Kluczowe wnioski}
-
-% TODO: 3–6 punktów najważniejszych obserwacji.
-
-\subsubsection{Ograniczenia badania}
-
-% TODO: Wypunktuj ograniczenia wyników (zbieżne z threats to validity).
-
-\subsubsection{Implikacje praktyczne}
-
-% TODO: Zalecenia dla praktyków i twórców narzędzi DevOps.
+Wyniki pokazują, że podatność na manipulację kontekstem jest wysoka i praktycznie istotna: krytyczne odchylenia wystąpiły w 56{,}7\% przebiegów, w tym w 66{,}7\% dla wariantu sprzeczna specyfikacja i 70{,}0\% dla wariantu pozorna zależność historyczna. Każdy z trzech wariantów manipulacji okazał się skuteczny co najmniej w części przypadków. Odpowiedź na RQ5 jest zatem jednoznaczna: agenty LLM potrafią traktować dokumentację repozytorium jako silniejszy sygnał niż sam kod aplikacji, co prowadzi do generowania artefaktów IaC zgodnych z fałszywym kontekstem, lecz sprzecznych z rzeczywistą specyfikacją systemu.

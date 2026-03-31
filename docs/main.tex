@@ -110,7 +110,8 @@ In the research phase, five research questions (RQ1–RQ5) were formulated conce
 \input{tex/3-przeglad-narzedzi}
 \input{tex/4-projekt-eksperymentow}
 \input{tex/5-wyniki-eksperymentow}
-% TODO: \input{tex/6-wnioski}
+\input{tex/6-dyskusja-wynikow}
+\input{tex/7-podsumowanie-i-dalsze-kierunki}
 
 %---------------
 % Bibliografia
@@ -191,12 +192,6 @@ When creating Dockerfile(s):
 - If the application needs to run as non-root, add a USER directive, otherwise let it run as root (default)
 - For multi-service repos, place each Dockerfile in its service directory (e.g., backend/Dockerfile, frontend/Dockerfile)
 - IMPORTANT: When using build_context (e.g., "frontend"), all paths in the Dockerfile are relative to that directory. For example, if build_context is "frontend", then "COPY package.json ." copies from frontend/package.json, NOT from the repository root
-
-Python specific:
-- For Python applications: Check if the code uses relative imports (e.g., "from . import models"). If it does:
-  * For web frameworks (Flask/FastAPI/Django): Use a proper WSGI/ASGI server like uvicorn or gunicorn with module path syntax (e.g., "uvicorn app.main:app" or "gunicorn app.main:app")
-  * For scripts: Run as a module using "python -m package.module" instead of "python file.py"
-  * Ensure WORKDIR is set correctly so Python can find the package
 
 When creating Kubernetes manifests:
 - Create separate resources for each service (e.g., if there's a backend and frontend, create 2 Deployments and 2 Services)
@@ -304,12 +299,6 @@ When creating Dockerfile(s):
   * For apt: use explicit versions like `apt-get install -y pkg=1.2.3-1` (look up versions with `apt-cache policy pkg` while analyzing the base image).
   * For pip: install from a pinned requirements file (`pip install --no-cache-dir -r requirements.txt`) or use `pip install --no-cache-dir pkg==1.2.3`.
 
-Python specific:
-- For Python applications: Check if the code uses relative imports (e.g., "from . import models"). If it does:
-  * For web frameworks (Flask/FastAPI/Django): Use a proper WSGI/ASGI server like uvicorn or gunicorn with module path syntax (e.g., "uvicorn app.main:app" or "gunicorn app.main:app")
-  * For scripts: Run as a module using "python -m package.module" instead of "python file.py"
-  * Ensure WORKDIR is set correctly so Python can find the package
-
 When creating Kubernetes manifests:
 - Create separate resources for each service (e.g., if there's a backend and frontend, create 2 Deployments and 2 Services)
 - For each stateless service: create a Deployment (use 1 replica by default) and a Service to expose it
@@ -393,7 +382,6 @@ Dockerfile:
 - Prefer minimal base images and multi-stage builds when it keeps runtime smaller without breaking.
 - Avoid unnecessary packages; install only what is required to build/run.
 - Make sure EXPOSE, CMD/ENTRYPOINT, and working directory align with the app.
- - For pip installs: use `--no-cache-dir` and pinned versions (requirements with `==` or explicit `pkg==ver`).
 
 Kubernetes manifests:
 - Add readinessProbe and livenessProbe when the app exposes a stable health endpoint.
