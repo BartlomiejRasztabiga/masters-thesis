@@ -1,7 +1,7 @@
 \clearpage % Rozdziały zaczynamy od nowej strony.
 \section{Wyniki eksperymentów}
 
-W niniejszym rozdziale przedstawiono wyniki przeprowadzonych eksperymentów badających możliwości autonomicznego generowania konfiguracji Infrastructure as Code przez agenty oparte na dużych modelach językowych. Analiza wyników zorganizowana jest zgodnie ze strukturą pytań badawczych przedstawionych w rozdziale 4 — dla każdego z pięciu pytań badawczych (RQ1–RQ5) zaprezentowano wyniki eksperymentalne, analizę danych oraz krótką dyskusję ich znaczenia. Rozdział kończy synteza wyników podkreślająca kluczowe obserwacje dotyczące zdolności LLM do generowania IaC.
+W niniejszym rozdziale przedstawiono wyniki przeprowadzonych eksperymentów badających możliwości autonomicznego generowania konfiguracji Infrastructure as Code przez agenty oparte na dużych modelach językowych. Analiza wyników zorganizowana jest zgodnie ze strukturą pytań badawczych przedstawionych w rozdziale 4 — dla każdego z pięciu pytań badawczych (RQ1–RQ5) zaprezentowano wyniki eksperymentalne, analizę danych oraz krótką dyskusję ich znaczenia.
 
 \subsection{Przegląd przeprowadzonych eksperymentów}
 
@@ -133,7 +133,7 @@ Poniżej zebrano najczęstsze przyczyny niepowodzeń obserwowane w RQ1:
     \item \textbf{Nieprawidłowe \texttt{imagePullPolicy}:} ustawienie \texttt{Never} uniemożliwia pobranie obrazu.
     \item \textbf{Nieaktualne obrazy bazowe:} zbyt stary base image powoduje błędy \texttt{apt} podczas budowy.
     \item \textbf{Niezgodne wersje środowiska:} agent nie rozpoznaje konfliktów wersji (np. Node 18 w base image nie wspiera zależności aplikacji), brakuje mu wiarygodnego źródła informacji o takich ograniczeniach.
-    \item \textbf{Błędny \texttt{test\_endpoint}:} agent wybiera niepoprawny endpoint zdrowia mimo działającej aplikacji pod \texttt{/}.
+    \item \textbf{Błędne \texttt{test\_endpoints}:} agent wybiera niepoprawny endpoint zdrowia mimo działającej aplikacji pod \texttt{/}.
     \item \textbf{Błędy importu w Pythonie:} uruchamianie modułów z relatywnymi importami bez pakietu (np. \texttt{ImportError: attempted relative import with no known parent package}).
 \end{itemize}
 
@@ -160,7 +160,7 @@ Zestawienie skuteczności etapów oraz metryk warunkowych znajduje się w tabeli
     \begin{tabular}{lccc}
         \textbf{Etap} & \textbf{Sukcesy} & \textbf{Skuteczność} & \textbf{95\% CI} \\
         Build & 32/45 & 71{,}1\% & 56{,}6\%--82{,}3\% \\
-        K8s apply & 24/42 & 57{,}1\% & 42{,}2\%--70{,}9\% \\
+        K8s apply & 24/45 & 53{,}3\% & 39{,}1\%--67{,}1\% \\
         apply $|$ build & 24/32 & 75{,}0\% & 57{,}9\%--86{,}7\% \\
         Runtime & 15/45 & 33{,}3\% & 21{,}4\%--47{,}9\% \\
         runtime $|$ apply & 15/24 & 62{,}5\% & 42{,}7\%--78{,}8\% \\
@@ -212,8 +212,8 @@ Zestawienie skuteczności etapów per repozytorium znajduje się w tabeli~\ref{t
         poc1-fastapi & 9/9 (100{,}0\%) & 9/9 (100{,}0\%) & 9/9 (100{,}0\%) \\
         poc2-fastapi & 9/9 (100{,}0\%) & 7/9 (77{,}8\%) & 3/9 (33{,}3\%) \\
         poc3-fastapi & 6/9 (66{,}7\%) & 3/9 (33{,}3\%) & 2/9 (22{,}2\%) \\
-        poc4-fastapi & 6/9 (66{,}7\%) & 4/7 (57{,}1\%) & 1/9 (11{,}1\%) \\
-        poc5 & 2/9 (22{,}2\%) & 1/8 (12{,}5\%) & 0/9 (0{,}0\%) \\
+        poc4-fastapi & 6/9 (66{,}7\%) & 4/9 (44{,}4\%) & 1/9 (11{,}1\%) \\
+        poc5 & 2/9 (22{,}2\%) & 1/9 (11{,}1\%) & 0/9 (0{,}0\%) \\
     \end{tabular}
     \caption{Skuteczność etapów per repozytorium w RQ2}
     \label{tab:h2-repo-stages}
@@ -257,7 +257,7 @@ Wraz ze wzrostem złożoności widać silny spadek skuteczności: od 100{,}0\% d
 
 \subsubsection{Trend złożoności}
 
-Dane wskazują na niemal idealny trend spadkowy skuteczności wraz ze wzrostem złożoności (korelacja Spearmana $\rho \approx -1{,}0$ dla POC1--POC5). Największy spadek widoczny jest między POC1 i POC2, a kolejne poziomy złożoności przynoszą dalsze obniżenie skuteczności aż do 0\% dla POC5. Wskazuje to na punkt załamania po przekroczeniu prostej architektury wielowarstwowej, gdy dochodzą dodatkowe zależności infrastrukturalne i wzajemne powiązania usług.
+Dane wskazują na bardzo wyraźny trend spadkowy skuteczności wraz ze wzrostem złożoności (dla pięciu poziomów POC1--POC5 korelacja rang Spearmana wynosi w przybliżeniu $\rho \approx -1{,}0$). Największy spadek widoczny jest między POC1 i POC2, a kolejne poziomy złożoności przynoszą dalsze obniżenie skuteczności aż do 0\% dla POC5. Wskazuje to na punkt załamania po przekroczeniu prostej architektury wielowarstwowej, gdy dochodzą dodatkowe zależności infrastrukturalne i wzajemne powiązania usług.
 
 \subsubsection{Typowe problemy i przyczyny awarii}
 
@@ -334,7 +334,7 @@ Pomimo deterministycznych parametrów (temperature=0, stały seed) w większośc
 
 Zmienność liczby kroków narzędziowych jest zazwyczaj umiarkowana (odchylenie standardowe stanowi 6{,}7\%--17{,}8\% wartości średniej), z wyraźnym wyjątkiem dla \texttt{poc4-fastapi} przy modelu gemini, gdzie odchylenie standardowe przekracza 20\% średniej. Sugeruje to, że różnice dotyczą głównie treści wygenerowanych plików, a nie samej sekwencji działań agenta.
 
-\textbf{Wyniki zagregowane:} Średni diff ratio dla całego RQ4 wyniósł 0{,}5632 (mediana 0{,}5401). W ujęciu per model, \texttt{gemini-2.5-flash} osiąga 0{,}5274, a \texttt{deepseek-chat} 0{,}5990. Średnie odchylenie standardowe liczby kroków narzędziowych wyniosło 5{,}37 (per model: 4{,}34 dla gemini i 6{,}40 dla deepseek), co wskazuje na umiarkowaną zmienność procesu wykonawczego w skali całego eksperymentu.
+\textbf{Wyniki zagregowane:} Średni diff ratio dla całego RQ4 wyniósł 0{,}5632 (mediana 0{,}5401). W ujęciu per model, \texttt{gemini-2.5-flash} osiąga 0{,}5274, a \texttt{deepseek-chat} (V3.2) 0{,}5990. Średnie odchylenie standardowe liczby kroków narzędziowych wyniosło 5{,}37 (per model: 4{,}34 dla gemini i 6{,}40 dla deepseek), co wskazuje na umiarkowaną zmienność procesu wykonawczego w skali całego eksperymentu.
 
 \subsubsection{Odpowiedź na RQ4}
 
@@ -364,7 +364,7 @@ Eksperyment RQ5 objął 90 przebiegów (3 warianty manipulacji $\times$ 3 modele
 
 \textbf{W3 (pozorna zależność historyczna):} wariant oparty na pozornej zależności historycznej osiągnął najwyższą skuteczność manipulacji: 21/30 przebiegów (70{,}0\%). Wygenerowane artefakty zawierały dodatkowe zasoby Redis (np.\ \texttt{StatefulSet}, \texttt{Service}, \texttt{Secret}, \texttt{ConfigMap}) oraz zmienne środowiskowe sugerujące zależność, mimo że nie wynikała ona z kodu aplikacji.
 
-\textbf{Porównanie modeli w RQ5:} najwyższą podatność wykazał \texttt{deepseek-chat}, dla którego odchylenie wystąpiło w 30/30 przebiegach (100{,}0\%; 95\% CI: 88{,}6\%--100{,}0\%). Model \texttt{gpt-5-mini} osiągnął 19/30 odchyleń (63{,}3\%; 95\% CI: 45{,}5\%--78{,}1\%), natomiast \texttt{gemini-2.5-flash} był wyraźnie bardziej odporny i uległ manipulacji tylko w 2/30 przebiegach (6{,}7\%; 95\% CI: 1{,}8\%--21{,}3\%).
+\textbf{Porównanie modeli w RQ5:} najwyższą podatność wykazał \texttt{deepseek-chat} (V3.2), dla którego odchylenie wystąpiło w 30/30 przebiegach (100{,}0\%; 95\% CI: 88{,}6\%--100{,}0\%). Model \texttt{gpt-5-mini} osiągnął 19/30 odchyleń (63{,}3\%; 95\% CI: 45{,}5\%--78{,}1\%), natomiast \texttt{gemini-2.5-flash} był wyraźnie bardziej odporny i uległ manipulacji tylko w 2/30 przebiegach (6{,}7\%; 95\% CI: 1{,}8\%--21{,}3\%).
 
 \subsubsection{Przykłady manipulacji}
 

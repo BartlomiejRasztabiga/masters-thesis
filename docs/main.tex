@@ -28,7 +28,7 @@
 % Wybór języka: \langpol, \langeng
 %-------------------------------------------------------------
 \facultyeiti    % Wydział Elektroniki i Technik Informacyjnych
-\MasterThesis % Praca inżynierska
+\MasterThesis % Praca magisterska
 \langpol % Praca w języku polskim
 
 \begin{document}
@@ -110,8 +110,8 @@ In the research phase, five research questions (RQ1–RQ5) were formulated conce
 \input{tex/3-przeglad-narzedzi}
 \input{tex/4-projekt-eksperymentow}
 \input{tex/5-wyniki-eksperymentow}
-\input{tex/6-dyskusja-wynikow}
-\input{tex/7-podsumowanie-i-dalsze-kierunki}
+% \input{tex/6-dyskusja-wynikow}
+% \input{tex/7-podsumowanie-i-dalsze-kierunki}
 
 %---------------
 % Bibliografia
@@ -128,15 +128,19 @@ In the research phase, five research questions (RQ1–RQ5) were formulated conce
 % zapewniając podstawowe formatowanie.
 
 \acronymlist
-\acronym{LLM}{ang. \emph{Large Language Model}} - duży model językowy
-\acronym{IaC}{ang. \emph{Infrastructure as Code} – infrastruktura jako kod}
-\acronym{K8s}{ang. \emph{Kubernetes} – system orkiestracji kontenerów}
-\acronym{CI/CD}{ang. \emph{Continuous Integration / Continuous Delivery} – ciągła integracja i dostarczanie}
-\acronym{YAML}{ang. \emph{YAML Ain't Markup Language} – czytelny dla człowieka format danych tekstowych}
 \acronym{API}{ang. \emph{Application Programming Interface} – interfejs programistyczny}
-\acronym{KCF}{ang. \emph{Kubernetes Configuration Fault} – błąd konfiguracyjny w manifestach Kubernetes}
+\acronym{CI/CD}{ang. \emph{Continuous Integration / Continuous Delivery} – ciągła integracja i dostarczanie}
+\acronym{CoT}{ang. \emph{Chain-of-Thought} – technika promptowania z krokami pośredniego rozumowania}
 \acronym{CWE}{ang. \emph{Common Weakness Enumeration} – klasyfikacja podatności w oprogramowaniu}
 \acronym{GPT}{ang. \emph{Generative Pre-trained Transformer} – architektura modelu językowego wykorzystywana w LLM}
+\acronym{IaC}{ang. \emph{Infrastructure as Code} – infrastruktura jako kod}
+\acronym{K8s}{ang. \emph{Kubernetes} – system orkiestracji kontenerów}
+\acronym{KCF}{ang. \emph{Kubernetes Configuration Fault} – błąd konfiguracyjny w manifestach Kubernetes}
+\acronym{LLM}{ang. \emph{Large Language Model}} - duży model językowy
+\acronym{MoE}{ang. \emph{Mixture-of-Experts} – architektura modelu z selektywną aktywacją ekspertów}
+\acronym{PaaS}{ang. \emph{Platform as a Service} – platforma jako usługa}
+\acronym{PoC}{ang. \emph{Proof of Concept} – weryfikacja koncepcji}
+\acronym{YAML}{ang. \emph{YAML Ain't Markup Language} – czytelny dla człowieka format danych tekstowych}
 \vspace{0.8cm}
 
 %--------------------------------------
@@ -244,7 +248,7 @@ After generating all files, respond with a JSON object in this format:
     "k8s/postgres-service.yaml",
     "k8s/postgres-secret.yaml"
   ],
-  "test_endpoint": "/api/health"
+  "test_endpoints": ["/api/health"]
 }}
 ```
 
@@ -351,7 +355,7 @@ After generating all files, respond with a JSON object in this format:
     "k8s/postgres-service.yaml",
     "k8s/postgres-secret.yaml"
   ],
-  "test_endpoint": "/api/health"
+  "test_endpoints": ["/api/health"]
 }}
 ```
 
