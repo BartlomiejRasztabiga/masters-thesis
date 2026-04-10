@@ -379,7 +379,7 @@ W celu usprawnienia zarządzania eksperymentami oraz monitorowania ich postępu 
 \begin{itemize}
     \item \textbf{Reprezentatywność zbioru RQ1}: 25 relatywnie prostych aplikacji webowych może nie odzwierciedlać złożoności systemów produkcyjnych; wyniki mogą nie uogólniać się na złożone architektury (odniesienie w RQ2).
     \item \textbf{Walidacja runtime endpointami HTTP}: sprawdzenie dostępności endpointów wskazanych w polu \texttt{test\_endpoints} nie weryfikuje w pełni komunikacji między usługami ani scenariuszy biznesowych; złożone zależności mogą pozostać niewykryte.
-    \item \textbf{Ograniczona liczba powtórzeń}: liczba powtórzeń w eksperymentach była niewielka (zwykle 1--3 przebiegi na kombinację repozytorium, modelu i prompta), co prowadzi do szerokich przedziałów ufności i ogranicza precyzję wnioskowania.
+    \item \textbf{Ograniczona liczba powtórzeń w RQ1--RQ3}: w pierwszych trzech eksperymentach liczba powtórzeń była niewielka (RQ1: 2, RQ2: 3, RQ3: 1 przebieg na kombinację repozytorium, modelu i prompta), co prowadzi do szerokich przedziałów ufności i ogranicza precyzję wnioskowania.
     \item \textbf{Środowisko testowe}: MicroK8s i lokalny rejestr na jednej maszynie mogą różnić się od produkcyjnych klastrów (wydajność, sieć, storage); wyniki mogą być wrażliwe na konfigurację hosta.
     \item \textbf{Czyszczenie repozytorium}: usuwanie istniejących \texttt{Dockerfile}/\texttt{docker-compose*} eliminuje podpowiedzi dla modelu, ale też odbiega od scenariusza, w którym część konfiguracji już istnieje.
 \end{itemize}
