@@ -257,7 +257,7 @@ Wraz ze wzrostem złożoności widać silny spadek skuteczności: od 100{,}0\% d
 
 \subsubsection{Trend złożoności}
 
-Dane wskazują na bardzo wyraźny trend spadkowy skuteczności wraz ze wzrostem złożoności (dla pięciu poziomów POC1--POC5 korelacja rang Spearmana wynosi w przybliżeniu $\rho \approx -1{,}0$). Największy spadek widoczny jest między POC1 i POC2, a kolejne poziomy złożoności przynoszą dalsze obniżenie skuteczności aż do 0\% dla POC5. Wskazuje to na punkt załamania po przekroczeniu prostej architektury wielowarstwowej, gdy dochodzą dodatkowe zależności infrastrukturalne i wzajemne powiązania usług.
+Dane wskazują na bardzo wyraźny trend spadkowy skuteczności wraz ze wzrostem złożoności. Dla pięciu poziomów POC1--POC5 można zaobserwować niemal monotoniczną zależność malejącą, jednak ze względu na małą liczbę poziomów i kontrolowany, ręcznie zaprojektowany charakter repozytoriów PoC wynik ten należy traktować przede wszystkim jako ilustrację trendu, a nie silny dowód statystyczny. Największy spadek widoczny jest między POC1 i POC2, a kolejne poziomy złożoności przynoszą dalsze obniżenie skuteczności aż do 0\% dla POC5. Sugeruje to punkt załamania po przekroczeniu prostej architektury wielowarstwowej, gdy dochodzą dodatkowe zależności infrastrukturalne i wzajemne powiązania usług.
 
 \subsubsection{Typowe problemy i przyczyny awarii}
 
@@ -276,7 +276,7 @@ Dane wskazują na bardzo wyraźny trend spadkowy skuteczności wraz ze wzrostem 
 
 \subsubsection{Odpowiedź na RQ2}
 
-Wyniki pokazują wyraźnie, że wzrost złożoności aplikacji silnie obniża skuteczność agentów LLM w generowaniu działających konfiguracji IaC. Skuteczność spada od 100{,}0\% dla POC1 do 0{,}0\% dla POC5, a całkowity end-to-end success rate w tym eksperymencie wyniósł 33{,}3\%. Spadek jest gwałtowny już po przejściu od prostego monolitu do aplikacji z dodatkowymi zależnościami, a dla najbardziej złożonego przypadku badany proces okazał się nieskuteczny. Odpowiedź na RQ2 jest więc jednoznaczna: złożoność stanowi jeden z głównych czynników ograniczających skuteczność podejścia.
+Wyniki wskazują, że wzrost złożoności aplikacji silnie obniża skuteczność agentów LLM w generowaniu działających konfiguracji IaC. Skuteczność spada od 100{,}0\% dla POC1 do 0{,}0\% dla POC5, a całkowity end-to-end success rate w tym eksperymencie wyniósł 33{,}3\%. Spadek jest gwałtowny już po przejściu od prostego monolitu do aplikacji z dodatkowymi zależnościami, a dla najbardziej złożonego przypadku badany proces okazał się nieskuteczny. W granicach badanego zestawu repozytoriów można więc uznać złożoność za jeden z głównych czynników ograniczających skuteczność podejścia.
 
 \subsection{Wyniki dla RQ3: Jakość i zgodność z dobrymi praktykami}
 
@@ -297,11 +297,11 @@ Poniżej zestawiono wyniki jakości dla 150 przebiegów (25 repozytoriów $\time
 
 \subsubsection{Wpływ prompt engineeringu}
 
-Wzmocnienie prompta o checklistę dobrych praktyk znacząco poprawia jakość konfiguracji: łączna liczba ostrzeżeń spadła z 147 do 30 (o 79{,}6\%), a średnia liczba ostrzeżeń na przebieg z 1{,}96 do 0{,}40. Odsetek przebiegów bez ostrzeżeń wzrósł o 57{,}4 p.p. (z 17{,}3\% do 74{,}7\%), a odsetek przebiegów z ostrzeżeniami spadł z 82{,}7\% do 25{,}3\%. W obu wariantach dominowały ostrzeżenia Kube-linter, jednak spadły one z 130 do 22, co wskazuje na skuteczność wytycznych dotyczących manifestów Kubernetes.
+Wzmocnienie prompta o checklistę dobrych praktyk wiązało się z wyraźną poprawą jakości konfiguracji: łączna liczba ostrzeżeń spadła z 147 do 30 (o 79{,}6\%), a średnia liczba ostrzeżeń na przebieg z 1{,}96 do 0{,}40. Odsetek przebiegów bez ostrzeżeń wzrósł o 57{,}4 p.p. (z 17{,}3\% do 74{,}7\%), a odsetek przebiegów z ostrzeżeniami spadł z 82{,}7\% do 25{,}3\%. W obu wariantach dominowały ostrzeżenia Kube-linter, jednak spadły one z 130 do 22, co sugeruje wysoką użyteczność wytycznych dotyczących manifestów Kubernetes. Ze względu na pojedyncze powtórzenie na kombinację wynik należy jednak interpretować ostrożnie.
 
 \subsubsection{Odpowiedź na RQ3}
 
-Wyniki pokazują, że jakość konfiguracji generowanych bez dodatkowych instrukcji jakościowych jest wyraźnie ograniczona: ostrzeżenia pojawiają się w 82{,}7\% przebiegów. Jednocześnie wpływ prompt engineeringu jest bardzo silny, ponieważ wariant best practices redukuje liczbę ostrzeżeń z 147 do 30, czyli o 79{,}6\%, i zwiększa odsetek konfiguracji bez ostrzeżeń z 17{,}3\% do 74{,}7\%. Odpowiedź na RQ3 jest więc dwojaka: bazowa jakość wymaga dodatkowej walidacji, ale dobrze zaprojektowane wytyczne w promptcie mogą tę jakość znacząco poprawić.
+Wyniki pokazują, że jakość konfiguracji generowanych bez dodatkowych instrukcji jakościowych jest wyraźnie ograniczona: ostrzeżenia pojawiają się w 82{,}7\% przebiegów. Jednocześnie zaobserwowano wyraźny pozytywny wpływ prompt engineeringu, ponieważ wariant best practices redukuje liczbę ostrzeżeń z 147 do 30, czyli o 79{,}6\%, i zwiększa odsetek konfiguracji bez ostrzeżeń z 17{,}3\% do 74{,}7\%. Odpowiedź na RQ3 jest więc dwojaka: bazowa jakość wymaga dodatkowej walidacji, ale dobrze zaprojektowane wytyczne w promptcie mogą istotnie poprawić jakość wyników.
 
 \subsection{Wyniki dla RQ4: Niezawodność i powtarzalność procesu agentowego}
 
@@ -376,4 +376,4 @@ W wariancie \textbf{W3} agent dodawał pełne zasoby Redis do stosu wdrożeniowe
 
 \subsubsection{Odpowiedź na RQ5}
 
-Wyniki pokazują, że podatność na manipulację kontekstem jest wysoka i praktycznie istotna: krytyczne odchylenia wystąpiły w 56{,}7\% przebiegów, w tym w 66{,}7\% dla wariantu sprzeczna specyfikacja i 70{,}0\% dla wariantu pozorna zależność historyczna. Każdy z trzech wariantów manipulacji okazał się skuteczny co najmniej w części przypadków. Odpowiedź na RQ5 jest zatem jednoznaczna: agenty LLM potrafią traktować dokumentację repozytorium jako silniejszy sygnał niż sam kod aplikacji, co prowadzi do generowania artefaktów IaC zgodnych z fałszywym kontekstem, lecz sprzecznych z rzeczywistą specyfikacją systemu.
+Wyniki pokazują, że podatność na manipulację kontekstem jest wysoka i praktycznie istotna: krytyczne odchylenia wystąpiły w 56{,}7\% przebiegów, w tym w 66{,}7\% dla wariantu sprzeczna specyfikacja i 70{,}0\% dla wariantu pozorna zależność historyczna. Każdy z trzech wariantów manipulacji okazał się skuteczny co najmniej w części przypadków. Odpowiedź na RQ5 jest zatem twierdząca z istotnym zastrzeżeniem: w warunkach badanego eksperymentu agenty LLM potrafiły traktować dokumentację repozytorium jako sygnał silniejszy niż sam kod aplikacji, co prowadziło do generowania artefaktów IaC zgodnych z fałszywym kontekstem, lecz sprzecznych z rzeczywistą specyfikacją systemu. Wyniki te wskazują, że nawet nieskomplikowane techniki manipulacji dokumentacyjnej mogą stanowić realne zagrożenie w scenariuszach autonomicznego generowania konfiguracji wdrożeniowej.

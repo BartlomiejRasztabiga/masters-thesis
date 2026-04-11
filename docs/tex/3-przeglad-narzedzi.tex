@@ -2,7 +2,7 @@
 
 \section{Przegląd technologii i narzędzi}
 
-Celem tego rozdziału jest przedstawienie najważniejszych technologii i narzędzi, stanowiących podstawę niniejszego badania. Szczególny nacisk położony zostanie na sposób wykorzystania dużych modeli językowych w generowaniu konfiguracji wdrożeniowej. Ponadto, omówione zostaną istotne narzędzia DevOps, takie jak Docker i Kubernetes, niezbędne w zarządzaniu środowiskami uruchomieniowymi, oraz narzędzia służące do walidacji i oceny jakości generowanego kodu IaC. Rozdział zawiera także opis środowiska eksperymentalnego oraz wykorzystywanych technologii wspierających automatyzację i monitorowanie eksperymentów.
+Celem tego rozdziału jest przedstawienie najważniejszych technologii i narzędzi, stanowiących podstawę niniejszego badania. Szczególny nacisk położono na sposób wykorzystania dużych modeli językowych w generowaniu konfiguracji wdrożeniowej. Ponadto omówiono istotne narzędzia DevOps, takie jak Docker i Kubernetes, niezbędne w zarządzaniu środowiskami uruchomieniowymi, oraz narzędzia służące do walidacji i oceny jakości generowanego kodu IaC. Rozdział zawiera także opis środowiska eksperymentalnego oraz wykorzystywanych technologii wspierających automatyzację i monitorowanie eksperymentów.
 
 \subsection{Modele językowe wykorzystywane w badaniu}
 
@@ -27,7 +27,7 @@ Wybrane do badania modele open-source to:
     \item \textbf{DeepSeek-Chat (V3.2)} \cite{deepseek_v32}
 \end{itemize}
 
-Wszystkie wymienione modele reprezentują aktualny szczyt osiągnięć w dziedzinie dużych modeli językowych. Wybrane zostały przede wszystkim ze względu na ich potwierdzone zdolności do generowania wysokiej jakości kodu oraz wsparcie dla funkcji \textit{tool calling}. Funkcje te umożliwiają bezpośrednią integrację modeli z zewnętrznymi narzędziami lub usługami poprzez dedykowane mechanizmy API bądź platformy agentowe, takie jak LangChain \cite{langchain} czy LangGraph \cite{langgraph}. W proponowanym w tej pracy podejściu, funkcje \textit{tool calling} będą odgrywać znaczącą rolę w zarządzaniu kontekstem i procesie generowania konfiguracji.
+Wszystkie wymienione modele reprezentują czołówkę współczesnych dużych modeli językowych. Wybrane zostały przede wszystkim ze względu na ich potwierdzone zdolności do generowania wysokiej jakości kodu oraz wsparcie dla funkcji \textit{tool calling}. Funkcje te umożliwiają bezpośrednią integrację modeli z zewnętrznymi narzędziami lub usługami poprzez dedykowane mechanizmy API bądź platformy agentowe, takie jak LangChain \cite{langchain} czy LangGraph \cite{langgraph}. W proponowanym w tej pracy podejściu funkcje \textit{tool calling} odgrywają znaczącą rolę w zarządzaniu kontekstem i procesie generowania konfiguracji.
 
 \subsection{Architektury i charakterystyka}
 
@@ -62,7 +62,7 @@ Efektywność wykorzystania dużych modeli językowych w dużej mierze zależy o
 
 W kontekście generowania konfiguracji wdrożeniowej, zastosowanie podejścia agentowego jest uzasadnione ze względu na możliwość kompleksowego zarządzania kontekstem i procesem generacji. Generowanie IaC często wymaga dostępu do wielu źródeł informacji i precyzyjnego umieszczenia danych w konfiguracji. W przeciwieństwie do jednorazowych generacji (jak w zero-shot czy few-shot), agent może, na podstawie dostarczonego mu opisu docelowej infrastruktury, wygenerować wstępną wersję konfiguracji (np. Dockerfile). Następnie, istotnym elementem jest możliwość wykorzystania zewnętrznych narzędzi do interakcji z kontekstem. Agent może na przykład czytać wybrane pliki z repozytorium kodu, aby lepiej zrozumieć strukturę projektu i zależności. Może również sterować swoim wewnętrznym przepływem rozumowania i zakresem czytanego kontekstu.
 
-W niniejszej pracy magisterskiej zastosowana zostanie właśnie metoda agentowa. Podejście agentowe może być realizowane na różne sposoby, zarówno poprzez bezpośrednie wykorzystanie dedykowanych interfejsów API udostępnianych przez niektóre modele (np. poprzez \textit{tool calling} czy \textit{function calling}), jak i poprzez zastosowanie specjalizowanych frameworków orkiestracyjnych, takich jak \textbf{AutoGen} \cite{autogen} czy \textbf{LangChain/LangGraph}. W tym badaniu, do implementacji agentów i zarządzania złożonymi przepływami pracy z wykorzystaniem funkcji \textit{tool calling} wybrana została biblioteka LangGraph w języku Python, uzupełniona o funkcjonalności LangChain. Rola agenta koncentruje się na efektywnym dostarczaniu kontekstu i zarządzaniu procesem generacji konfiguracji IaC.
+W niniejszej pracy magisterskiej zastosowano właśnie metodę agentową. Podejście agentowe może być realizowane na różne sposoby, zarówno poprzez bezpośrednie wykorzystanie dedykowanych interfejsów API udostępnianych przez niektóre modele (np. poprzez \textit{tool calling} czy \textit{function calling}), jak i poprzez zastosowanie specjalizowanych frameworków orkiestracyjnych, takich jak \textbf{AutoGen} \cite{autogen} czy \textbf{LangChain/LangGraph}. W tym badaniu do implementacji agentów i zarządzania złożonymi przepływami pracy z wykorzystaniem funkcji \textit{tool calling} wybrana została biblioteka LangGraph w języku Python, uzupełniona o funkcjonalności LangChain. Rola agenta koncentruje się na efektywnym dostarczaniu kontekstu i zarządzaniu procesem generacji konfiguracji IaC.
 
 \subsection{Narzędzia DevOps: Docker i Kubernetes}
 
@@ -99,7 +99,7 @@ Analiza zdolności LLM do unikania wymienionych błędów oraz do generowania ef
 
 \subsection{Narzędzia do oceny jakości IaC}
 
-W kontekście automatycznego generowania konfiguracji Infrastructure as Code (IaC) przez modele językowe, ważne jest zapewnienie, że wygenerowane konfiguracje są nie tylko poprawne składniowo, ale również bezpieczne, zgodne z najlepszymi praktykami i efektywne. Do tego celu służą wyspecjalizowane narzędzia do analizy i walidacji kodu IaC. Wyniki uzyskane z tych narzędzi będą stanowić podstawę do obiektywnej oceny jakości konfiguracji generowanych przez LLM w dalszej części niniejszej pracy. W niniejszym podrozdziale opisane zostaną dwa wybrane narzędzia, które zostaną użyte w badaniu: Hadolint \cite{hadolint} (dla Dockerfile) i Kube-linter \cite{kubelinter} (dla manifestów Kubernetes).
+W kontekście automatycznego generowania konfiguracji Infrastructure as Code (IaC) przez modele językowe ważne jest zapewnienie, że wygenerowane konfiguracje są nie tylko poprawne składniowo, ale również bezpieczne, zgodne z najlepszymi praktykami i efektywne. Do tego celu służą wyspecjalizowane narzędzia do analizy i walidacji kodu IaC. Wyniki uzyskane z tych narzędzi stanowią podstawę do obiektywnej oceny jakości konfiguracji generowanych przez LLM w dalszej części niniejszej pracy. W niniejszym podrozdziale opisano dwa wybrane narzędzia użyte w badaniu: Hadolint \cite{hadolint} (dla Dockerfile) i Kube-linter \cite{kubelinter} (dla manifestów Kubernetes).
 
 Oba narzędzia działają na zasadzie statycznej analizy kodu, co oznacza, że analizują pliki konfiguracyjne bez konieczności ich uruchamiania lub wdrażania.
 
@@ -127,7 +127,7 @@ set spec.type to "ClusterIP"
 
 W tym przykładzie, zaprezentowanym w wycinku \ref{lst:example-kubelinter}, Kube-linter zgłasza brak livenessProbe i readinessProbe w definicji Poda oraz sugeruje zmianę typu Serwisu na ClusterIP.
 
-Interpretacja wyników z obu narzędzi wymaga zrozumienia specyfiki Dockerfile i manifestów Kubernetes. Ważne jest, aby skupić się na błędach o wysokim poziomie ważności (np. problemy z bezpieczeństwem, brak sond) oraz na ostrzeżeniach, które mogą prowadzić do problemów z wydajnością lub stabilnością aplikacji. Wyjścia z tych narzędzi zostaną wykorzystane w dalszej części pracy do obiektywnej oceny jakości generowanych konfiguracji IaC.
+Interpretacja wyników z obu narzędzi wymaga zrozumienia specyfiki Dockerfile i manifestów Kubernetes. Ważne jest, aby skupić się na błędach o wysokim poziomie ważności (np. problemy z bezpieczeństwem, brak sond) oraz na ostrzeżeniach, które mogą prowadzić do problemów z wydajnością lub stabilnością aplikacji. Wyjścia z tych narzędzi zostały wykorzystane w dalszej części pracy do obiektywnej oceny jakości generowanych konfiguracji IaC.
 
 \subsection{Środowisko eksperymentalne i technologie wspierające}
 

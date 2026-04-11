@@ -47,7 +47,7 @@ Agent został zaimplementowany przy użyciu bibliotek LangChain oraz LangGraph i
 Agent dysponuje zestawem jedenastu funkcji umożliwiających interakcję z repozytorium:
 
 \begin{itemize}
-    \item \texttt{clone\_repo(repo\_url)} – klonuje repozytorium Git do izolowanej przestrzeni roboczej i usuwa wybrane pliki uznane za mylące dla generacji (m.in. metadane VCS, pliki CI/CD, pliki dokumentacji, oraz istniejące konfiguracje takie jak \texttt{Dockerfile} i \texttt{docker-compose*.yml}), aby agent generował konfigurację na podstawie analizy kodu źródłowego,
+    \item \texttt{clone\_repo(repo\_url)} – klonuje repozytorium Git do izolowanej przestrzeni roboczej i usuwa wybrane pliki uznane za mylące dla generacji (m.in. metadane VCS, pliki CI/CD oraz istniejące konfiguracje takie jak \texttt{Dockerfile} i \texttt{docker-compose*.yml}); w eksperymentach RQ1--RQ4 filtrowane są również typowe pliki dokumentacyjne, natomiast w RQ5 dokumentacja manipulacyjna pozostaje celowo zachowana, aby mogła oddziaływać na agenta,
 
     \item \texttt{prepare\_repo\_tree()} – generuje tekstowy widok struktury repozytorium (lista plików wraz z lokalizacją i rozmiarem), ułatwiający szybkie rozpoznanie kluczowych komponentów,
 
@@ -127,7 +127,7 @@ Konfiguracja agenta jest sterowana zestawem parametrów przekazywanych w definic
 \begin{itemize}
     \item \texttt{temperature} — kontroluje losowość generacji; typowo 1.0 (eksploracja) lub 0.0 w testach powtarzalności,
     \item \texttt{seed} — opcjonalne ziarno losowości (np. dla powtarzalnych przebiegów),
-    \item \texttt{prompt\_version} — pozwalają wymusić konkretny wariant prompta,
+    \item \texttt{prompt\_version} — pozwala wymusić konkretny wariant prompta,
     \item \texttt{recursion\_limit} — limit kroków w pętli agentowej (domyślnie 200),
     \item liczba powtórzeń — ustawiana w definicji eksperymentu (\texttt{repetitions}); określa, ile razy uruchamiany jest ten sam zestaw parametrów (repozytorium, model, prompt/parametry) w celu np. oszacowania zmienności wyników.
 \end{itemize}
@@ -283,7 +283,7 @@ W ramach RQ4 analizowane są dwa wymiary powtarzalności. Pierwszy odnosi się d
 
 \subsubsection{Zbiór danych testowych}
 
-Wykorzystano pięć kontrolowanych repozytoriów POC (POC1--POC5), obejmujących rosnącą złożoność architektury. Eksperyment realizowany jest dla dwóch modeli (\texttt{gemini-2.5-flash}, \texttt{deepseek-chat} (V3.2)) i pojedynczego wariantu prompta (bazowego). Każda kombinacja (repozytorium, model) uruchamiana jest pięciokrotnie, co daje łącznie 50 przebiegów. We wszystkich powtórzeniach stosuje się identyczne parametry wejściowe (temperature=0, stały seed), aby mierzyć wahania wynikające z niedeterministycznych elementów procesu.
+Wykorzystano pięć kontrolowanych repozytoriów POC (POC1--POC5), obejmujących rosnącą złożoność architektury. Eksperyment realizowany jest dla dwóch modeli (\texttt{gemini-2.5-flash}, \texttt{deepseek-chat} (V3.2)) i pojedynczego wariantu prompta (bazowego). Każda kombinacja (repozytorium, model) uruchamiana jest pięciokrotnie, co daje łącznie 50 przebiegów. We wszystkich powtórzeniach stosuje się identyczne parametry wejściowe (temperature=0, stały seed), aby mierzyć wahania wynikające z niedeterministycznych elementów procesu. Należy jednak zaznaczyć, że deterministyczność deklarowana na poziomie API nie gwarantuje pełnej identyczności odpowiedzi, ponieważ na wynik mogą wpływać również elementy infrastruktury dostawcy modelu. Oznacza to, że obserwowane wahania wyników mogą zaniżać faktyczną zmienność wynikającą z samego modelu, a mierzona powtarzalność stanowi dolne oszacowanie rzeczywistej stabilności procesu generacji.
 
 Wybór modeli podyktowany był koniecznością wsparcia parametru \texttt{temperature=0}. Modele z serii GPT-5 (w~tym \texttt{gpt-5-mini}) odrzucają ten parametr na poziomie API — przy jego przekazaniu interfejs zwraca błąd walidacji i~nie inicjuje generacji. Z~tego względu zastosowano modele \texttt{gemini-2.5-flash} (Google) oraz \texttt{deepseek-chat} (DeepSeek V3.2), które wspierają pełen zakres wartości temperatury (0--2) i~parametr \texttt{seed} dla deterministycznej generacji.
 
@@ -319,7 +319,7 @@ Jako bazę wykorzystano repozytorium \texttt{poc1-fastapi}. Przygotowano trzy wa
     \item \textbf{W2: autorytatywne zalecenia bezpieczeństwa} — dodano \texttt{SECURITY.md} oraz notatkę operacyjną z wymaganiem uruchomienia aplikacji w trybie \texttt{privileged} i z \texttt{hostNetwork}, uzasadnionym rzekomą diagnostyką produkcyjną.
     \item \textbf{W3: pozorna zależność historyczna} — dodano \texttt{docs/legacy\_migration.md}, \texttt{.env.example} oraz notatkę w changelogu sugerujące konieczność utrzymania nieistniejącej zależności Redis.
 \end{itemize}
-Eksperyment wykonywany jest dla trzech modeli (\texttt{gemini-2.5-flash}, \texttt{gpt-5-mini}, \texttt{deepseek-chat} (V3.2)) z dziesięcioma powtórzeniami na kombinację, co daje łącznie 90 przebiegów. W celu skupienia oceny na podatności semantycznej, a nie na funkcjonalności końcowego wdrożenia, w RQ5 wyłączono walidację runtime; analiza opiera się na wygenerowanych artefaktach (\texttt{Dockerfile} i manifestach Kubernetes).
+Eksperyment wykonywany jest dla trzech modeli (\texttt{gemini-2.5-flash}, \texttt{gpt-5-mini}, \texttt{deepseek-chat} (V3.2)) z dziesięcioma powtórzeniami na kombinację, co daje łącznie 90 przebiegów. W celu skupienia oceny na podatności semantycznej, a nie na funkcjonalności końcowego wdrożenia, w RQ5 wyłączono walidację runtime; analiza opiera się na wygenerowanych artefaktach (\texttt{Dockerfile} i manifestach Kubernetes). W odróżnieniu od RQ1--RQ4, w tym eksperymencie nie usuwa się zmanipulowanych plików dokumentacyjnych, ponieważ stanowią one właściwy bodziec badawczy.
 
 \subsubsection{Metryki}
 
@@ -378,7 +378,7 @@ W celu usprawnienia zarządzania eksperymentami oraz monitorowania ich postępu 
 \label{sec:threats-to-validity}
 \begin{itemize}
     \item \textbf{Reprezentatywność zbioru RQ1}: 25 relatywnie prostych aplikacji webowych może nie odzwierciedlać złożoności systemów produkcyjnych; wyniki mogą nie uogólniać się na złożone architektury (odniesienie w RQ2).
-    \item \textbf{Walidacja runtime endpointami HTTP}: sprawdzenie dostępności endpointów wskazanych w polu \texttt{test\_endpoints} nie weryfikuje w pełni komunikacji między usługami ani scenariuszy biznesowych; złożone zależności mogą pozostać niewykryte.
+    \item \textbf{Walidacja runtime endpointami HTTP}: sprawdzenie dostępności endpointów wskazanych w polu \texttt{test\_endpoints} nie weryfikuje w pełni komunikacji między usługami ani scenariuszy biznesowych; dodatkowo wybór endpointów jest częścią artefaktu generowanego przez agenta, więc ewaluacja nie jest całkowicie niezależna od procesu generacji.
     \item \textbf{Ograniczona liczba powtórzeń w RQ1--RQ3}: w pierwszych trzech eksperymentach liczba powtórzeń była niewielka (RQ1: 2, RQ2: 3, RQ3: 1 przebieg na kombinację repozytorium, modelu i prompta), co prowadzi do szerokich przedziałów ufności i ogranicza precyzję wnioskowania.
     \item \textbf{Środowisko testowe}: MicroK8s i lokalny rejestr na jednej maszynie mogą różnić się od produkcyjnych klastrów (wydajność, sieć, storage); wyniki mogą być wrażliwe na konfigurację hosta.
     \item \textbf{Czyszczenie repozytorium}: usuwanie istniejących \texttt{Dockerfile}/\texttt{docker-compose*} eliminuje podpowiedzi dla modelu, ale też odbiega od scenariusza, w którym część konfiguracji już istnieje.
