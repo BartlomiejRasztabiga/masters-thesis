@@ -13,19 +13,19 @@ W ramach badania sformułowano pięć pytań badawczych:
 
 \begin{itemize}
     \item \textbf{RQ1: W jakim stopniu agenty LLM potrafią autonomicznie wygenerować funkcjonalne konfiguracje Docker i Kubernetes?} \\
-    Pytanie dotyczy zdolności agentów do przygotowania konfiguracji umożliwiającej poprawne zbudowanie, wdrożenie i uruchomienie aplikacji bez dodatkowej ingerencji człowieka, w tym osiągnięcie gotowości usługowej potwierdzonej odpowiedzią HTTP po wdrożeniu na klastrze testowym.
+    Pytanie dotyczy zdolności agentów do przygotowania konfiguracji umożliwiającej poprawne zbudowanie, wdrożenie i uruchomienie aplikacji bez dodatkowej ingerencji człowieka, w tym osiągnięcie gotowości usługowej potwierdzonej odpowiedzią HTTP po wdrożeniu na klastrze testowym. Dotychczasowe prace \cite{xu_cloudeval-yaml_2023, kratzke_dont_2024} oceniały generację konfiguracji bez pełnej walidacji wdrożeniowej obejmującej etap uruchomienia aplikacji.
 
     \item \textbf{RQ2: Jak wzrost złożoności aplikacji wpływa na skuteczność autonomicznie generowanych konfiguracji?} \\
-    Pytanie bada, jak zmieniają się wyniki agentów wraz ze wzrostem liczby komponentów, zależności infrastrukturalnych i relacji między usługami.
+    Pytanie bada, jak zmieniają się wyniki agentów wraz ze wzrostem liczby komponentów, zależności infrastrukturalnych i relacji między usługami. Istniejące prace, takie jak Repo2Run \cite{hu_llm-based_2025}, ograniczają się do jednousługowych projektów jednego języka; brak systematycznej analizy wpływu złożoności architektury na skuteczność generacji.
 
     \item \textbf{RQ3: Jaką jakość mają generowane konfiguracje IaC i jaki wpływ ma na nią prompt engineering ukierunkowany na dobre praktyki?} \\
-    Pytanie dotyczy skali ostrzeżeń wykrywanych przez narzędzia statycznej analizy oraz tego, czy rozszerzenie prompta o checklistę dobrych praktyk poprawia jakość generowanych artefaktów.
+    Pytanie dotyczy skali ostrzeżeń wykrywanych przez narzędzia statycznej analizy oraz tego, czy rozszerzenie prompta o checklistę dobrych praktyk poprawia jakość generowanych artefaktów. Kratzke i Drews \cite{kratzke_dont_2024} sugerują kluczową rolę doboru promptu, jednak bez ilościowej oceny wpływu wytycznych jakościowych na wynik statycznej analizy konfiguracji.
 
     \item \textbf{RQ4: Na ile powtarzalny jest proces generacji konfiguracji przez agenta LLM przy niezmienionych warunkach wejściowych?} \\
-    Pytanie koncentruje się na zmienności wygenerowanych artefaktów i przebiegu procesu agentowego mimo deterministycznych parametrów wejściowych.
+    Pytanie koncentruje się na zmienności wygenerowanych artefaktów i przebiegu procesu agentowego mimo deterministycznych parametrów wejściowych. Niezawodność i deterministyczność wieloetapowych procesów agentowych nie była dotąd systematycznie badana w kontekście generowania IaC.
 
     \item \textbf{RQ5: W jakim stopniu agenty LLM są podatne na manipulację kontekstem repozytorium?} \\
-    Pytanie bada, czy złośliwe lub mylące treści w dokumentacji i plikach pomocniczych prowadzą do generowania artefaktów IaC sprzecznych z kodem źródłowym lub dobrymi praktykami bezpieczeństwa.
+    Pytanie bada, czy złośliwe lub mylące treści w dokumentacji i plikach pomocniczych prowadzą do generowania artefaktów IaC sprzecznych z kodem źródłowym lub dobrymi praktykami bezpieczeństwa. Liu i in.\ \cite{liu_prompt_2024} oraz Fu i in.\ \cite{fu_security_2025} identyfikują zagrożenia związane z manipulacją promptem i lukami w kodzie generowanym przez LLM, jednak bez badania scenariusza złośliwej zawartości repozytoriów w kontekście generowania IaC.
 \end{itemize}
 
 \bigskip
@@ -34,7 +34,81 @@ Każde z powyższych pytań badawczych analizowane jest przy użyciu dedykowanej
 
 \subsection{Architektura systemu testowego}
 
-Eksperymenty wymagają kompleksowego środowiska testowego składającego się z trzech głównych komponentów: agenta generującego konfiguracje, potoku walidacyjnego oraz infrastruktury wykonawczej.
+Eksperymenty wymagają kompleksowego środowiska testowego składającego się z trzech głównych komponentów: agenta generującego konfiguracje, potoku walidacyjnego oraz infrastruktury wykonawczej. Rysunek~\ref{fig:agent-architecture} przedstawia ogólny przepływ danych w systemie — od wejściowego adresu URL repozytorium, przez iteracyjną pętlę agenta, aż do siedmioetapowego potoku walidacyjnego.
+
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+    >=Stealth, font=\normalsize,
+    io/.style={draw=black, fill=green!10, rounded corners=4pt, inner sep=7pt, align=center, minimum width=3cm},
+    llmstyle/.style={draw=black, fill=orange!12, rounded corners=4pt, inner sep=7pt, align=center, minimum width=4.8cm},
+    toolstyle/.style={draw=gray!55, fill=gray!8, rounded corners=2pt, inner sep=4pt, align=center,
+                      font=\small\ttfamily, minimum width=4.8cm, minimum height=0.58cm},
+    jsonstyle/.style={draw=black, fill=blue!8, rounded corners=4pt, inner sep=7pt, align=left, minimum width=4cm},
+    stepstyle/.style={draw=black!35, fill=black!4, rounded corners=2pt, inner sep=4pt, align=left,
+                      font=\small, minimum width=4.2cm, minimum height=0.52cm},
+    agentgrp/.style={draw=orange!50, dashed, thick, rounded corners=6pt, inner sep=11pt},
+    valgrp/.style={draw=blue!40, dashed, thick, rounded corners=6pt, inner sep=11pt},
+]
+
+%% --- WEJŚCIE ---
+\node[io] (inp)
+    {{\bfseries Wejście}\\[4pt]URL repozytorium\\Prompt systemowy};
+
+%% --- MODEL LLM ---
+\node[llmstyle, right=2.8cm of inp] (llmn)
+    {{\bfseries Model LLM}\\[4pt]\small GPT-5 Mini\\Gemini 2.5 Flash\\DeepSeek V3.2};
+
+%% --- Narzędzia agenta ---
+\node[below=0.32cm of llmn, font=\small\itshape, text=gray!70] (rlbl)
+    {$\updownarrow$ pętla ReAct (wywołania narzędzi)};
+
+\node[toolstyle, below=0.22cm of rlbl] (t1) {clone\_repo};
+\node[toolstyle, below=0.10cm of t1]   (t2) {prepare\_repo\_tree};
+\node[toolstyle, below=0.10cm of t2]   (t3) {get\_file\_content};
+\node[toolstyle, below=0.10cm of t3]   (t4) {write\_file \,/\, patch\_file};
+\node[toolstyle, below=0.10cm of t4]   (t5) {search\_files \,/\, find\_files};
+\node[toolstyle, below=0.10cm of t5]   (t6) {think \,/\, base64};
+
+%% --- Ramka agenta ---
+\node[agentgrp, fit=(llmn)(rlbl)(t1)(t2)(t3)(t4)(t5)(t6),
+      label={[font=\small\bfseries]above:\strut Agent LLM (LangGraph)}] (agent) {};
+
+%% --- JSON wyjściowy ---
+\node[jsonstyle, right=2.8cm of llmn] (json)
+    {{\bfseries JSON wyjściowy}\\[4pt]
+     \small\texttt{docker\_images}\\
+     \small\texttt{kubernetes\_files}\\
+     \small\texttt{test\_endpoints}};
+
+%% --- Kroki walidacyjne ---
+\node[stepstyle, below=0.55cm of json] (v1) {1.\enspace Składnia Dockerfile};
+\node[stepstyle, below=0.10cm of v1]   (v2) {2.\enspace Hadolint};
+\node[stepstyle, below=0.10cm of v2]   (v3) {3.\enspace Budowa obrazów Docker};
+\node[stepstyle, below=0.10cm of v3]   (v4) {4.\enspace Składnia manifestów K8s};
+\node[stepstyle, below=0.10cm of v4]   (v5) {5.\enspace Kube-linter};
+\node[stepstyle, below=0.10cm of v5]   (v6) {6.\enspace \texttt{kubectl apply}};
+\node[stepstyle, below=0.10cm of v6]   (v7) {7.\enspace Walidacja HTTP (runtime)};
+
+%% --- Ramka potoku walidacyjnego ---
+\node[valgrp, fit=(json)(v1)(v2)(v3)(v4)(v5)(v6)(v7),
+      label={[font=\small\bfseries]above:\strut Potok walidacyjny}] (val) {};
+
+%% --- Strzałki główne ---
+\draw[->, thick] (inp.east)                    -- (agent.west  |- inp.east);
+\draw[->, thick] (agent.east |- json.west)     -- (json.west);
+\draw[->, thick] (json.south)                  -- (v1.north);
+
+%% --- Strzałki kroków walidacyjnych ---
+\foreach \from/\to in {v1/v2, v2/v3, v3/v4, v4/v5, v5/v6, v6/v7}
+    \draw[->, thick, gray!55] (\from.south) -- (\to.north);
+
+\end{tikzpicture}%
+}
+\caption{Architektura systemu testowego: agent LLM iteracyjnie analizuje repozytorium i generuje konfiguracje IaC, które następnie przechodzą przez siedmioetapowy potok walidacyjny.}
+\label{fig:agent-architecture}
+\end{figure}
 
 \subsubsection{Agent LLM}
 
@@ -61,9 +135,9 @@ Agent dysponuje zestawem jedenastu funkcji umożliwiających interakcję z repoz
 
     \item \texttt{write\_file(file\_path, content)} – zapisuje nowy plik lub nadpisuje istniejący,
 
-    \item \texttt{patch\_file(file\_path, patch)} – aplikuje patch w formacie unified diff,
+    \item \texttt{patch\_file(file\_path, patch)} – aplikuje łatkę (ang.\ \textit{patch}) w formacie unified diff,
 
-    \item \texttt{base64\_encode(content)} – koduje tekst do base64 (np. dla Kubernetes Secrets),
+    \item \texttt{base64\_encode(content)} – koduje tekst do base64 (np.\ dla Kubernetes Secrets),
 
     \item \texttt{base64\_decode(encoded)} – dekoduje base64,
 
@@ -296,6 +370,8 @@ Analiza powtarzalności opiera się na następujących metrykach (zgodnie ze spo
     \text{diff\_ratio} = \frac{\text{liczba linii zmienionych}}{\tfrac{1}{2}(\text{liczba linii w A} + \text{liczba linii w B})},
 \]
 gdzie linie zmienione to suma wstawek i usunięć z porównania \texttt{ndiff}.
+Wartości bliskie~0 wskazują na niemal identyczne artefakty między powtórzeniami, natomiast wartości bliskie~1 oznaczają niemal całkowite przepisanie pliku.
+Teoretycznie możliwe są wartości przekraczające~1 (gdy suma zmian jest większa niż uśredniona liczba linii obu plików, co może zajść przy skrajnie różniących się długościach wygenerowanych konfiguracji) — taka wartość stanowi anomalię wskazującą na zupełnie odmienną strukturę artefaktu w kolejnych powtórzeniach.
 \begin{itemize}
     \item \textbf{Run-to-run diff ratio} — udział zmienionych linii pomiędzy parami powtórzeń dla wygenerowanych plików; raportowane są średnia, maksimum i odchylenie standardowe dla wszystkich par w danej kombinacji.
     \item \textbf{Zmienność liczby kroków narzędziowych} — średnia i odchylenie standardowe liczby wywołań narzędzi agenta (np. odczyty plików, listowanie katalogów, uruchomienia poleceń) w ramach tej samej kombinacji.
