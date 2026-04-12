@@ -295,6 +295,84 @@ Analiza RQ2 wykorzystuje kontrolowany zestaw pięciu repozytoriów PoC o rosnąc
     \label{tab:h2-complexity}
 \end{table}
 
+Rysunek~\ref{fig:poc-architectures} ilustruje kompozycję usług w każdym repozytorium testowym.
+
+\begin{figure}[H]
+\centering
+\resizebox{0.96\textwidth}{!}{%
+\begin{tikzpicture}[
+    font=\normalsize,
+    fe/.style={draw=blue!60, fill=blue!10, rounded corners=3pt,
+               inner sep=5pt, align=center, minimum width=2.4cm, minimum height=0.62cm,
+               font=\footnotesize\bfseries},
+    be/.style={draw=green!60!black, fill=green!10, rounded corners=3pt,
+               inner sep=5pt, align=center, minimum width=2.4cm, minimum height=0.62cm,
+               font=\footnotesize\bfseries},
+    db/.style={draw=orange!70, fill=orange!10, rounded corners=3pt,
+               inner sep=5pt, align=center, minimum width=2.4cm, minimum height=0.62cm,
+               font=\footnotesize},
+    mq/.style={draw=violet!60, fill=violet!8, rounded corners=3pt,
+               inner sep=5pt, align=center, minimum width=2.4cm, minimum height=0.62cm,
+               font=\footnotesize},
+    ca/.style={draw=red!55, fill=red!8, rounded corners=3pt,
+               inner sep=5pt, align=center, minimum width=2.4cm, minimum height=0.62cm,
+               font=\footnotesize},
+    colhdr/.style={font=\small\bfseries},
+]
+
+% Stałe pozycji kolumn (x) i wierszy (y)
+% Kolumny: POC1=0, POC2=2.9, POC3=5.8, POC4=8.7, POC5=11.6
+% Wiersze: 0, -0.82, -1.64, -2.46, -3.28, -4.10
+
+% Nagłówki kolumn
+\foreach \x/\lbl in {0/POC1, 2.9/POC2, 5.8/POC3, 8.7/POC4, 11.6/POC5}
+    \node[colhdr] at (\x, 0.6) {\lbl};
+\draw[gray!25, thick] (-1.4, 0.28) -- (13.0, 0.28);
+
+%% POC1 – 1 serwis
+\node[be] at ( 0.0,  0.00) {FastAPI};
+
+%% POC2 – 2 serwisy
+\node[be] at ( 2.9,  0.00) {FastAPI};
+\node[db] at ( 2.9, -0.82) {PostgreSQL};
+
+%% POC3 – 3 serwisy
+\node[fe] at ( 5.8,  0.00) {React};
+\node[be] at ( 5.8, -0.82) {FastAPI};
+\node[db] at ( 5.8, -1.64) {PostgreSQL};
+
+%% POC4 – 5 serwisów
+\node[fe] at ( 8.7,  0.00) {React};
+\node[be] at ( 8.7, -0.82) {FastAPI \(\times\)3};
+\node[db] at ( 8.7, -1.64) {PostgreSQL \(\times\)3};
+\node[mq] at ( 8.7, -2.46) {RabbitMQ};
+
+%% POC5 – 7 serwisów
+\node[fe] at (11.6,  0.00) {React};
+\node[be] at (11.6, -0.82) {FastAPI \(\times\)3};
+\node[be] at (11.6, -1.64) {Node.js};
+\node[db] at (11.6, -2.46) {PostgreSQL \(\times\)4};
+\node[mq] at (11.6, -3.28) {RabbitMQ};
+\node[ca] at (11.6, -4.10) {Redis};
+
+%% Strzałka złożoności
+\draw[->, gray!45, thick]
+    (-1.3, -5.0) -- (13.0, -5.0)
+    node[right, font=\footnotesize\itshape, gray!70] {rosnąca złożoność};
+
+%% Legenda
+\node[fe, minimum width=1.9cm, font=\scriptsize] at ( 0.0, -5.65) {frontend};
+\node[be, minimum width=1.9cm, font=\scriptsize] at ( 2.9, -5.65) {backend/API};
+\node[db, minimum width=1.9cm, font=\scriptsize] at ( 5.8, -5.65) {baza danych};
+\node[mq, minimum width=1.9cm, font=\scriptsize] at ( 8.7, -5.65) {broker};
+\node[ca, minimum width=1.9cm, font=\scriptsize] at (11.6, -5.65) {cache};
+
+\end{tikzpicture}%
+}
+\caption{Kompozycja usług w repozytoriach POC1--POC5 użytych w eksperymencie RQ2.}
+\label{fig:poc-architectures}
+\end{figure}
+
 Każde repozytorium jest uruchamiane dla trzech modeli (\texttt{gemini-2.5-flash}, \texttt{gpt-5-mini}, \texttt{deepseek-chat} (V3.2)) z trzema powtórzeniami, co daje łącznie 45 przebiegów. W odróżnieniu od RQ1 zwiększono liczbę powtórzeń, aby uzyskać stabilniejszy obraz wpływu złożoności na skuteczność.
 
 \subsubsection{Metryki}

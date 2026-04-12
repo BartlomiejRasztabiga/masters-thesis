@@ -295,6 +295,55 @@ Poniżej zestawiono wyniki jakości dla 150 przebiegów (25 repozytoriów $\time
     \label{tab:h3-lint-summary}
 \end{table}
 
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    ybar stacked,
+    bar width=40pt,
+    ymin=0,
+    ymax=178,
+    width=0.64\textwidth,
+    height=8cm,
+    xtick={1,2},
+    xticklabels={Bazowy, Best practices},
+    ylabel={Łączna liczba ostrzeżeń},
+    axis x line*=bottom,
+    axis y line*=left,
+    ymajorgrids=true,
+    major grid style={draw=gray!20},
+    enlarge x limits=0.55,
+    tick label style={font=\small},
+    label style={font=\small},
+    legend style={
+        at={(0.98,0.98)}, anchor=north east,
+        font=\small, draw=gray!40,
+    },
+]
+    % Hadolint (Dockerfile) – dolna część słupka
+    \addplot[fill=blue!25, draw=blue!55] coordinates {(1,17) (2,8)};
+    \addlegendentry{Hadolint (Dockerfile)}
+
+    % Kube-linter (Kubernetes) – górna część słupka
+    \addplot[fill=orange!35, draw=orange!65] coordinates {(1,130) (2,22)};
+    \addlegendentry{Kube-linter (Kubernetes)}
+
+    % Etykiety łącznych wartości nad słupkami
+    \node[font=\small\bfseries] at (axis cs:1, 155) {147};
+    \node[font=\small\bfseries] at (axis cs:2,  38) {30};
+
+    % Strzałka ze wskazaniem redukcji
+    \draw[->, thick, gray!55]
+        (axis cs:1.18, 147) -- (axis cs:1.82, 30)
+        node[midway, above, sloped, font=\small, black]
+            {$-$79{,}6\%};
+
+\end{axis}
+\end{tikzpicture}
+\caption{Porównanie łącznej liczby ostrzeżeń statycznej analizy (Hadolint + Kube-linter) w RQ3: wariant bazowy vs.\ best practices. Każdy słupek dzieli się na część Dockerfile (niebieski) i Kubernetes (pomarańczowy). Strzałka wskazuje redukcję o~79{,}6\% przy wzmocnieniu prompta o wytyczne dobrych praktyk.}
+\label{fig:h3-warnings-comparison}
+\end{figure}
+
 \subsubsection{Wpływ prompt engineeringu}
 
 Wzmocnienie prompta o checklistę dobrych praktyk wiązało się z wyraźną poprawą jakości konfiguracji: łączna liczba ostrzeżeń spadła z 147 do 30 (o 79{,}6\%), a średnia liczba ostrzeżeń na przebieg z 1{,}96 do 0{,}40. Odsetek przebiegów bez ostrzeżeń wzrósł o 57{,}4 p.p. (z 17{,}3\% do 74{,}7\%), a odsetek przebiegów z ostrzeżeniami spadł z 82{,}7\% do 25{,}3\%. W obu wariantach dominowały ostrzeżenia Kube-linter, jednak spadły one z 130 do 22, co sugeruje wysoką użyteczność wytycznych dotyczących manifestów Kubernetes. Ze względu na pojedyncze powtórzenie na kombinację wynik należy jednak interpretować ostrożnie.
