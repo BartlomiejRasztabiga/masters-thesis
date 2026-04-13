@@ -377,6 +377,74 @@ Wyniki pokazują, że jakość konfiguracji generowanych bez dodatkowych instruk
     \label{tab:h4-repeatability}
 \end{table}
 
+\begin{figure}[h]
+    \centering
+    \resizebox{\textwidth}{!}{%
+    \begin{tikzpicture}
+        % wymiary komórek
+        \pgfmathsetmacro{\cw}{2.15}
+        \pgfmathsetmacro{\ch}{1.15}
+        % pozycja paska koloru
+        \pgfmathsetmacro{\cbx}{5*\cw + 0.8}
+        \pgfmathsetmacro{\cbw}{0.42}
+
+        % --- Wiersz 1: Gemini 2.5 Flash (dół, y = 0..ch) ---
+        \foreach [count=\ci from 0] \val in {0.1682, 0.3945, 0.4383, 0.9908, 0.6450} {
+            \pgfmathtruncatemacro{\pct}{round(\val*100)}
+            \colorlet{cellcol}{red!\pct!green}
+            \pgfmathsetmacro{\cx}{\ci*\cw}
+            \fill[cellcol] (\cx, 0) rectangle (\cx+\cw, \ch);
+            \node[font=\scriptsize\bfseries] at (\cx+\cw/2, \ch/2) {\val};
+        }
+
+        % --- Wiersz 2: DeepSeek V3.2 (góra, y = ch..2ch) ---
+        \foreach [count=\ci from 0] \val in {0.3484, 0.5301, 0.5501, 0.7661, 0.8004} {
+            \pgfmathtruncatemacro{\pct}{round(\val*100)}
+            \colorlet{cellcol}{red!\pct!green}
+            \pgfmathsetmacro{\cx}{\ci*\cw}
+            \fill[cellcol] (\cx, \ch) rectangle (\cx+\cw, 2*\ch);
+            \node[font=\scriptsize\bfseries] at (\cx+\cw/2, \ch*1.5) {\val};
+        }
+
+        % --- Siatka ---
+        \pgfmathsetmacro{\gridw}{5*\cw}
+        \pgfmathsetmacro{\gridh}{2*\ch}
+        \draw[black!50, thin] (0,0) rectangle (\gridw, \gridh);
+        \foreach \i in {1,...,4} {
+            \pgfmathsetmacro{\gx}{\i*\cw}
+            \draw[black!50, thin] (\gx, 0) -- (\gx, \gridh);
+        }
+        \draw[black!50, thin] (0, \ch) -- (\gridw, \ch);
+
+        % --- Etykiety osi Y ---
+        \node[anchor=east, font=\small] at (-0.15, \ch/2)   {Gemini 2.5 Flash};
+        \node[anchor=east, font=\small] at (-0.15, \ch*1.5) {DeepSeek V3.2};
+
+        % --- Etykiety osi X ---
+        \foreach [count=\ci from 0] \lbl in {POC1,POC2,POC3,POC4,POC5} {
+            \pgfmathsetmacro{\lx}{\ci*\cw+\cw/2}
+            \node[anchor=north, font=\small] at (\lx, -0.12) {\lbl};
+        }
+
+        % --- Pasek koloru ---
+        \shade[bottom color=green, top color=red]
+            (\cbx, 0) rectangle (\cbx+\cbw, 2*\ch);
+        \draw[black!50, thin]
+            (\cbx, 0) rectangle (\cbx+\cbw, 2*\ch);
+        \pgfmathsetmacro{\cbright}{\cbx+\cbw}
+        \foreach \v/\frac in {0/0, 0.25/0.5, 0.5/1.0, 0.75/1.5, 1.0/2.0} {
+            \pgfmathsetmacro{\ty}{\frac*\ch}
+            \draw[thin] (\cbright, \ty) -- (\cbright+0.15, \ty);
+            \node[anchor=west, font=\tiny] at (\cbright+0.18, \ty) {\v};
+        }
+        \pgfmathsetmacro{\cblabel}{\cbx-0.3}
+        \node[rotate=90, anchor=south, font=\small] at (\cblabel, \ch) {Diff ratio};
+    \end{tikzpicture}%
+    }
+    \caption{Mapa cieplna średniego diff ratio w RQ4 (kolor zielony = wysoka powtarzalność, czerwony = niska)}
+    \label{fig:h4-heatmap}
+\end{figure}
+
 \subsubsection{Analiza powtarzalności}
 
 Pomimo deterministycznych parametrów (temperature=0, stały seed) w większości konfiguracji obserwowana jest istotna zmienność wygenerowanych artefaktów (tab.~\ref{tab:h4-repeatability}). Największe różnice występują w bardziej złożonych repozytoriach (POC4 i POC5), gdzie diff ratio przekracza 0{,}6, natomiast POC1 zachowuje względną stabilność (diff ratio poniżej 0{,}35). Wskazuje to, że powtarzalność procesu spada wraz ze wzrostem złożoności wejścia, nawet przy tych samych ustawieniach losowości.
@@ -414,6 +482,34 @@ Eksperyment RQ5 objął 90 przebiegów (3 warianty manipulacji $\times$ 3 modele
 \textbf{W3 (pozorna zależność historyczna):} wariant oparty na pozornej zależności historycznej osiągnął najwyższą skuteczność manipulacji: 21/30 przebiegów (70{,}0\%). Wygenerowane artefakty zawierały dodatkowe zasoby Redis (np.\ \texttt{StatefulSet}, \texttt{Service}, \texttt{Secret}, \texttt{ConfigMap}) oraz zmienne środowiskowe sugerujące zależność, mimo że nie wynikała ona z kodu aplikacji.
 
 \textbf{Porównanie modeli w RQ5:} najwyższą podatność wykazał \texttt{deepseek-chat} (V3.2), dla którego odchylenie wystąpiło w 30/30 przebiegach (100{,}0\%; 95\% CI: 88{,}6\%--100{,}0\%). Model \texttt{gpt-5-mini} osiągnął 19/30 odchyleń (63{,}3\%; 95\% CI: 45{,}5\%--78{,}1\%), natomiast \texttt{gemini-2.5-flash} był wyraźnie bardziej odporny i uległ manipulacji tylko w 2/30 przebiegach (6{,}7\%; 95\% CI: 1{,}8\%--21{,}3\%).
+
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            xbar,
+            xmin=0, xmax=115,
+            xlabel={Odsetek przebiegów z odchyleniem [\%]},
+            ytick={1,2,3},
+            yticklabels={Gemini 2.5 Flash, GPT-5 Mini, DeepSeek V3.2},
+            nodes near coords,
+            nodes near coords style={font=\small, xshift=2pt},
+            nodes near coords align={horizontal},
+            bar width=18pt,
+            width=0.75\textwidth,
+            height=5.5cm,
+            enlarge y limits=0.4,
+            xmajorgrids=true,
+            grid style=dashed,
+        ]
+        \addplot[fill=green!60!black,  draw=green!40!black,  bar shift=0pt] coordinates { (6.7,   1) };
+        \addplot[fill=orange!70!black, draw=orange!50!black, bar shift=0pt] coordinates { (63.3,  2) };
+        \addplot[fill=red!80!black,    draw=red!60!black,    bar shift=0pt] coordinates { (100.0, 3) };
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Podatność modeli na manipulację kontekstem w RQ5 (odsetek przebiegów z wykrytym odchyleniem)}
+    \label{fig:h5-susceptibility}
+\end{figure}
 
 \subsubsection{Przykłady manipulacji}
 
