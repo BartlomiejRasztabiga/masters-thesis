@@ -1,87 +1,89 @@
 \clearpage % Rozdziały zaczynamy od nowej strony.
 \section{Dyskusja wyników}
 
-W niniejszym rozdziale przedstawiono przekrojową interpretację wyników zaprezentowanych w rozdziale 5. Celem dyskusji jest powiązanie odpowiedzi na poszczególne pytania badawcze, wskazanie zależności między obserwowanymi zjawiskami oraz ocena znaczenia praktycznego uzyskanych rezultatów dla zastosowania agentów LLM w zadaniach DevOps.
+TODO
 
-\subsection{Synteza odpowiedzi na pytania badawcze}
+% W niniejszym rozdziale przedstawiono przekrojową interpretację wyników zaprezentowanych w rozdziale 5. Celem dyskusji jest powiązanie odpowiedzi na poszczególne pytania badawcze, wskazanie zależności między obserwowanymi zjawiskami oraz ocena znaczenia praktycznego uzyskanych rezultatów dla zastosowania agentów LLM w zadaniach DevOps.
 
-% TODO: Zsyntetyzować odpowiedzi na RQ1--RQ5 w jednej narracji.
-% Proponowany zakres:
-% - RQ1: realna skuteczność end-to-end i jej granice,
-% - RQ2: wpływ złożoności architektury na spadek skuteczności,
-% - RQ3: relacja między jakością artefaktów a instrukcjami jakościowymi,
-% - RQ4: znaczenie zmienności procesu mimo deterministycznych ustawień,
-% - RQ5: podatność na manipulację jako ograniczenie zaufania do wyników.
+% \subsection{Synteza odpowiedzi na pytania badawcze}
 
-\subsection{Porównanie modeli}
+% % TODO: Zsyntetyzować odpowiedzi na RQ1--RQ5 w jednej narracji.
+% % Proponowany zakres:
+% % - RQ1: realna skuteczność end-to-end i jej granice,
+% % - RQ2: wpływ złożoności architektury na spadek skuteczności,
+% % - RQ3: relacja między jakością artefaktów a instrukcjami jakościowymi,
+% % - RQ4: znaczenie zmienności procesu mimo deterministycznych ustawień,
+% % - RQ5: podatność na manipulację jako ograniczenie zaufania do wyników.
 
-% TODO: Przeprowadzić analizę przekrojową modeli między RQ1--RQ5.
-% Proponowany zakres:
-% - porównanie skuteczności funkcjonalnej między modelami,
-% - różnice w jakości generowanych artefaktów,
-% - różnice w powtarzalności procesu,
-% - różnice w odporności na manipulację kontekstem,
-% - kompromisy między skutecznością, jakością i bezpieczeństwem.
+% \subsection{Porównanie modeli}
 
-\subsection{Interpretacja ograniczeń modeli LLM}
+% % TODO: Przeprowadzić analizę przekrojową modeli między RQ1--RQ5.
+% % Proponowany zakres:
+% % - porównanie skuteczności funkcjonalnej między modelami,
+% % - różnice w jakości generowanych artefaktów,
+% % - różnice w powtarzalności procesu,
+% % - różnice w odporności na manipulację kontekstem,
+% % - kompromisy między skutecznością, jakością i bezpieczeństwem.
 
-% TODO: Zinterpretować główne źródła błędów i ograniczeń modeli.
-% Proponowany zakres:
-% - ograniczone rozumienie kontekstu runtime i środowiska wykonawczego,
-% - problemy z zależnościami między usługami i konfiguracją infrastrukturalną,
-% - halucynacje i nadmierne uogólnianie jako mechanizm błędów,
-% - zależność jakości wyniku od kompletności i spójności sygnałów wejściowych.
+% \subsection{Interpretacja ograniczeń modeli LLM}
 
-\subsection{Rola prompt engineeringu}
+% % TODO: Zinterpretować główne źródła błędów i ograniczeń modeli.
+% % Proponowany zakres:
+% % - ograniczone rozumienie kontekstu runtime i środowiska wykonawczego,
+% % - problemy z zależnościami między usługami i konfiguracją infrastrukturalną,
+% % - halucynacje i nadmierne uogólnianie jako mechanizm błędów,
+% % - zależność jakości wyniku od kompletności i spójności sygnałów wejściowych.
 
-% TODO: Wyjaśnić, dlaczego rozszerzony prompt poprawia jakość wyników.
-% Proponowany zakres:
-% - redukcja przestrzeni dopuszczalnych rozwiązań,
-% - wymuszenie uwzględniania dobrych praktyk,
-% - wpływ na jakość artefaktów i spójność decyzji,
-% - praktyczne implikacje dla projektowania instrukcji systemowych.
+% \subsection{Rola prompt engineeringu}
 
-\subsection{Niezawodność i deterministyczność procesu agentowego}
+% % TODO: Wyjaśnić, dlaczego rozszerzony prompt poprawia jakość wyników.
+% % Proponowany zakres:
+% % - redukcja przestrzeni dopuszczalnych rozwiązań,
+% % - wymuszenie uwzględniania dobrych praktyk,
+% % - wpływ na jakość artefaktów i spójność decyzji,
+% % - praktyczne implikacje dla projektowania instrukcji systemowych.
 
-% TODO: Omówić znaczenie wyników RQ4 w szerszym kontekście.
-% Proponowany zakres:
-% - dlaczego temperature=0 nie gwarantuje pełnej deterministyczności,
-% - wpływ architektury agentowej i narzędzi na zmienność wyników,
-% - różnica między pojedynczym wywołaniem modelu a wieloetapowym procesem agentowym,
-% - konsekwencje praktyczne dla automatyzacji i powtarzalności pipeline'ów.
+% \subsection{Niezawodność i deterministyczność procesu agentowego}
 
-\subsection{Aspekty bezpieczeństwa i podatność na manipulację}
+% % TODO: Omówić znaczenie wyników RQ4 w szerszym kontekście.
+% % Proponowany zakres:
+% % - dlaczego temperature=0 nie gwarantuje pełnej deterministyczności,
+% % - wpływ architektury agentowej i narzędzi na zmienność wyników,
+% % - różnica między pojedynczym wywołaniem modelu a wieloetapowym procesem agentowym,
+% % - konsekwencje praktyczne dla automatyzacji i powtarzalności pipeline'ów.
 
-% TODO: Omówić implikacje wyników RQ5 dla bezpieczeństwa praktycznych wdrożeń.
-% Proponowany zakres:
-% - znaczenie podatności na mylący kontekst repozytorium,
-% - repo poisoning i prompt injection jako realne ryzyka,
-% - wpływ na zaufanie do wygenerowanych artefaktów,
-% - potrzeba mechanizmów obronnych i dodatkowej weryfikacji.
+% \subsection{Aspekty bezpieczeństwa i podatność na manipulację}
 
-\subsection{Porównanie z literaturą}
+% % TODO: Omówić implikacje wyników RQ5 dla bezpieczeństwa praktycznych wdrożeń.
+% % Proponowany zakres:
+% % - znaczenie podatności na mylący kontekst repozytorium,
+% % - repo poisoning i prompt injection jako realne ryzyka,
+% % - wpływ na zaufanie do wygenerowanych artefaktów,
+% % - potrzeba mechanizmów obronnych i dodatkowej weryfikacji.
 
-% TODO: Odnieść uzyskane wyniki do literatury omówionej w rozdziale 2.
-% Proponowany zakres:
-% - które obserwacje potwierdzają wcześniejsze prace,
-% - gdzie wyniki wskazują silniejsze ograniczenia praktyczne,
-% - różnice wynikające z zastosowania architektury agentowej i walidacji end-to-end.
+% \subsection{Porównanie z literaturą}
 
-\subsection{Znaczenie praktyczne dla automatyzacji DevOps}
+% % TODO: Odnieść uzyskane wyniki do literatury omówionej w rozdziale 2.
+% % Proponowany zakres:
+% % - które obserwacje potwierdzają wcześniejsze prace,
+% % - gdzie wyniki wskazują silniejsze ograniczenia praktyczne,
+% % - różnice wynikające z zastosowania architektury agentowej i walidacji end-to-end.
 
-% TODO: Zebrać najważniejsze implikacje praktyczne w jednym miejscu.
-% Proponowany zakres:
-% - zastosowania w prostszych projektach i jako wsparcie inżyniera,
-% - ograniczenia przy aplikacjach wielousługowych,
-% - potrzeba walidacji statycznej i testów runtime,
-% - warunki bezpiecznego użycia w środowisku organizacyjnym.
+% \subsection{Znaczenie praktyczne dla automatyzacji DevOps}
 
-\subsection{Ograniczenia badania i zagrożenia dla trafności}
+% % TODO: Zebrać najważniejsze implikacje praktyczne w jednym miejscu.
+% % Proponowany zakres:
+% % - zastosowania w prostszych projektach i jako wsparcie inżyniera,
+% % - ograniczenia przy aplikacjach wielousługowych,
+% % - potrzeba walidacji statycznej i testów runtime,
+% % - warunki bezpiecznego użycia w środowisku organizacyjnym.
 
-% TODO: Opisać ograniczenia metodologiczne i ich wpływ na interpretację wyników.
-% Proponowany zakres:
-% - dobór repozytoriów i liczba powtórzeń,
-% - ograniczony zestaw modeli,
-% - środowisko wykonawcze i pipeline walidacyjny,
-% - brak walidacji runtime w RQ3 i RQ5,
-% - możliwa zależność wyników od promptu i użytych narzędzi agenta.
+% \subsection{Ograniczenia badania i zagrożenia dla trafności}
+
+% % TODO: Opisać ograniczenia metodologiczne i ich wpływ na interpretację wyników.
+% % Proponowany zakres:
+% % - dobór repozytoriów i liczba powtórzeń,
+% % - ograniczony zestaw modeli,
+% % - środowisko wykonawcze i pipeline walidacyjny,
+% % - brak walidacji runtime w RQ3 i RQ5,
+% % - możliwa zależność wyników od promptu i użytych narzędzi agenta.
