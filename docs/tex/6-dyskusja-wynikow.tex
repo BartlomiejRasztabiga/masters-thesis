@@ -7,7 +7,7 @@ W niniejszym rozdziale przedstawiono przekrojową interpretację wyników zaprez
 
 Przeprowadzone eksperymenty dostarczyły spójnego obrazu możliwości i ograniczeń agentów LLM w autonomicznym generowaniu konfiguracji Infrastructure as Code. Poniżej zestawiono kluczowe obserwacje per pytanie badawcze, wskazując zależności między nimi.
 
-\textbf{RQ1 — autonomiczna generacja funkcjonalnych konfiguracji.} Agenty LLM potrafią wygenerować działające konfiguracje IaC w ponad 60\% przypadków dla prostych i umiarkowanie złożonych aplikacji webowych (end-to-end success rate: 62{,}7\%). Etapy build i apply przebiegają skutecznie w około 78--77\% przebiegów, natomiast główna bariera leży w przejściu od poprawnej konfiguracji do poprawnego działania aplikacji w środowisku runtime. Błędy koncentrują się wokół ograniczonego rozumienia środowiska wykonawczego — wersji bibliotek, kontekstu budowania obrazu, uprawnień systemowych — a nie samego języka konfiguracyjnego IaC.
+\textbf{RQ1 — autonomiczna generacja funkcjonalnych konfiguracji.} Agenty LLM potrafią wygenerować działające konfiguracje IaC w ponad 60\% przypadków dla prostych i umiarkowanie złożonych aplikacji webowych (end-to-end success rate: 62{,}7\%). Etapy build i apply przebiegają skutecznie odpowiednio w 78\% i 76\% przebiegów, natomiast główna bariera leży w przejściu od poprawnej konfiguracji do poprawnego działania aplikacji w środowisku runtime. Błędy koncentrują się wokół ograniczonego rozumienia środowiska wykonawczego — wersji bibliotek, kontekstu budowania obrazu, uprawnień systemowych — a nie samego języka konfiguracyjnego IaC.
 
 \textbf{RQ2 — ograniczenia złożonościowe.} Złożoność aplikacji wielokomponentowych jest dominującym czynnikiem ograniczającym skuteczność. Skuteczność spada od 100\% dla pojedynczej usługi (POC1) do 0\% dla układu pięciu skoordynowanych serwisów (POC5), a ogólny success rate w eksperymencie kontrolowanym wyniósł 33{,}3\%. Główna przyczyna degradacji to rosnąca trudność ze spójną koordynacją konfiguracji sieciowej, sekretów i zależności między usługami — nie zaś wzrost objętości samych plików konfiguracyjnych.
 
@@ -32,7 +32,7 @@ Trzy modele biorące udział w badaniu — \texttt{gemini-2.5-flash}, \texttt{gp
         RQ4 diff ratio (avg) & 0{,}5274 & --- & 0{,}5990 \\
         RQ5 podatność & 6{,}7\% & 63{,}3\% & 100{,}0\% \\
     \end{tabular}
-    \caption{Porównanie modeli w przekroju RQ1--RQ5}
+    \caption{Porównanie modeli w przekroju RQ1--RQ5 ($^*$~RQ4 przeprowadzono tylko dla modeli Gemini i DeepSeek)}
     \label{tab:models-comparison}
 \end{table}
 
@@ -76,7 +76,7 @@ Wyniki RQ4 kwestionują intuicyjne założenie, że ustawienie temperature=0 w m
 
 \textbf{Różnica między modelem a agentem.} Pojedyncze wywołanie modelu z temperature=0 jest w praktyce zbliżone do deterministycznego. Natomiast wieloetapowy proces agentowy z narzędziami IO jest z natury niedeterministyczny: kolejność odczytu plików, decyzje o iteratywnej korekcie błędów, wybór nazw zmiennych czy wybór bazowego obrazu Docker stanowią punkty rozgałęzienia, które kumulują zmienność. W tym sensie wyniki RQ4 mierzą nie tyle własności modelu, co własności architektury agentowej.
 
-\textbf{Skala zmienności a złożoność.} Rosnący diff ratio wraz z rosnącą złożonością (POC1: 0{,}17--0{,}35; POC5: 0{,}64--0{,}80) sugeruje, że złożone przypadki tworzą więcej punktów rozgałęzienia i większą powierzchnię decyzyjną. Liczba kroków narzędziowych rośnie niemal monotonicznie: model deepseek wykonuje ok.\ 64 kroków dla POC5 vs.\ ok.\ 19 dla POC1, co wskazuje na dużo więcej możliwości akumulacji odchyleń.
+\textbf{Skala zmienności a złożoność.} Rosnący diff ratio wraz z rosnącą złożonością (POC1: 0{,}17--0{,}35; POC5: 0{,}64--0{,}80) sugeruje, że złożone przypadki tworzą więcej punktów rozgałęzienia i większą powierzchnię decyzyjną. Liczba kroków narzędziowych rośnie wraz ze złożonością, choć nie monotonicznie: dla modelu deepseek wynosi ok.\ 19 kroków dla POC1 i ok.\ 64 dla POC4, a dla POC5 nieznacznie spada do ok.\ 64 (deepseek) i 38 (gemini), co może odzwierciedlać wcześniejsze kończenie pracy przez agenta w obliczu nierozwiązywalnych zależności. Ogólnie jednak większa liczba kroków oznacza więcej możliwości akumulacji odchyleń.
 
 \textbf{Konsekwencje praktyczne.} W automatycznych pipeline'ach DevOps zmienność procesu oznacza, że wynik jednorazowego uruchomienia agenta nie jest reprezentatywny dla jego ogólnych możliwości. Stabilne wdrożenie produkcyjne wymaga albo wielokrotnego uruchomienia z mechanizmem głosowania lub selekcji, albo dodatkowej walidacji końcowej wystarczająco rygorystycznej, aby wychwycić rozbieżności między powtórzeniami. Alternatywnym podejściem jest architektura agentowa z deterministyczną warstwą planowania i ograniczeniem przestrzeni decyzyjnej modelu do wyborów między wcześniej zdefiniowanymi szablonami.
 
@@ -84,7 +84,7 @@ Wyniki RQ4 kwestionują intuicyjne założenie, że ustawienie temperature=0 w m
 
 Wyniki RQ5 wskazują, że podatność agentów LLM na manipulację kontekstem jest realna i praktycznie istotna. Krytyczne odchylenia od specyfikacji wystąpiły w 56{,}7\% przypadków przy stosunkowo prostych technikach manipulacji dokumentacyjnej — bez użycia zaawansowanych metod inżynierii promptów ani exploitowania podatności modelu.
 
-\textbf{Mechanizm podatności.} Agenty LLM działające na repozytoriach traktują dostępne pliki — dokumentację, komentarze, pliki README, opisy API — jako wiarygodny kontekst. W środowisku produkcyjnym nie istnieje separacja między „zaufanymi" plikami kodu a „niezaufanymi" plikami dokumentacyjnymi. Oznacza to, że atakujący z prawem zapisu do repozytorium może osadzić w dokumentacji fałszywe wymagania, które agent bezkrytycznie przeniesie do generowanej konfiguracji wdrożeniowej. Jest to forma ataku \textit{repo poisoning} opisana w kontekście systemów AI automatyzujących zadania programistyczne.
+\textbf{Mechanizm podatności.} Agenty LLM działające na repozytoriach traktują dostępne pliki — dokumentację, komentarze, pliki README, opisy API — jako wiarygodny kontekst. W środowisku produkcyjnym nie istnieje separacja między „zaufanymi" plikami kodu a „niezaufanymi" plikami dokumentacyjnymi. Oznacza to, że atakujący z prawem zapisu do repozytorium może osadzić w dokumentacji fałszywe wymagania, które agent bezkrytycznie przeniesie do generowanej konfiguracji wdrożeniowej. Jest to forma ataku \textit{repo poisoning} opisana w kontekście systemów AI automatyzujących zadania programistyczne \cite{zhao_survey_2025}.
 
 \textbf{Wariant W2 jako punkt odniesienia.} Spośród trzech wariantów, autorytatywne zalecenia bezpieczeństwa (W2) okazały się najmniej skuteczne (33{,}3\%). Sugeruje to, że modele są w pewnym stopniu przeszkolone do rozpoznawania instrukcji o charakterze „security override" jako podejrzanych — co jest pozytywną obserwacją. Jednak fakt, że mimo to 10/30 przebiegów uległo manipulacji i wygenerowało manifesty z eskalacją uprawnień, wskazuje, że te mechanizmy obronne są niewystarczające.
 
