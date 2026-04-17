@@ -29,10 +29,10 @@ Trzy modele biorące udział w badaniu — \texttt{gemini-2.5-flash}, \texttt{gp
         \textbf{Metryka} & \textbf{Gemini 2.5 Flash} & \textbf{GPT-5 Mini} & \textbf{DeepSeek V3.2} \\
         RQ1 (end-to-end) & 62{,}0\% & 68{,}0\% & 58{,}0\% \\
         RQ2 (end-to-end) & 20{,}0\% & 46{,}7\% & 33{,}3\% \\
-        RQ4 diff ratio (avg) & 0{,}5274 & --- & 0{,}5990 \\
+        RQ4 diff ratio (avg) & 0{,}5274 & ---\textsuperscript{*} & 0{,}5990 \\
         RQ5 podatność & 6{,}7\% & 63{,}3\% & 100{,}0\% \\
     \end{tabular}
-    \caption{Porównanie modeli w przekroju RQ1--RQ5 ($^*$~RQ4 przeprowadzono tylko dla modeli Gemini i DeepSeek)}
+    \caption{Porównanie modeli w przekroju RQ1--RQ5 ($^*$~RQ4 nie obejmowało modelu GPT-5 Mini)}
     \label{tab:models-comparison}
 \end{table}
 
@@ -60,7 +60,7 @@ Analiza typowych błędów zebranych w rozdziale~5 wskazuje na kilka systemowych
 
 Wyniki RQ3 stanowią bezpośredni dowód empiryczny na wpływ prompt engineeringu na jakość generowanych artefaktów IaC. Rozszerzenie instrukcji systemowej o checklistę dobrych praktyk zmniejszyło łączną liczbę ostrzeżeń o 79{,}6\% i trzykrotnie zwiększyło odsetek konfiguracji w pełni wolnych od ostrzeżeń. Efekt ten jest zbieżny z obserwacjami z literatury: Kratzke i Drews \cite{kratzke_dont_2024} wskazują na kluczową rolę techniki promptowania w osiąganiu wysokiej jakości manifestów Kubernetes.
 
-\textbf{Mechanizm działania.} Prompt engineeringowy wariant best practices działa przez \textit{redukcję przestrzeni dopuszczalnych rozwiązań}: model, który w trybie bazowym może wybrać dowolne poprawne rozwiązanie, w trybie rozszerzonym otrzymuje jawny zestaw kryteriów, które musi spełnić. W efekcie zbiór generowanych konfiguracji przesuwa się w kierunku podzbioru spełniającego dodatkowe wymagania jakościowe. Nie poprawia to zdolności rozumowania modelu — poprawia precyzję celu.
+\textbf{Mechanizm działania.} Wariant best practices działa przez \textit{redukcję przestrzeni dopuszczalnych rozwiązań}: model, który w trybie bazowym może wybrać dowolne poprawne rozwiązanie, w trybie rozszerzonym otrzymuje jawny zestaw kryteriów, które musi spełnić. W efekcie zbiór generowanych konfiguracji przesuwa się w kierunku podzbioru spełniającego dodatkowe wymagania jakościowe. Nie poprawia to zdolności rozumowania modelu — poprawia precyzję celu.
 
 \textbf{Wpływ na jakość Kubernetes vs.\ Dockerfile.} W obu wariantach dominowały ostrzeżenia Kube-linter: 130 w wariancie bazowym vs.\ 22 w wariancie best practices. Ostrzeżenia Hadolint były mniej liczne (17 vs.\ 8) i spadły relatywnie mniej. Wskazuje to, że modele mają lepszą domyślną znajomość dobrych praktyk Dockerfile niż manifestów Kubernetes, co może wynikać z większej reprezentacji plików Dockerfile w danych treningowych i mniejszej ich specyficzności konfiguracyjnej.
 
@@ -76,7 +76,7 @@ Wyniki RQ4 kwestionują intuicyjne założenie, że ustawienie temperature=0 w m
 
 \textbf{Różnica między modelem a agentem.} Pojedyncze wywołanie modelu z temperature=0 jest w praktyce zbliżone do deterministycznego. Natomiast wieloetapowy proces agentowy z narzędziami IO jest z natury niedeterministyczny: kolejność odczytu plików, decyzje o iteratywnej korekcie błędów, wybór nazw zmiennych czy wybór bazowego obrazu Docker stanowią punkty rozgałęzienia, które kumulują zmienność. W tym sensie wyniki RQ4 mierzą nie tyle własności modelu, co własności architektury agentowej.
 
-\textbf{Skala zmienności a złożoność.} Rosnący diff ratio wraz z rosnącą złożonością (POC1: 0{,}17--0{,}35; POC5: 0{,}64--0{,}80) sugeruje, że złożone przypadki tworzą więcej punktów rozgałęzienia i większą powierzchnię decyzyjną. Liczba kroków narzędziowych rośnie wraz ze złożonością, choć nie monotonicznie: dla modelu deepseek wynosi ok.\ 19 kroków dla POC1 i ok.\ 64 dla POC4, a dla POC5 nieznacznie spada do ok.\ 64 (deepseek) i 38 (gemini), co może odzwierciedlać wcześniejsze kończenie pracy przez agenta w obliczu nierozwiązywalnych zależności. Ogólnie jednak większa liczba kroków oznacza więcej możliwości akumulacji odchyleń.
+\textbf{Skala zmienności a złożoność.} Rosnący diff ratio wraz z rosnącą złożonością (POC1: 0{,}17--0{,}35; POC5: 0{,}64--0{,}80) sugeruje, że złożone przypadki tworzą więcej punktów rozgałęzienia i większą powierzchnię decyzyjną. Liczba kroków narzędziowych rośnie wraz ze złożonością, choć nie monotonicznie: dla modelu deepseek wynosi ok.\ 19 kroków dla POC1 i ok.\ 67 dla POC4, po czym nieznacznie spada do ok.\ 64 dla POC5; dla gemini analogiczny spadek jest wyraźniejszy (44 → 38 kroków między POC4 a POC5). Może to odzwierciedlać wcześniejsze kończenie pracy przez agenta w obliczu nierozwiązywalnych zależności. Ogólnie jednak większa liczba kroków oznacza więcej możliwości akumulacji odchyleń.
 
 \textbf{Konsekwencje praktyczne.} W automatycznych pipeline'ach DevOps zmienność procesu oznacza, że wynik jednorazowego uruchomienia agenta nie jest reprezentatywny dla jego ogólnych możliwości. Stabilne wdrożenie produkcyjne wymaga albo wielokrotnego uruchomienia z mechanizmem głosowania lub selekcji, albo dodatkowej walidacji końcowej wystarczająco rygorystycznej, aby wychwycić rozbieżności między powtórzeniami. Alternatywnym podejściem jest architektura agentowa z deterministyczną warstwą planowania i ograniczeniem przestrzeni decyzyjnej modelu do wyborów między wcześniej zdefiniowanymi szablonami.
 
@@ -122,7 +122,7 @@ Zestawiając wyniki wszystkich pięciu pytań badawczych, można sformułować p
 
 \subsection{Retrospektywna ocena zagrożeń dla trafności}
 
-Zagrożenia ważności eksperymentów zostały zidentyfikowane a priori w rozdziale~4 (\ref{sec:threats-to-validity}). W świetle uzyskanych wyników można ocenić, które z nich faktycznie zmaterializowały się i z jaką siłą.
+Zagrożenia trafności eksperymentów zostały zidentyfikowane a priori w rozdziale~4 (\ref{sec:threats-to-validity}). W świetle uzyskanych wyników można ocenić, które z nich faktycznie zmaterializowały się i z jaką siłą.
 
 \textbf{Reprezentatywność zbioru RQ1} okazała się zagrożeniem aktywnym: skupienie na prostych aplikacjach webowych Python/Node.js sprawia, że wyniki nie przenoszą się bezpośrednio na złożone systemy wielousługowe — co RQ2 potwierdził doświadczalnie. Zagrożenie było znane i celowe; wyniki RQ2 stanowią jego kontrolowane rozwinięcie.
 
