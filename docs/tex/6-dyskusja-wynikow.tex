@@ -54,7 +54,7 @@ Analiza typowych błędów zebranych w rozdziale~5 wskazuje na kilka systemowych
 
 \textbf{Halucynacje i nadmierne uogólnianie.} W kilku przypadkach (widocznych w wynikach RQ5 dla wariantu W3) agent dodawał zasoby infrastrukturalne niewynikające z kodu — np.\ pełny stos Redis — jedynie dlatego, że kontekst dokumentacyjny sugerował ich użycie. Mechanizm ten przypomina halucynacje faktograficzne opisane w literaturze \cite{zhao_survey_2025}: model generuje spójny, poprawnie sformatowany artefakt, który jednak nie odpowiada rzeczywistym wymaganiom aplikacji. W odróżnieniu od typowych halucynacji, tutaj artefakt jest poprawny względem \textit{dostarczonego kontekstu}, lecz błędny względem \textit{faktycznej specyfikacji} — co czyni go trudniejszym do wykrycia przez proste narzędzia.
 
-\textbf{Zależność jakości od kompletności sygnałów wejściowych.} Wyniki RQ3 pokazują, że domyślna wiedza modelu o dobrych praktykach nie jest wystarczająca — 82{,}7\% przebiegów bez dodatkowych instrukcji generuje artefakty z ostrzeżeniami. Modele nie stosują automatycznie najlepszych praktyk (np.\ nieroot user, resource limits, security contexts), jeśli nie są do tego jawnie nakierowane. Oznacza to, że jakość wyników jest silnie uzależniona od jakości i kompletności instrukcji systemowej — co stanowi zarówno ograniczenie, jak i możliwość kontrolowania zachowania modelu przez projektanta systemu agentowego.
+\textbf{Zależność jakości od kompletności sygnałów wejściowych.} Modele nie stosują automatycznie najlepszych praktyk (np.\ nieroot user, resource limits, security contexts) bez jawnego nakierowania — szczegółowa analiza tego efektu i jego implikacje omówione są w sekcji poświęconej roli prompt engineeringu.
 
 \subsection{Rola prompt engineeringu}
 
