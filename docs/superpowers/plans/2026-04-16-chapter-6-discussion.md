@@ -1,0 +1,412 @@
+# Rozdział 6: Dyskusja wyników — Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Napisać kompletny Rozdział 6 „Dyskusja wyników" pracy magisterskiej w LaTeX, obejmujący syntezę RQ1–RQ5, porównanie modeli, implikacje praktyczne i ograniczenia badania.
+
+**Architecture:** Rozdział składa się z 9 podrozdziałów pisanych jeden po drugim; każdy opiera się bezpośrednio na wynikach z rozdziału 5 (tex/5-wyniki-eksperymentow.tex). Plik wyjściowy to tex/6-dyskusja-wynikow.tex.
+
+**Tech Stack:** LaTeX, pgfplots (wykresy), biblatex (cytowania); wyniki z RQ1–RQ5 opisane w tex/5-wyniki-eksperymentow.tex.
+
+---
+
+## Kluczowe dane do wykorzystania
+
+| RQ | Wynik kluczowy |
+|----|---------------|
+| RQ1 | 62,7% end-to-end (94/150); build 78,7%; apply 76,7%; główne błędy: runtime (env, wersje) |
+| RQ2 | 33,3% (15/45); POC1=100% → POC5=0%; silny trend monotonicznie malejący |
+| RQ3 | Bazowy: 82,7% z ostrzeżeniami, 147 ostrzeżeń łącznie; best-practices: 25,3% z ostrzeżeniami, 30 ostrzeżeń (–79,6%) |
+| RQ4 | Diff ratio avg=0,5632 (mediana 0,5401); gemini 0,5274; deepseek 0,5990; temperature=0 nie gwarantuje pełnej deterministyczności |
+| RQ5 | 56,7% manipulacji (51/90); W1=66,7%; W2=33,3%; W3=70,0%; gemini 6,7%; gpt-5-mini 63,3%; deepseek 100% |
+
+## Per-model summary
+
+| Model | RQ1 | RQ2 | RQ5 (podatność) |
+|-------|-----|-----|-----------------|
+| gemini-2.5-flash | 62,0% | 20,0% | 6,7% |
+| gpt-5-mini | 68,0% | 46,7% | 63,3% |
+| deepseek-chat (V3.2) | 58,0% | 33,3% | 100,0% |
+
+---
+
+## Task 1: Sekcja — Synteza odpowiedzi na pytania badawcze
+
+**Files:**
+- Modify: `tex/6-dyskusja-wynikow.tex`
+
+- [ ] **Krok 1: Zastąp `TODO` nagłówkiem rozdziału i napisz wprowadzenie + subsection synteza**
+
+Usuń linię `TODO` z pliku i wstaw poniższy tekst:
+
+```latex
+\clearpage
+\section{Dyskusja wyników}
+
+W niniejszym rozdziale przedstawiono przekrojową interpretację wyników zaprezentowanych w rozdziale~\ref{sec:wyniki}. Celem dyskusji jest powiązanie odpowiedzi na poszczególne pytania badawcze, wskazanie zależności między obserwowanymi zjawiskami oraz ocena znaczenia praktycznego uzyskanych rezultatów dla zastosowania agentów LLM w zadaniach DevOps.
+
+\subsection{Synteza odpowiedzi na pytania badawcze}
+
+Przeprowadzone eksperymenty dostarczyły spójnego obrazu możliwości i ograniczeń agentów LLM w autonomicznym generowaniu konfiguracji Infrastructure as Code. Poniżej zestawiono kluczowe obserwacje per pytanie badawcze, wskazując zależności między nimi.
+
+\textbf{RQ1 — autonomiczna generacja funkcjonalnych konfiguracji.} Agenty LLM potrafią wygenerować działające konfiguracje IaC w ponad 60\% przypadków dla prostych i umiarkowanie złożonych aplikacji webowych (end-to-end success rate: 62{,}7\%). Etapy build i apply przebiegają skutecznie w około 78--77\% przebiegów, natomiast główna bariera leży w przejściu od poprawnej konfiguracji do poprawnego działania aplikacji w środowisku runtime. Błędy koncentrują się wokół ograniczonego rozumienia środowiska wykonawczego — wersji bibliotek, kontekstu budowania obrazu, uprawnień systemowych — a nie samego języka konfiguracyjnego IaC.
+
+\textbf{RQ2 — ograniczenia złożonościowe.} Złożoność aplikacji wielokomponentowych jest dominującym czynnikiem ograniczającym skuteczność. Skuteczność spada od 100\% dla pojedynczej usługi (POC1) do 0\% dla układu pięciu skoordynowanych serwisów (POC5), a ogólny success rate w eksperymencie kontrolowanym wyniósł 33{,}3\%. Główna przyczyna degradacji to rosnąca trudność ze spójną koordynacją konfiguracji sieciowej, sekretów i zależności między usługami — nie zaś wzrost objętości samych plików konfiguracyjnych.
+
+\textbf{RQ3 — jakość i zgodność z dobrymi praktykami.} Bez dodatkowych wskazówek jakościowych, 82{,}7\% przebiegów generuje artefakty z co najmniej jednym ostrzeżeniem statycznej analizy. Włączenie wytycznych bezpośrednio do prompta (wariant best practices) redukuje łączną liczbę ostrzeżeń o 79{,}6\% (ze 147 do 30) i trzykrotnie zwiększa odsetek przebiegów bez ostrzeżeń (z 17{,}3\% do 74{,}7\%). Wynik ten wskazuje, że domyślna wiedza modeli o dobrych praktykach IaC jest niewystarczająca, ale łatwa do aktywowania przez odpowiednie instrukcje.
+
+\textbf{RQ4 — niezawodność i powtarzalność.} Pomimo deterministycznych ustawień (temperature=0, stały seed), średni diff ratio wygenerowanych artefaktów wyniósł 0{,}5632, wskazując na istotną zmienność treści między kolejnymi uruchomieniami dla tego samego wejścia. Zmienność liczby kroków narzędziowych była umiarkowana (odchylenie standardowe typowo 6--17\% wartości średniej), co sugeruje, że różnice dotyczą głównie decyzji treściowych agenta, a nie dramatycznych rozbieżności w ścieżce wykonania. Problem nasila się wraz ze wzrostem złożoności wejścia.
+
+\textbf{RQ5 — podatność na manipulację kontekstem.} Krytyczne odchylenia od specyfikacji repozytorium wystąpiły w 56{,}7\% przebiegów, gdy w dokumentacji repozytorium umieszczono wprowadzający w błąd kontekst. Każdy z trzech wariantów manipulacji (sprzeczna specyfikacja, autorytatywne zalecenia bezpieczeństwa, pozorna zależność historyczna) okazał się skuteczny. Implikuje to, że agenty LLM nie traktują kodu źródłowego jako jedynego autorytetu — równoprawnym, a niekiedy silniejszym sygnałem jest dokumentacja, co stwarza realne ryzyko w środowiskach produkcyjnych.
+
+\textbf{Zależności między RQ.} Wyniki wskazują na kilka istotnych powiązań. Po pierwsze, wzrost złożoności (RQ2) koreluje z wyższą zmiennością procesu (RQ4): w POC4--POC5 diff ratio przekracza 0{,}76, podczas gdy dla POC1 wynosi poniżej 0{,}35. Sugeruje to, że trudniejsze przypadki nie tylko częściej kończą się porażką, ale też prowadzą do bardziej rozbieżnych trajektorii agenta. Po drugie, wyniki RQ3 i RQ5 wspólnie wskazują na centralną rolę sygnałów kontekstowych w kształtowaniu wyników: prompt engineering może zarówno poprawiać jakość (gdy zawiera właściwe wytyczne), jak i wprowadzać błędy (gdy dostarcza fałszywych informacji). Model nie dokonuje niezależnej walidacji spójności — ufa temu, co dostaje.
+```
+
+- [ ] **Krok 2: Zbuduj PDF i sprawdź kompilację**
+
+```bash
+cd /Users/rasztabigab/Studia/masters-thesis/docs && latexmk -pdf -interaction=nonstopmode main.tex 2>&1 | tail -20
+```
+
+Oczekiwane: kompilacja bez błędów (ostrzeżenia \hbox są dopuszczalne).
+
+- [ ] **Krok 3: Commit**
+
+```bash
+cd /Users/rasztabigab/Studia/masters-thesis/docs && git add tex/6-dyskusja-wynikow.tex && git commit -m "feat(ch6): synteza odpowiedzi na RQ1-RQ5"
+```
+
+---
+
+## Task 2: Sekcja — Porównanie modeli
+
+**Files:**
+- Modify: `tex/6-dyskusja-wynikow.tex`
+
+- [ ] **Krok 1: Dołącz podrozdział porównania modeli na końcu pliku**
+
+```latex
+\subsection{Porównanie modeli}
+
+Trzy modele biorące udział w badaniu — \texttt{gemini-2.5-flash}, \texttt{gpt-5-mini} oraz \texttt{deepseek-chat} (V3.2) — wykazały wyraźnie odmienne profile skuteczności, jakości i odporności. Tabela~\ref{tab:models-comparison} zestawia kluczowe metryki przekrojowe.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lccc}
+        \textbf{Metryka} & \textbf{Gemini 2.5 Flash} & \textbf{GPT-5 Mini} & \textbf{DeepSeek V3.2} \\
+        RQ1 (end-to-end) & 62{,}0\% & 68{,}0\% & 58{,}0\% \\
+        RQ2 (end-to-end) & 20{,}0\% & 46{,}7\% & 33{,}3\% \\
+        RQ4 diff ratio (avg) & 0{,}5274 & --- & 0{,}5990 \\
+        RQ5 podatność & 6{,}7\% & 63{,}3\% & 100{,}0\% \\
+    \end{tabular}
+    \caption{Porównanie modeli w przekroju RQ1--RQ5}
+    \label{tab:models-comparison}
+\end{table}
+
+\textbf{Skuteczność funkcjonalna (RQ1, RQ2).} Model \texttt{gpt-5-mini} osiągnął najwyższy end-to-end success rate zarówno w zbiorze 25 repozytoriów (68{,}0\%), jak i w zbiorze kontrolowanym POC1--POC5 (46{,}7\%). Model \texttt{deepseek-chat} wypadł najsłabiej w RQ1 (58{,}0\%), natomiast \texttt{gemini-2.5-flash} – w RQ2 (20{,}0\%). Różnice między modelami w RQ1 mieszczą się w granicach wzajemnie zachodzących 95\% CI, co sugeruje, że nie są one statystycznie istotne przy przyjętej liczności próby. Natomiast w RQ2 wyraźna przewaga \texttt{gpt-5-mini} przy złożonych repozytoriach wskazuje, że model ten lepiej radzi sobie z koordynacją wielokomponentowych zależności konfiguracyjnych.
+
+\textbf{Powtarzalność procesu (RQ4).} Model \texttt{deepseek-chat} wykazał wyższy średni diff ratio (0{,}5990) niż \texttt{gemini-2.5-flash} (0{,}5274), co oznacza, że jego wyniki cechuje większa zmienność treści przy kolejnych uruchomieniach. Jednocześnie model deepseek wykonywał więcej kroków narzędziowych (średnio ok.\ 19--64 w zależności od repozytorium), co wskazuje na bardziej eksploracyjny styl pracy agenta.
+
+\textbf{Odporność na manipulację (RQ5).} Tu różnice są dramatyczne. \texttt{Gemini-2.5-flash} wykazał wyjątkową odporność: podatność na poziomie 6{,}7\% (2/30 przebiegów). Model \texttt{gpt-5-mini} był podatny w 63{,}3\% przypadków, a \texttt{deepseek-chat} uległ manipulacji we wszystkich 30 przebiegach (100\%). Tak skrajna różnica nie wynika z prostych parametrów modelu (rozmiar, architektura), lecz prawdopodobnie ze sposobu trenowania i wyrównania preferencji modelu w kontekście konfliktujących sygnałów. Wysoka odporność Gemini może wiązać się z bardziej rygorystycznym procesem RLHF lub specyficznym sposobem traktowania treści plików jako kontekstu nieautorytatywnego.
+
+\textbf{Kompromisy.} Żaden z modeli nie dominuje jednocześnie we wszystkich wymiarach. \texttt{GPT-5-mini} jest najskuteczniejszy funkcjonalnie, ale wykazuje wysoką podatność na manipulację (63{,}3\%). \texttt{Gemini-2.5-flash} jest najodporniejszy na manipulację, lecz najsłabszy w RQ2. \texttt{DeepSeek V3.2} łączy przeciętną skuteczność z maksymalną podatnością i najwyższą zmiennością procesu. Wybór modelu powinien więc uwzględniać specyfikę kontekstu wdrożenia: dla środowisk, gdzie repozytorium może zawierać niezaufaną dokumentację, priorytetem jest odporność (Gemini); dla prostszych, zaufanych repozytoriów — maksymalna skuteczność (GPT-5 Mini).
+```
+
+- [ ] **Krok 2: Kompilacja kontrolna**
+
+```bash
+cd /Users/rasztabigab/Studia/masters-thesis/docs && latexmk -pdf -interaction=nonstopmode main.tex 2>&1 | grep -E "^!" | head -10
+```
+
+Oczekiwane: brak linii zaczynających się od `!`.
+
+- [ ] **Krok 3: Commit**
+
+```bash
+cd /Users/rasztabigab/Studia/masters-thesis/docs && git add tex/6-dyskusja-wynikow.tex && git commit -m "feat(ch6): porównanie modeli"
+```
+
+---
+
+## Task 3: Sekcja — Interpretacja ograniczeń modeli LLM
+
+**Files:**
+- Modify: `tex/6-dyskusja-wynikow.tex`
+
+- [ ] **Krok 1: Dołącz podrozdział na końcu pliku**
+
+```latex
+\subsection{Interpretacja ograniczeń modeli LLM}
+
+Analiza typowych błędów zebranych w rozdziale~\ref{sec:wyniki} wskazuje na kilka systemowych ograniczeń obecnych generacji modeli językowych w kontekście generowania konfiguracji IaC.
+
+\textbf{Ograniczone rozumienie środowiska runtime.} Modele posiadają wiedzę o składni Dockerfile i manifestów Kubernetes, jednak nie mają bezpośredniego dostępu do środowiska wykonawczego podczas generowania. Skutkuje to błędami wynikającymi z niezgodności wersji (np. Node 18 nie wspiera niektórych zależności), problemami z uprawnieniami systemowymi (runAsNonRoot vs.\ obraz budowany na root) oraz błędami ścieżek i kontekstów budowania. Model wnioskuje o środowisku na podstawie kodu i nazw plików, ale nie może zweryfikować tych założeń bez faktycznego uruchomienia kontenera.
+
+\textbf{Problemy z koordynacją zależności wielousługowych.} Wraz ze wzrostem liczby komponentów rośnie liczba wzajemnych zależności, które agent musi skoordynować: nazwy usług DNS, sekrety bazy danych, zmienne środowiskowe, porty sieciowe. Eksperyment RQ2 pokazuje, że model radzi sobie z tym dobrze dla monolitów (POC1: 100\%), ale w złożonych układach (POC3--POC5) narasta odsetek błędów integracyjnych — brakujące Service, niepoprawne zmienne, błędne zakodowanie sekretów. Sugeruje to, że agent nie utrzymuje globalnego modelu spójności systemu, lecz generuje poszczególne pliki w pewnej mierze niezależnie.
+
+\textbf{Halucynacje i nadmierne uogólnianie.} W kilku przypadkach (widocznych np.\ w wynikach RQ5 dla wariantu W3) agent dodawał zasoby infrastrukturalne niewynikające z kodu — np.\ pełny stos Redis — jedynie dlatego, że kontekst dokumentacyjny sugerował ich użycie. Mechanizm ten przypomina halucynacje faktograficzne opisane w literaturze \cite{zhao_survey_2025}: model generuje spójny, poprawnie sformatowany artefakt, który jednak nie odpowiada rzeczywistym wymaganiom aplikacji. W odróżnieniu od typowych halucynacji, tutaj artefakt jest poprawny względem \textit{dostarczonego kontekstu}, lecz błędny względem \textit{faktycznej specyfikacji} — co czyni go trudniejszym do wykrycia przez proste narzędzia.
+
+\textbf{Zależność jakości od kompletności sygnałów wejściowych.} Wyniki RQ3 pokazują, że domyślna wiedza modelu o dobrych praktykach nie jest wystarczająca — 82{,}7\% przebiegów bez dodatkowych instrukcji generuje artefakty z ostrzeżeniami. Modele nie stosują automatycznie najlepszych praktyk (np.\ nieroot user, resource limits, security contexts), jeśli nie są do tego jawnie nakierowane. Oznacza to, że jakość wyników jest silnie uzależniona od jakości i kompletności instrukcji systemowej — co stanowi zarówno ograniczenie, jak i możliwość kontrolowania zachowania modelu przez projektanta systemu agentowego.
+```
+
+- [ ] **Krok 2: Kompilacja kontrolna**
+
+```bash
+cd /Users/rasztabigab/Studia/masters-thesis/docs && latexmk -pdf -interaction=nonstopmode main.tex 2>&1 | grep -E "^!" | head -10
+```
+
+- [ ] **Krok 3: Commit**
+
+```bash
+cd /Users/rasztabigab/Studia/masters-thesis/docs && git add tex/6-dyskusja-wynikow.tex && git commit -m "feat(ch6): interpretacja ograniczeń LLM"
+```
+
+---
+
+## Task 4: Sekcja — Rola prompt engineeringu
+
+**Files:**
+- Modify: `tex/6-dyskusja-wynikow.tex`
+
+- [ ] **Krok 1: Dołącz podrozdział na końcu pliku**
+
+```latex
+\subsection{Rola prompt engineeringu}
+
+Wyniki RQ3 stanowią bezpośredni dowód empiryczny na wpływ prompt engineeringu na jakość generowanych artefaktów IaC. Rozszerzenie instrukcji systemowej o checklistę dobrych praktyk zmniejszyło łączną liczbę ostrzeżeń o 79{,}6\% i trzykrotnie zwiększyło odsetek konfiguracji w pełni wolnych od ostrzeżeń. Efekt ten jest zbieżny z obserwacjami z literatury: Kratzke i Drews \cite{kratzke_dont_2024} wskazują na kluczową rolę techniki promptowania w osiąganiu wysokiej jakości manifestów Kubernetes.
+
+\textbf{Mechanizm działania.} Prompt engineeringowy wariant best practices działa przez \textit{redukcję przestrzeni dopuszczalnych rozwiązań}: model, który w trybie bazowym może wybrać dowolne poprawne rozwiązanie, w trybie rozszerzonym otrzymuje jawny zestaw kryteriów, które musi spełnić. W efekcie zbiór generowanych konfiguracji przesuwa się w kierunku podzbioru spełniającego dodatkowe wymagania jakościowe. Nie poprawia to zdolności rozumowania modelu — poprawia precyzję celu.
+
+\textbf{Wpływ na jakość Kubernetes vs.\ Dockerfile.} W obu wariantach dominowały ostrzeżenia Kube-linter: 130 w wariancie bazowym vs.\ 22 w wariancie best practices. Ostrzeżenia Hadolint były mniej liczne (17 vs.\ 8) i spadły relatywnie mniej. Wskazuje to, że modele mają lepszą domyślną znajomość dobrych praktyk Dockerfile niż manifestów Kubernetes, co może wynikać z większej reprezentacji plików Dockerfile w danych treningowych i mniejszej ich specyficzności konfiguracyjnej.
+
+\textbf{Implikacje dla projektowania systemów agentowych.} W praktycznych zastosowaniach warto zaprojektować instrukcję systemową zawierającą konkretne, sprawdzalne wymagania (np.\ „zawsze dodawaj \texttt{securityContext.runAsNonRoot: true}", „zawsze definiuj resource limits"). Szablonowe wymagania mogą być generowane lub parametryzowane na podstawie polityk bezpieczeństwa organizacji. Równocześnie wyniki RQ5 ostrzegają, że rozbudowanie instrukcji systemowej zwiększa jej powierzchnię podatności: każdy fałszywy sygnał w kontekście będzie działał jako silniejszy override jeśli agent nie posiada mechanizmu walidacji spójności.
+
+\textbf{Granice podejścia.} Prompt engineering nie zastępuje walidacji runtime. Nawet konfiguracje pozbawione ostrzeżeń statycznych mogą zawierać błędy prowadzące do awarii w środowisku wykonawczym (np.\ błędna wersja bazy obrazu, niezgodność zależności). Optymalna strategia łączy rozbudowany prompt z automatyczną walidacją statyczną (Hadolint, Kube-linter) oraz testami runtime, co jest zbieżne z zaleceniami przeglądu literatury \cite{srivatsa_survey_2024}.
+```
+
+- [ ] **Krok 2: Kompilacja kontrolna**
+
+```bash
+cd /Users/rasztabigab/Studia/masters-thesis/docs && latexmk -pdf -interaction=nonstopmode main.tex 2>&1 | grep -E "^!" | head -10
+```
+
+- [ ] **Krok 3: Commit**
+
+```bash
+cd /Users/rasztabigab/Studia/masters-thesis/docs && git add tex/6-dyskusja-wynikow.tex && git commit -m "feat(ch6): rola prompt engineeringu"
+```
+
+---
+
+## Task 5: Sekcja — Niezawodność i deterministyczność procesu agentowego
+
+**Files:**
+- Modify: `tex/6-dyskusja-wynikow.tex`
+
+- [ ] **Krok 1: Dołącz podrozdział na końcu pliku**
+
+```latex
+\subsection{Niezawodność i deterministyczność procesu agentowego}
+
+Wyniki RQ4 kwestionują intuicyjne założenie, że ustawienie temperature=0 w modelu językowym zapewnia w pełni deterministyczne działanie systemu agentowego. Średni diff ratio 0{,}5632 oznacza, że w typowym przebiegu ponad połowa linii wygenerowanych artefaktów różni się między powtórzeniami dla tego samego wejścia.
+
+\textbf{Dlaczego temperature=0 nie gwarantuje pełnej deterministyczności.} Współczesne modele językowe działają na sprzęcie z obliczeniami zmiennoprzecinkowymi, gdzie operacje równoległe mogą prowadzić do nieidentycznych wyników przy kolejnych wywołaniach nawet przy tych samych parametrach \cite{zhao_survey_2025}. Jednak w kontekście systemu agentowego kluczowym dodatkowym źródłem zmienności jest \textit{wieloetapowy charakter procesu}: agent wielokrotnie czyta pliki, zapisuje je, modyfikuje i weryfikuje — każde wywołanie narzędziowe dostarcza nowe informacje do kontekstu kolejnego wywołania modelu. Nawet drobna fluktuacja na wcześniejszym etapie propaguje się i amplifikuje w kolejnych krokach.
+
+\textbf{Różnica między modelem a agentem.} Pojedyncze wywołanie modelu z temperature=0 jest w praktyce zbliżone do deterministycznego. Natomiast wieloetapowy proces agentowy z narzędziami IO jest z natury niedeterministyczny: kolejność odczytu plików, decyzje o iteratywnej korekcie błędów, wybór nazw zmiennych czy wybór bazowego obrazu Docker stanowią punkty rozgałęzienia, które kumulują zmienność. W tym sensie wyniki RQ4 mierzą nie tyle własności modelu, co własności architektury agentowej.
+
+\textbf{Skala zmienności a złożoność.} Rosnący diff ratio wraz z rosnącą złożonością (POC1: 0,17--0,35; POC5: 0,64--0,80) sugeruje, że złożone przypadki tworzą więcej punktów rozgałęzienia i większą powierzchnię decyzyjną. Liczba kroków narzędziowych rośnie niemonotonicz-nie: model deepseek wykonuje ok.\ 64 kroków dla POC5 vs.\ ok.\ 19 dla POC1, co wskazuje na dużo więcej możliwości akumulacji odchyleń.
+
+\textbf{Konsekwencje praktyczne.} W automatycznych pipeline'ach DevOps zmienność procesu oznacza, że wynik jednorazowego uruchomienia agenta nie jest reprezentatywny dla jego ogólnych możliwości. Stabilne wdrożenie produkcyjne wymaga albo wielokrotnego uruchomienia z mechanizmem głosowania/selekcji, albo dodatkowej walidacji końcowej wystarczająco rygorystycznej, aby wychwycić rozbieżności między powtórzeniami. Alternatywnym podejściem jest architektura agentowa z deterministyczną warstwą planowania i ograniczeniem przestrzeni decyzyjnej modelu do wyborów między wcześniej zdefiniowanymi szablonami.
+```
+
+- [ ] **Krok 2: Kompilacja kontrolna**
+
+```bash
+cd /Users/rasztabigab/Studia/masters-thesis/docs && latexmk -pdf -interaction=nonstopmode main.tex 2>&1 | grep -E "^!" | head -10
+```
+
+- [ ] **Krok 3: Commit**
+
+```bash
+cd /Users/rasztabigab/Studia/masters-thesis/docs && git add tex/6-dyskusja-wynikow.tex && git commit -m "feat(ch6): niezawodność i deterministyczność"
+```
+
+---
+
+## Task 6: Sekcja — Aspekty bezpieczeństwa i podatność na manipulację
+
+**Files:**
+- Modify: `tex/6-dyskusja-wynikow.tex`
+
+- [ ] **Krok 1: Dołącz podrozdział na końcu pliku**
+
+```latex
+\subsection{Aspekty bezpieczeństwa i podatność na manipulację}
+
+Wyniki RQ5 wskazują, że podatność agentów LLM na manipulację kontekstem jest realna i praktycznie istotna. Krytyczne odchylenia od specyfikacji wystąpiły w 56{,}7\% przypadków przy stosunkowo prostych technikach manipulacji dokumentacyjnej — bez użycia zaawansowanych metod inżynierii promptów ani exploitowania podatności modelu.
+
+\textbf{Mechanizm podatności.} Agenty LLM działające na repozytoriach traktują dostępne pliki — dokumentację, komentarze, pliki README, opisy API — jako wiarygodny kontekst. W środowisku produkcyjnym nie istnieje separacja między „zaufanymi" plikami kodu a „niezaufanymi" plikami dokumentacyjnymi. Oznacza to, że atakujący z prawem zapisu do repozytorium może osadzić w dokumentacji fałszywe wymagania, które agent bezkrytycznie przeniesie do generowanej konfiguracji wdrożeniowej. Jest to forma ataku \textit{repo poisoning} opisana w kontekście systemów AI automatyzujących zadania programistyczne.
+
+\textbf{Wariant W2 jako punkt odniesienia.} Spośród trzech wariantów, autorytatywne zalecenia bezpieczeństwa (W2) okazały się najmniej skuteczne (33{,}3\%). Sugeruje to, że modele są w pewnym stopniu przeszkolone do rozpoznawania instrukcji o charakterze „security override" jako podejrzanych — co jest pozytywną obserwacją. Jednak fakt, że mimo to 10/30 przebiegów uległo manipulacji i wygenerowało manifesty z eskalacją uprawnień, wskazuje, że te mechanizmy obronne są niewystarczające.
+
+\textbf{Niejednorodność podatności między modelami.} Wyjątkowa odporność \texttt{gemini-2.5-flash} (6{,}7\%) w zestawieniu z pełną podatnością \texttt{deepseek-chat} (100\%) pokazuje, że odporność na tego rodzaju manipulacje jest istotnie zróżnicowana między modelami i nie wynika tylko z ich ogólnej skuteczności. Model odporny na manipulację może być mniej skuteczny funkcjonalnie (Gemini w RQ2: 20\%), co sugeruje potencjalny kompromis między posłuszeństwem wobec kontekstu a krytycznym myśleniem.
+
+\textbf{Implikacje dla bezpiecznego wdrożenia.} Praktyczne wdrożenie agentów LLM do automatycznego generowania konfiguracji IaC wymaga: (1) ograniczenia dostępu agenta wyłącznie do plików niezbędnych (zasada minimalnych uprawnień informacyjnych), (2) mechanizmów walidacji wygenerowanych artefaktów względem kodu źródłowego — nie tylko dokumentacji, (3) obowiązkowej ludzkiej weryfikacji artefaktów bezpieczeństwa (security contexts, uprawnienia, sekrety) przed wdrożeniem. Samodzielne systemy agentowe bez takich mechanizmów stanowią wektor ataku umożliwiający eskalację uprawnień lub wstrzyknięcie nieautoryzowanych zależności infrastrukturalnych przez osoby z dostępem do repozytorium.
+```
+
+- [ ] **Krok 2: Kompilacja kontrolna**
+
+```bash
+cd /Users/rasztabigab/Studia/masters-thesis/docs && latexmk -pdf -interaction=nonstopmode main.tex 2>&1 | grep -E "^!" | head -10
+```
+
+- [ ] **Krok 3: Commit**
+
+```bash
+cd /Users/rasztabigab/Studia/masters-thesis/docs && git add tex/6-dyskusja-wynikow.tex && git commit -m "feat(ch6): bezpieczeństwo i podatność na manipulację"
+```
+
+---
+
+## Task 7: Sekcja — Porównanie z literaturą
+
+**Files:**
+- Modify: `tex/6-dyskusja-wynikow.tex`
+
+- [ ] **Krok 1: Dołącz podrozdział na końcu pliku**
+
+```latex
+\subsection{Porównanie z literaturą}
+
+Uzyskane wyniki można odnieść do kilku kluczowych prac omówionych w rozdziale~\ref{sec:literatura}.
+
+\textbf{Potwierdzenie ogólnego potencjału LLM w IaC.} Wynik 62{,}7\% end-to-end success rate (RQ1) potwierdza ogólny wniosek z pracy Srivatsa i in.\ \cite{srivatsa_survey_2024}, że LLM mają realny potencjał automatyzacji zadań IaC. Jednocześnie uzyskany wynik jest wyraźnie niższy niż 86\% opisywane przez Hu i in.\ \cite{hu_llm-based_2025} dla projektu Repo2Run na zbiorze projektów Pythona. Różnica wynika prawdopodobnie z bardziej rygorystycznych kryteriów walidacji niniejszej pracy (pełna weryfikacja runtime obejmująca wdrożenie na Kubernetes i testy endpoint health-check) oraz odmiennego charakteru zadania (generowanie Dockerfile + manifestów K8s vs.\ samo konfigurowanie środowiska Python).
+
+\textbf{Wpływ złożoności — zgodność z obserwacjami Kratzke i Drews.} Obserwacja, że agenty lepiej radzą sobie z prostymi, jednousługowymi aplikacjami, jest zbieżna z wnioskami Kratzke i Drews \cite{kratzke_dont_2024}, którzy zaobserwowali, że modele wymagają większej pomocy (więcej przykładów few-shot, korekty iteracyjne) dla bardziej złożonych konfiguracji. Niniejsze badanie dostarcza jednak bardziej bezpośredniego pomiaru tej zależności poprzez kontrolowany eksperyment z pięcioma poziomami złożoności.
+
+\textbf{Rola prompt engineeringu — zgodność z Kratzke i Drews oraz Docker GenAI.} Wyniki RQ3 są bezpośrednio spójne z wnioskami Kratzke i Drews \cite{kratzke_dont_2024} o kluczowej roli projektowania promptów oraz z rekomendacjami Docker GenAI \cite{docker_genai} dotyczącymi włączania najlepszych praktyk do instrukcji generowania. Niniejsza praca dostarcza ilościowego potwierdzenia tej obserwacji: redukcja ostrzeżeń o 79{,}6\% przy przejściu z promptu bazowego do wariantu best practices.
+
+\textbf{Podatność na manipulację — zagadnienie nieodnotowane w literaturze IaC.} Wyniki RQ5 dotyczą obszaru, który nie był do tej pory systematycznie badany w kontekście generowania konfiguracji IaC. Problem repo poisoning i prompt injection w systemach agentic-AI pojawia się w ogólnej literaturze dotyczącej bezpieczeństwa LLM \cite{zhao_survey_2025}, ale nie był empirycznie weryfikowany w kontekście Dockerfile i manifestów Kubernetes. Wyniki wskazują, że ten wektor ataku jest realny i powinien stać się przedmiotem dalszych badań.
+
+\textbf{Różnica między walidacją statyczną a end-to-end.} Lanciano i in.\ \cite{lanciano_analyzing_2023} oraz Xu i in.\ \cite{xu_cloudeval-yaml_2023} stosowali walidację opartą przede wszystkim na poprawności składniowej i semantycznej manifestów. Niniejsza praca uzupełnia ten obraz o walidację runtime, która ujawnia kategorię błędów niewidocznych dla narzędzi statycznych — błędy środowiskowe, wersjonowania i konfiguracji sieciowej między usługami.
+```
+
+- [ ] **Krok 2: Kompilacja kontrolna**
+
+```bash
+cd /Users/rasztabigab/Studia/masters-thesis/docs && latexmk -pdf -interaction=nonstopmode main.tex 2>&1 | grep -E "^!" | head -10
+```
+
+- [ ] **Krok 3: Commit**
+
+```bash
+cd /Users/rasztabigab/Studia/masters-thesis/docs && git add tex/6-dyskusja-wynikow.tex && git commit -m "feat(ch6): porównanie z literaturą"
+```
+
+---
+
+## Task 8: Sekcja — Znaczenie praktyczne dla automatyzacji DevOps
+
+**Files:**
+- Modify: `tex/6-dyskusja-wynikow.tex`
+
+- [ ] **Krok 1: Dołącz podrozdział na końcu pliku**
+
+```latex
+\subsection{Znaczenie praktyczne dla automatyzacji DevOps}
+
+Zestawiając wyniki wszystkich pięciu pytań badawczych, można sformułować praktyczne rekomendacje dotyczące wdrażania agentów LLM w procesach DevOps.
+
+\textbf{Zastosowania, w których agenty LLM są przydatne.} Najwyższe success rate obserwowano dla prostych, jednousługowych aplikacji webowych o czytelnej strukturze kodu (np.\ aplikacje Flask, FastAPI z jednym kontenerem). Dla tego profilu aplikacji agenty LLM mogą efektywnie zautomatyzować tworzenie konfiguracji IaC jako \textit{asystent inżyniera} — generując szkielet konfiguracji, który wymaga tylko weryfikacji i ewentualnych drobnych poprawek, nie zaś tworzenia od zera. Takie zastosowanie może istotnie skrócić czas wdrożeń i obniżyć barierę wejścia dla mniej doświadczonych programistów, co jest zgodne z motywacją pracy \cite{hu_llm-based_2025}.
+
+\textbf{Ograniczenia przy aplikacjach wielousługowych.} Dla aplikacji z wieloma serwisami, bazami danych i wzajemnymi zależnościami infrastrukturalnymi (profil POC3--POC5) obecne agenty nie nadają się do w pełni autonomicznej pracy bez dodatkowych mechanizmów kontroli. Walidacja end-to-end często zawodzi, a zmienność wyników jest wysoka. W takich przypadkach bardziej wartościowe jest zastosowanie agenta do generowania pojedynczych komponentów (np.\ Deployment dla konkretnego mikroserwisu) z oddzielną weryfikacją spójności całości przez inżyniera.
+
+\textbf{Obowiązkowa walidacja statyczna.} Wyniki RQ3 silnie uzasadniają obowiązkowość walidacji statycznej (Hadolint, Kube-linter lub równoważne narzędzia) jako elementu pipeline CI/CD, gdy konfiguracja IaC jest generowana przez LLM. Bez prompt engineeringu „best practices" ponad 80\% generowanych konfiguracji zawiera co najmniej jedno ostrzeżenie — a wiele z tych ostrzeżeń ma bezpośrednie implikacje bezpieczeństwa (brak security context, brak resource limits).
+
+\textbf{Kontrola kontekstu jako kluczowy element bezpieczeństwa.} W środowiskach organizacyjnych, gdzie nad repozytoriami pracuje wiele osób lub gdzie repozytorium jest dostępne z zewnątrz, wyniki RQ5 wskazują na konieczność kontrolowania, jakie pliki agent może odczytać. Minimalizacja kontekstu — dostęp wyłącznie do plików kodu, nie do dokumentacji i historii — może istotnie zmniejszyć podatność na manipulację. Brak takiej kontroli stwarza nowy wektor ataku w pipeline CI/CD.
+
+\textbf{Pipeline rekomendowany.} Na podstawie wyników pracy, praktyczny pipeline agentowego generowania IaC powinien obejmować: (1) ograniczony kontekst wejściowy (tylko kod), (2) rozbudowaną instrukcję systemową z checklistą dobrych praktyk, (3) automatyczną walidację statyczną wygenerowanych artefaktów, (4) opcjonalne testy runtime przed zatwierdzeniem oraz (5) obowiązkowy przegląd ludzki w zakresie uprawnień i konfiguracji bezpieczeństwa.
+```
+
+- [ ] **Krok 2: Kompilacja kontrolna**
+
+```bash
+cd /Users/rasztabigab/Studia/masters-thesis/docs && latexmk -pdf -interaction=nonstopmode main.tex 2>&1 | grep -E "^!" | head -10
+```
+
+- [ ] **Krok 3: Commit**
+
+```bash
+cd /Users/rasztabigab/Studia/masters-thesis/docs && git add tex/6-dyskusja-wynikow.tex && git commit -m "feat(ch6): znaczenie praktyczne dla DevOps"
+```
+
+---
+
+## Task 9: Sekcja — Ograniczenia badania i zagrożenia dla trafności
+
+**Files:**
+- Modify: `tex/6-dyskusja-wynikow.tex`
+
+- [ ] **Krok 1: Dołącz podrozdział na końcu pliku**
+
+```latex
+\subsection{Ograniczenia badania i zagrożenia dla trafności}
+
+Niniejsza praca, podobnie jak każde badanie empiryczne, posiada szereg ograniczeń metodologicznych, które należy uwzględnić przy interpretacji wyników.
+
+\textbf{Dobór repozytoriów.} Zbiór 25 repozytoriów użyty w RQ1 i RQ3 pochodzi z publicznych projektów GitHub o określonym profilu (proste aplikacje webowe, najczęściej Python/Node.js). Wyniki mogą nie uogólniać się na aplikacje korporacyjne, projekty z niestandardowymi wymaganiami build lub technologie spoza tego profilu. Repozytoria kontrolowane (POC1--POC5) zapewniają kontrolę nad zmiennością złożoności, ale są skonstruowane ręcznie, co ogranicza ich reprezentatywność.
+
+\textbf{Ograniczona liczba powtórzeń.} W eksperymencie RQ3 zastosowano pojedyncze powtórzenie na kombinację repozytorium--model--wariant, co zmniejsza siłę statystyczną wyników i zwiększa ryzyko wpływu przypadkowych fluktuacji. Wyniki RQ3 należy interpretować jako wskazanie trendu, a nie precyzyjną ocenę ilościową.
+
+\textbf{Ograniczony zestaw modeli.} Przebadano trzy modele komercyjne dostępne przez API. Wyniki mogą się różnić dla modeli open-source, modeli dostrojonych do zadań DevOps lub przyszłych wersji badanych modeli. Architektura wewnętrzna modeli (rozmiar, metoda trenowania, RLHF) nie jest w pełni znana i utrudnia generalizację wniosków.
+
+\textbf{Środowisko wykonawcze i pipeline walidacyjny.} Eksperymenty były wykonywane w izolowanym środowisku lokalnym (Minikube). Wyniki w środowiskach chmurowych (AKS, GKE, EKS) mogą się różnić ze względu na odmienne domyślne polityki bezpieczeństwa, konfiguracje network policies lub dostępność rejestrów obrazów. Pipeline walidacyjny testował podstawową funkcjonalność (health-check endpoint), ale nie obejmował bardziej zaawansowanych scenariuszy (load testing, persistent storage, multi-node scheduling).
+
+\textbf{Brak walidacji runtime w RQ3 i RQ5.} Ocena w RQ3 opiera się wyłącznie na statycznej analizie Hadolint i Kube-linter, a w RQ5 — na manualnej analizie artefaktów. Nie można wykluczyć, że część konfiguracji pozytywnie ocenionych przez narzędzia statyczne zawierałaby błędy runtime, ani że konfiguracje z odchyleniami w RQ5 byłyby w praktyce niedziałające.
+
+\textbf{Zależność wyników od promptu i narzędzi agenta.} Skuteczność systemu zależy od konkretnej instrukcji systemowej i zestawu narzędzi agenta. Inne projekty, które zaprojektują różne prompty lub użyją innych narzędzi (np.\ z dostępem do testerów kontenerów), mogą uzyskać inne wyniki. Wyniki należy traktować jako charakterystykę konkretnej implementacji systemu agentowego, a nie modeli językowych w izolacji.
+```
+
+- [ ] **Krok 2: Finalna kompilacja PDF**
+
+```bash
+cd /Users/rasztabigab/Studia/masters-thesis/docs && latexmk -pdf -interaction=nonstopmode main.tex 2>&1 | tail -5
+```
+
+Oczekiwane: `Latexmk: All targets (main.pdf) are up-to-date.` lub analogiczny komunikat sukcesu.
+
+- [ ] **Krok 3: Commit finalny**
+
+```bash
+cd /Users/rasztabigab/Studia/masters-thesis/docs && git add tex/6-dyskusja-wynikow.tex && git commit -m "feat(ch6): ograniczenia badania — rozdział 6 kompletny"
+```
+
+---
+
+## Self-Review
+
+**Pokrycie specyfikacji:**
+- [x] Synteza RQ1–RQ5 — Task 1
+- [x] Porównanie modeli — Task 2
+- [x] Interpretacja ograniczeń LLM — Task 3
+- [x] Rola prompt engineeringu — Task 4
+- [x] Niezawodność i deterministyczność — Task 5
+- [x] Bezpieczeństwo i podatność — Task 6
+- [x] Porównanie z literaturą — Task 7
+- [x] Implikacje praktyczne DevOps — Task 8
+- [x] Ograniczenia badania — Task 9
+
+**Cytowania używane:**
+- `\cite{zhao_survey_2025}` — Tasks 3, 5, 7
+- `\cite{srivatsa_survey_2024}` — Tasks 4, 7
+- `\cite{hu_llm-based_2025}` — Tasks 7, 8
+- `\cite{kratzke_dont_2024}` — Tasks 4, 7
+- `\cite{docker_genai}` — Task 7
+- `\cite{lanciano_analyzing_2023}` — Task 7
+- `\cite{xu_cloudeval-yaml_2023}` — Task 7
+
+**Odsyłacze do rozdziałów:**
+- `\ref{sec:wyniki}` — Tasks 1, 3 (upewnij się że label istnieje w ch5)
+- `\ref{sec:literatura}` — Task 7 (upewnij się że label istnieje w ch2)
+
+**Uwaga:** Przed uruchomieniem sprawdź, czy w `tex/5-wyniki-eksperymentow.tex` jest `\label{sec:wyniki}` oraz czy w `tex/2-przeglad-literatury.tex` jest `\label{sec:literatura}`. Jeśli nie — użyj `\ref{sec:wyniki_eksperymentow}` lub usuń odwołanie, zastępując je „w rozdziale 5" / „w rozdziale 2".
