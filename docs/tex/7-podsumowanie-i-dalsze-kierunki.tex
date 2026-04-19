@@ -1,86 +1,46 @@
 \clearpage % Rozdziały zaczynamy od nowej strony.
 \section{Podsumowanie i dalsze kierunki badań}
 
-Rozdział stanowi końcowe domknięcie pracy. Zebrano w nim syntetyczne odpowiedzi na pytania badawcze, najważniejsze wnioski wynikające z przeprowadzonych eksperymentów oraz wskazano kierunki dalszych badań, które mogą zwiększyć użyteczność i wiarygodność agentów LLM w zadaniach związanych z generowaniem konfiguracji Infrastructure as Code.
+Niniejsza praca zbadała, w jakim stopniu agenty oparte na dużych modelach językowych mogą autonomicznie generować konfiguracje Infrastructure as Code — pliki Dockerfile i manifesty Kubernetes — dla rzeczywistych aplikacji webowych. Eksperymenty objęły pięć pytań badawczych dotyczących skuteczności funkcjonalnej, wpływu złożoności, jakości artefaktów, powtarzalności procesu oraz odporności na manipulację kontekstem.
 
 \subsection{Odpowiedzi na pytania badawcze}
 
-Poniżej zebrano zwięzłe odpowiedzi na każde z pięciu pytań badawczych sformułowanych w rozdziale~4. Tabela~\ref{tab:rq-summary} zestawia wyniki ilościowe, a poniżej przedstawiono krótką interpretację każdej odpowiedzi.
+\textbf{RQ1.} Agenty LLM potrafią autonomicznie wygenerować działające konfiguracje IaC dla większości prostych i umiarkowanie złożonych aplikacji webowych. Granica ich możliwości leży nie w znajomości składni, lecz w zdolności do przewidywania zachowania środowiska runtime bez możliwości jego obserwacji.
 
-\begin{table}[h]
-    \centering
-    \begin{tabular}{lp{9cm}}
-        \textbf{Pytanie} & \textbf{Kluczowy wynik} \\
-        \hline
-        RQ1 & End-to-end success rate: 62{,}7\% (94/150); build 78{,}7\%; apply 76{,}7\% \\
-        RQ2 & Success rate spada od 100\% (POC1) do 0\% (POC5); łącznie 33{,}3\% (15/45) \\
-        RQ3 & Bazowy: 82{,}7\% przebiegów z ostrzeżeniami; best practices: 25{,}3\% ($-$79{,}6\% ostrzeżeń) \\
-        RQ4 & Średni diff ratio: 0{,}5632; temperature=0 nie gwarantuje pełnej powtarzalności \\
-        RQ5 & Manipulacja skuteczna w 56{,}7\% (51/90); DeepSeek: 100\%; Gemini: 6{,}7\% \\
-    \end{tabular}
-    \caption{Zestawienie kluczowych wyników per pytanie badawcze}
-    \label{tab:rq-summary}
-\end{table}
+\textbf{RQ2.} Złożoność architektury wielousługowej stanowi barierę, której obecne agenty nie przekraczają niezawodnie. Nawet umiarkowany wzrost liczby współzależnych serwisów prowadzi do dramatycznego spadku skuteczności — agent generuje pliki lokalnie poprawne, które nie tworzą spójnej całości.
 
-\textbf{RQ1.} Agenty LLM są w stanie autonomicznie wygenerować funkcjonalne konfiguracje IaC dla ponad 60\% badanych aplikacji webowych. Granica możliwości leży nie w znajomości składni, lecz w zdolności do przewidywania zachowania środowiska runtime bez możliwości jego obserwacji.
+\textbf{RQ3.} Domyślna jakość generowanych artefaktów jest niewystarczająca do zastosowań produkcyjnych. Rozszerzenie instrukcji systemowej o wytyczne jakościowe drastycznie poprawia wyniki, co wskazuje, że modele posiadają potrzebną wiedzę, lecz wymagają jawnego nakierowania.
 
-\textbf{RQ2.} Złożoność architektury wielousługowej jest dominującym czynnikiem ograniczającym skuteczność. Już przejście od jednej do dwóch usług powoduje drastyczny spadek success rate; dla pięciu skoordynowanych serwisów żaden z modeli nie wygenerował działającej konfiguracji.
+\textbf{RQ4.} Proces agentowy nie jest w pełni powtarzalny nawet przy deterministycznych ustawieniach modelu. Zmienność wynika z wieloetapowej architektury agenta i narasta wraz ze złożonością zadania.
 
-\textbf{RQ3.} Jakość generowanych artefaktów bez dodatkowych instrukcji jest niewystarczająca do zastosowań produkcyjnych — ponad 80\% konfiguracji zawiera ostrzeżenia statycznej analizy. Rozszerzenie instrukcji systemowej o wytyczne jakościowe redukuje tę liczbę niemal czterokrotnie, co potwierdza, że modele posiadają potrzebną wiedzę, lecz wymagają jawnego nakierowania.
-
-\textbf{RQ4.} Proces agentowy nie jest w pełni powtarzalny nawet przy deterministycznych ustawieniach modelu. Zmienność pochodzi z wieloetapowej architektury agenta, a nie z samplowania — i nasila się wraz ze złożonością wejścia.
-
-\textbf{RQ5.} Agenty LLM są podatne na manipulację kontekstem repozytorium. Fałszywe wymagania osadzone w dokumentacji skutecznie wpływają na generowane artefakty, przy czym podatność jest silnie zróżnicowana między modelami (od 6{,}7\% dla Gemini do 100\% dla DeepSeek).
+\textbf{RQ5.} Agenty są podatne na manipulację dokumentacją repozytorium. Fałszywe wymagania osadzone w plikach tekstowych skutecznie wpływają na generowane konfiguracje bez konieczności exploitowania modelu, przy czym podatność jest silnie zróżnicowana między modelami.
 
 \subsection{Kluczowe wnioski}
 
-Na podstawie przeprowadzonych eksperymentów sformułowano następujące wnioski:
+Wyniki wskazują, że agenty LLM stanowią realne, lecz ograniczone narzędzie do automatyzacji IaC. Są użyteczne jako asystent inżyniera przy prostych, jednokomponentowych aplikacjach — skracając czas tworzenia szkieletu konfiguracji — ale nie zastępują człowieka w scenariuszach złożonych lub wymagających wysokiego poziomu bezpieczeństwa. Kluczowym odkryciem jest asymetria między tym, co model \textit{potrafi} (zna składnię, zna dobre praktyki), a tym, co \textit{robi bez nakierowania} (generuje konfiguracje poniżej standardu, ulega manipulacji). Ta asymetria oznacza, że jakość systemu agentowego zależy w dużej mierze od jakości jego projektu — instrukcji, zestawu narzędzi i mechanizmów walidacji — a nie tylko od wyboru modelu bazowego.
 
-\begin{enumerate}
-    \item \textbf{Agenty LLM mają realną, lecz ograniczoną użyteczność w generowaniu IaC.} Skuteczność na poziomie 62{,}7\% dla prostych aplikacji wskazuje na praktyczny potencjał, który nie przekłada się na niezawodność w bardziej złożonych scenariuszach.
+Żaden z badanych modeli nie dominuje jednocześnie we wszystkich wymiarach: skuteczności funkcjonalnej, powtarzalności i odporności na manipulację. Wybór modelu powinien być podyktowany profilem ryzyka konkretnego wdrożenia.
 
-    \item \textbf{Złożoność wielousługowa stanowi barierę architekturalną, nie tylko ilościową.} Problem nie leży w objętości generowanych plików, lecz w braku globalnego modelu spójności systemu po stronie agenta. Modele generują pliki lokalnie poprawne, które mogą nie tworzyć spójnej całości.
+\subsection{Implikacje praktyczne}
 
-    \item \textbf{Prompt engineering istotnie poprawia jakość, bez zmiany modelu.} Redukcja ostrzeżeń o 79{,}6\% przy przejściu na wariant best practices pokazuje, że jakość artefaktów jest w dużej mierze funkcją jakości instrukcji, a nie samego modelu.
-
-    \item \textbf{Deterministyczność procesu agentowego wymaga projektowania na poziomie orkiestracji.} Ustawienie temperature=0 nie wystarcza — zmienność jest właściwością architektury wieloetapowej, a nie parametrem modelu.
-
-    \item \textbf{Bezpieczeństwo autonomicznych agentów IaC jest realnym problemem.} Podatność na manipulację dokumentacją repozytorium nie wymaga exploitowania modelu — wystarczy dostęp do pliku README lub AGENTS.md. Różnice między modelami w tym wymiarze są dramatyczne.
-
-    \item \textbf{Żaden model nie dominuje we wszystkich wymiarach jednocześnie.} GPT-5 Mini osiąga najwyższą skuteczność funkcjonalną, Gemini 2.5 Flash — najwyższą odporność na manipulację, DeepSeek V3.2 — najniższą powtarzalność. Dobór modelu powinien uwzględniać profil ryzyka wdrożenia.
-\end{enumerate}
-
-\subsection{Implikacje praktyczne i końcowa ocena przydatności agentów LLM w DevOps}
-
-Agenty LLM stanowią obiecujące, lecz jeszcze niedojrzałe narzędzie do autonomicznej generacji konfiguracji IaC. Ich użyteczność jest realna w ograniczonym zakresie — prostych, jednokomponentowych aplikacjach z kontrolowanym i zaufanym kontekstem — ale wymaga wsparcia przez walidację statyczną, ograniczenie kontekstu wejściowego i ludzki nadzór nad artefaktami bezpieczeństwa. Droga do pełnej autonomii w bardziej złożonych scenariuszach pozostaje otwarta i wymaga dalszych usprawnień zarówno w samych modelach, jak i w architekturze systemów agentowych.
-
-Dla zastosowań praktycznych rekomendowany pipeline agentowego generowania IaC obejmuje: (1)~ograniczony kontekst wejściowy (tylko kod źródłowy, bez dokumentacji i historii), (2)~rozbudowaną instrukcję systemową z checklistą dobrych praktyk bezpieczeństwa i jakości, (3)~automatyczną walidację statyczną wygenerowanych artefaktów (Hadolint, Kube-linter), (4)~opcjonalne testy runtime przed zatwierdzeniem oraz (5)~obowiązkowy przegląd ludzki artefaktów bezpieczeństwa (security contexts, uprawnienia, sekrety). Zastosowanie agenta bez tych mechanizmów kontrolnych nie jest zalecane w środowiskach produkcyjnych.
+Bezpieczne zastosowanie agentów LLM do generowania IaC wymaga: ograniczenia kontekstu wejściowego wyłącznie do kodu źródłowego, rozbudowanej instrukcji systemowej z wytycznymi jakościowymi, obowiązkowej walidacji statycznej wygenerowanych artefaktów oraz ludzkiego przeglądu konfiguracji bezpieczeństwa przed wdrożeniem. Zastosowanie bez tych mechanizmów kontrolnych nie jest zalecane w środowiskach produkcyjnych. Szczegółowe rekomendacje i omówienie kompromisów między modelami zawiera rozdział~6.
 
 \subsection{Ograniczenia pracy}
 
-Niniejsza praca posiada kilka ograniczeń metodologicznych omówionych szczegółowo w rozdziale~6. Syntetycznie: zbiór 25 repozytoriów reprezentuje wyłącznie proste aplikacje webowe w Python/Node.js, co ogranicza generalizację wyników na inne technologie i architektury. Przebadano trzy modele komercyjne — wyniki mogą się różnić dla modeli open-source lub modeli dostrojonych do zadań DevOps. Eksperymenty przeprowadzono w lokalnym środowisku MicroK8s, które może odbiegać od produkcyjnych klastrów chmurowych. Ocena jakości w RQ3 i podatności w RQ5 opiera się na analizie statycznej i artefaktów, bez pełnej walidacji runtime.
+Wyniki dotyczą konkretnej implementacji systemu agentowego, określonego zestawu modeli komercyjnych i zbioru prostych aplikacji webowych. Nie można ich bezpośrednio uogólniać na inne technologie, modele open-source ani środowiska produkcyjne różniące się od lokalnego klastra testowego. Szczegółowa retrospektywna ocena zagrożeń trafności znajduje się w rozdziale~6.
 
 \subsection{Dalsze kierunki badań}
 
 Wyniki pracy otwierają kilka kierunków dalszych badań:
 
 \begin{itemize}
-    \item \textbf{Szerszy zestaw modeli i technologii.} Weryfikacja wyników na modelach open-source (np.\ Llama, Mistral), modelach dostrojonych do zadań DevOps oraz innych stosach technologicznych (Java, Go, aplikacje z persystencją).
+    \item \textbf{Architektura wieloagentowa z podziałem ról.} Zbadanie, czy separacja ról planowania, generowania i walidacji między wyspecjalizowanymi agentami redukuje zmienność i poprawia koordynację wielousługową.
 
-    \item \textbf{Architektura wieloagentowa z podziałem ról.} Zbadanie, czy separacja ról planowania, generowania i walidacji między wyspecjalizowanymi agentami redukuje zmienność procesu i poprawia koordynację wielousługową — jako alternatywa dla jednego agenta generalistycznego.
+    \item \textbf{Pętla sprzężenia zwrotnego z runtime.} Rozszerzenie systemu o iteracyjną korektę na podstawie wyników faktycznego uruchomienia kontenera, co może istotnie zwiększyć skuteczność etapu runtime.
 
-    \item \textbf{Pętla sprzężenia zwrotnego z runtime.} Rozszerzenie systemu o możliwość iteracyjnej korekty na podstawie wyników faktycznego uruchomienia kontenera (analogicznie do Repo2Run), co może istotnie zwiększyć skuteczność etapu runtime.
+    \item \textbf{Mechanizmy obronne przed manipulacją kontekstem.} Opracowanie i ocena technik wykrywania lub neutralizowania repo poisoning — weryfikacja spójności między kodem a dokumentacją, analiza anomalii lub ograniczenie uprawnień informacyjnych agenta.
 
-    \item \textbf{Mechanizmy obronne przed manipulacją kontekstem.} Opracowanie i ocena technik wykrywania lub neutralizowania repo poisoning — np.\ weryfikacja spójności między kodem a dokumentacją, analiza anomalii w dokumentacji lub ograniczenie uprawnień informacyjnych agenta.
+    \item \textbf{Fine-tuning i szerszy zestaw modeli.} Porównanie modeli ogólnych z modelami dostrojonymi na zbiorach konfiguracji IaC oraz weryfikacja wyników na modelach open-source i innych stosach technologicznych.
 
-    \item \textbf{Fine-tuning na zbiorach DevOps.} Porównanie skuteczności modeli ogólnych z modelami dostrojonymi na zbiorach konfiguracji IaC, szczególnie w wymiarze koordynacji wielousługowej i generowania poprawnych sekretów.
-
-    \item \textbf{Integracja z praktykami CI/CD.} Ocena zastosowania agentów LLM jako elementu pipeline CI/CD z automatycznym wyzwalaniem, walidacją i raportowaniem — w tym wpływ na czas wdrożeń i jakość konfiguracji w rzeczywistych projektach.
+    \item \textbf{Integracja z praktykami CI/CD.} Ocena agentów LLM jako elementu automatycznego pipeline wdrożeniowego w rzeczywistych projektach, z pomiarem wpływu na czas i jakość konfiguracji.
 \end{itemize}
-
-% TODO (z rozdziału 6): Dopisać implikacje dla przyszłych badaczy (implications for researchers):
-%   - jakie pytania otwiera niniejsza praca dla kolejnych badań?
-%   - np. czy fine-tuning na zbiorach DevOps poprawia koordynację wielousługową?
-%   - czy wieloagentowe architektury z podziałem ról (planner + validator) redukują zmienność?
-%   - czy istnieją mechanizmy obronne skutecznie neutralizujące repo poisoning?
-%   - jak odporność na manipulację skaluje się z wielkością i typem modelu?
