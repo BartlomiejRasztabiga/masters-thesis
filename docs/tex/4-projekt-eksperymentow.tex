@@ -170,6 +170,14 @@ Agent po zakończeniu pracy zwraca JSON o następującej strukturze:
     \item \texttt{test\_endpoints} – lista relatywnych ścieżek HTTP do weryfikacji działania aplikacji.
 \end{itemize}
 
+\bigskip
+\noindent
+\textbf{Świadoma decyzja projektowa — architektura bez sprzężenia zwrotnego:}
+
+Architektura systemu celowo nie przewiduje przekazywania wyników potoku walidacyjnego z powrotem do agenta. Konfiguracje są generowane jednorazowo, a wyniki walidacji pełnią wyłącznie rolę ewaluacyjną — nie korygującą. Jest to decyzja metodologiczna: eksperymenty mierzą czystą zdolność modelu LLM do poprawnej jednorazowej generacji, a nie zdolność systemu do samonaprawy w iteracyjnej pętli korekcyjnej.
+
+Przyjęta architektura bez sprzężenia zwrotnego utrudnia bezpośrednie porównania z systemami posiadającymi mechanizm iteracyjnej korekty — takim jak Repo2Run \cite{hu_llm-based_2025}, gdzie agent ponawia próby generacji na podstawie wyników faktycznego uruchomienia kontenera. Różnica ta stanowi istotną zmienną współzakłócającą przy interpretacji wyników względem zewnętrznych benchmarków i jest szczegółowo omawiana w rozdziale~\ref{sec:ograniczenia}.
+
 \subsubsection{Potok walidacyjny}
 
 Po wygenerowaniu konfiguracji przez agenta, następuje automatyczna ewaluacja składająca się z niezależnych kroków:

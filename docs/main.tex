@@ -70,11 +70,11 @@
 %-------------------------------------
 \cleardoublepage % Zaczynamy od nieparzystej strony
 \abstract
-Celem niniejszej pracy magisterskiej jest zbadanie możliwości autonomicznego generowania konfiguracji infrastruktury jako kodu (IaC) przez agenty oparte na dużych modelach językowych (LLM), ze szczególnym uwzględnieniem plików Dockerfile oraz manifestów Kubernetes. Praca koncentruje się na weryfikacji, czy agenty LLM są w stanie — bez ingerencji człowieka — wygenerować funkcjonalne, bezpieczne i zgodne z dobrymi praktykami konfiguracje wdrożeniowe. Przeprowadzono przegląd literatury opisującej aktualne badania w tym obszarze, wskazując zarówno potencjał automatyzacji, jak i liczne wyzwania związane z poprawnością, bezpieczeństwem i niezawodnością autonomicznie wygenerowanego kodu.
+Celem niniejszej pracy magisterskiej jest zbadanie możliwości autonomicznego generowania konfiguracji infrastruktury jako kodu (IaC) przez agenty oparte na dużych modelach językowych (LLM), ze szczególnym uwzględnieniem plików Dockerfile oraz manifestów Kubernetes. Praca weryfikuje, czy agenty LLM są w stanie — bez ingerencji człowieka — wygenerować funkcjonalne, bezpieczne i zgodne z dobrymi praktykami konfiguracje wdrożeniowe dla rzeczywistych aplikacji webowych.
 
-W części badawczej sformułowano pięć pytań badawczych (RQ1–RQ5) dotyczących: autonomicznej generacji funkcjonalnych konfiguracji, ograniczeń złożonościowych, jakości i zgodności z dobrymi praktykami, niezawodności procesu oraz podatności na manipulację kontekstem. Zaprojektowano dedykowany system testowy obejmujący agenta LLM z dostępem do jedenastu narzędzi analizy repozytorium, potok walidacyjny oraz infrastrukturę wykonawczą (MicroK8s). Przeprowadzono serię eksperymentów na rzeczywistych projektach z GitHub oraz pięciu kontrolowanych repozytoriach testowych o rosnącej złożoności. Dla pytania RQ3 zastosowano automatyczną analizę statyczną jakości (Hadolint, Kube-linter). Wyniki eksperymentów poddano szczegółowej analizie statystycznej i jakościowej, co pozwoliło odpowiedzieć na wszystkie pięć pytań badawczych i sformułować wnioski dotyczące praktycznej przydatności agentów LLM w kontekście automatyzacji DevOps.
+W części badawczej sformułowano pięć pytań badawczych (RQ1–RQ5) dotyczących: autonomicznej generacji funkcjonalnych konfiguracji, ograniczeń złożonościowych, jakości i zgodności z dobrymi praktykami, powtarzalności procesu oraz podatności na manipulację kontekstem. Zaprojektowano dedykowany system testowy obejmujący agenta LLM (GPT-5 Mini, Gemini 2.5 Flash, DeepSeek V3.2) z dostępem do jedenastu narzędzi analizy repozytorium, siedmioetapowy potok walidacyjny oraz infrastrukturę wykonawczą opartą na Kubernetes. Eksperymenty przeprowadzono na 25 rzeczywistych projektach z GitHub oraz pięciu kontrolowanych repozytoriach o rosnącej złożoności.
 
-% TODO
+Uzyskane wyniki wskazują, że agenty LLM są użyteczne przy prostych aplikacjach jednokomponentowych — end-to-end success rate wyniósł 62{,}7\% — lecz zawodzą przy koordynacji wielousługowej (skuteczność spada do 0\% dla najbardziej złożonych przypadków) i są podatne na manipulację dokumentacją repozytorium (56{,}7\% krytycznych odchyleń od specyfikacji). Rozszerzenie instrukcji systemowej o wytyczne dobrych praktyk redukuje liczbę ostrzeżeń statycznych o 79{,}6\%. Główna konkluzja jest warunkowa: pełna autonomia jest osiągalna tylko dla prostych, zaufanych repozytoriów; w pozostałych przypadkach konieczny jest nadzór człowieka i starannie zaprojektowany system agentowy.
 
 \keywords Infrastructure as Code, LLM, agenty LLM, Kubernetes, Docker, automatyzacja, bezpieczeństwo, DevOps, pytania badawcze
 
@@ -84,11 +84,11 @@ W części badawczej sformułowano pięć pytań badawczych (RQ1–RQ5) dotyczą
 %----------------------------------------
 \clearpage
 \secondabstract
-The goal of this master's thesis is to investigate the capabilities of autonomous Infrastructure as Code (IaC) configuration generation by agents based on large language models (LLMs), with a particular focus on Dockerfiles and Kubernetes manifests. The work focuses on verifying whether LLM agents are capable of generating functional, secure, and best-practice-compliant deployment configurations without human intervention. A literature review of recent research in the field was conducted, identifying both the automation potential and key challenges related to the correctness, security, and reliability of autonomously generated code.
+This master's thesis investigates the capabilities of autonomous Infrastructure as Code (IaC) configuration generation by agents based on large language models (LLMs), with a particular focus on Dockerfiles and Kubernetes manifests. The work verifies whether LLM agents are capable of generating functional, secure, and best-practice-compliant deployment configurations for real-world web applications without human intervention.
 
-In the research phase, five research questions (RQ1–RQ5) were formulated concerning: autonomous generation of functional configurations, complexity limitations, quality and compliance with best practices, process reliability and repeatability, and susceptibility to context manipulation. A dedicated testing system was designed, comprising an LLM agent with access to eleven repository analysis tools, a validation pipeline, and execution infrastructure (MicroK8s). A series of experiments was conducted on real-world GitHub projects and five controlled test repositories with increasing complexity. For RQ3, automated static analysis (Hadolint, Kube-linter) was used to assess configuration quality. Experimental results were subjected to detailed statistical and qualitative analysis, which made it possible to answer all five research questions and formulate conclusions regarding the practical utility of LLM agents in the context of DevOps automation.
+Five research questions (RQ1–RQ5) were formulated concerning: autonomous generation of functional configurations, complexity limitations, quality and compliance with best practices, process repeatability, and susceptibility to context manipulation. A dedicated testing system was designed, comprising an LLM agent (GPT-5 Mini, Gemini 2.5 Flash, DeepSeek V3.2) with access to eleven repository analysis tools, a seven-stage validation pipeline, and Kubernetes-based execution infrastructure. Experiments were conducted on 25 real-world GitHub projects and five controlled repositories with increasing complexity.
 
-% TODO
+The results show that LLM agents are useful for simple, single-component applications — achieving a 62.7\% end-to-end success rate — but fail at multi-service coordination (success rate drops to 0\% for the most complex cases) and are susceptible to repository documentation manipulation (56.7\% critical deviations from specification). Augmenting the system prompt with best-practice guidelines reduces static analysis warnings by 79.6\%. The main conclusion is conditional: full autonomy is achievable only for simple, trusted repositories; in other cases, human oversight and a carefully designed agent system are required.
 
 \secondkeywords Infrastructure as Code, Large Language Models, LLM agents, Kubernetes, Docker, Automation, Security, DevOps, Research questions
 
@@ -281,107 +281,11 @@ BEFORE submitting your final JSON output, verify:
 \appendix{Prompt \texttt{best\_practises} wykorzystywany w eksperymencie}
 \label{att:prompt-best-practises}
 
-Poniżej przedstawiono pełną treść prompta \texttt{best\_practises} używanego w wariancie eksperymentu RQ3.
+Wariant \texttt{best\_practises} jest identyczny z promptem bazowym (załącznik~\ref{att:prompt}) — jedyną różnicą jest dołączona na końcu sekcja \texttt{BEST PRACTICES CHECKLIST}, przedstawiona poniżej. Dzięki temu prompt engineering stanowi precyzyjnie izolowaną zmienną eksperymentalną w RQ3.
+
+\noindent\textit{(Treść identyczna z załącznikiem~\ref{att:prompt} aż do końca sekcji weryfikacji. Poniżej przedstawiono wyłącznie dołączoną sekcję \texttt{BEST PRACTICES CHECKLIST}.)}
 
 \begin{minted}[breaklines=true, fontsize=\small, linenos, frame=lines]{text}
-You are an expert in web application deployment, specializing in Docker containerization and Kubernetes orchestration.
-
-You have access to tools that can help you analyze web application repositories, understand their architecture and dependencies, and create production-ready Docker and Kubernetes configurations.
-
-CRITICAL: You have only ONE chance to get everything right on the first try. Once you finish generating all files and provide the final JSON output, the evaluation begins immediately. The Dockerfiles will be built, containers will be run, and Kubernetes manifests will be applied in a fully automated process with NO feedback loop. Your work will be scored based on whether the application successfully builds, deploys, and runs end-to-end. There is no opportunity to fix errors after submission.
-
-Your objective is to:
-1. Clone the repository
-2. Analyze the repository to understand the application(s) and discover all services and their dependencies
-3. Create Dockerfile(s) to containerize the application(s) - one per service if multiple services exist
-4. Create Kubernetes manifests (Deployments/StatefulSets, Services, Ingresses) to deploy the application(s) and all discovered dependencies
-
-When creating Dockerfile(s):
-- Identify all services in the repository (may be single-service or multi-service monorepo)
-- Create one Dockerfile per service
-- Use an appropriate base image for each application's language/framework
-- Copy necessary files and install dependencies
-- Expose the application port
-- Specify the command to run the application
-- Prefer running as non-root: create or use an existing non-root user and add a USER directive when it won't break the app
-- For multi-service repos, place each Dockerfile in its service directory (e.g., backend/Dockerfile, frontend/Dockerfile)
-- IMPORTANT: When using build_context (e.g., "frontend"), all paths in the Dockerfile are relative to that directory. For example, if build_context is "frontend", then "COPY package.json ." copies from frontend/package.json, NOT from the repository root
-- IMPORTANT: Pin package versions.
-  * For apt: use explicit versions like `apt-get install -y pkg=1.2.3-1` (look up versions with `apt-cache policy pkg` while analyzing the base image).
-  * For pip: install from a pinned requirements file (`pip install --no-cache-dir -r requirements.txt`) or use `pip install --no-cache-dir pkg==1.2.3`.
-
-When creating Kubernetes manifests:
-- Create separate resources for each service (e.g., if there's a backend and frontend, create 2 Deployments and 2 Services)
-- For each stateless service: create a Deployment (use 1 replica by default) and a Service to expose it
-- For web-accessible services: create an Ingress with host: "<repository-name>.{domain_suffix}"
-  * IMPORTANT: The host must be lowercase and comply with RFC 1123 subdomain rules (only lowercase letters, numbers, hyphens, and dots)
-  * Convert repository name to lowercase before using it in the host (e.g., "Math-PDF-Generator" → "math-pdf-generator")
-- Set imagePullPolicy: IfNotPresent (do NOT use "Never")
-- Include resource requests and limits for all containers
-- Add health checks if the service has a health endpoint
-- For security context: default to non-root when possible; if the Dockerfile sets USER or the base image is known to be non-root, set runAsNonRoot: true (and runAsUser when known)
-- Use readOnlyRootFilesystem: true and add writable volume mounts (e.g., emptyDir for /tmp or app-specific write paths) when the app needs write access
-- When non-root/read-only would break the app, document the reason and fall back to root with minimal permissions
-
-IMPORTANT - Discovering External Dependencies:
-Your key task is to actively discover what external services the application needs:
-- Analyze code, configuration files, environment variables, and connection strings
-- Look for database connections (PostgreSQL, MySQL, MongoDB, etc.)
-- Look for cache/message queue usage (Redis, RabbitMQ, Kafka, etc.)
-- Look for any other external services the application connects to
-- For each discovered dependency, create appropriate Kubernetes resources:
-  * StatefulSet for stateful services (databases, message queues)
-  * PersistentVolumeClaim for data persistence - use storageClassName: "microk8s-hostpath" or omit it entirely to use the default storage class
-  * Service to expose the dependency
-  * Secret for credentials
-  * ConfigMap for non-sensitive configuration
-
-After generating all files, respond with a JSON object in this format:
-
-```json
-{{
-  "docker_images": [
-    {{
-      "dockerfile_path": "backend/Dockerfile",
-      "image_tag": "backend",
-      "build_context": "backend"
-    }},
-    {{
-      "dockerfile_path": "frontend/Dockerfile",
-      "image_tag": "frontend",
-      "build_context": "frontend"
-    }}
-  ],
-  "kubernetes_files": [
-    "k8s/backend-deployment.yaml",
-    "k8s/backend-service.yaml",
-    "k8s/frontend-deployment.yaml",
-    "k8s/frontend-service.yaml",
-    "k8s/ingress.yaml",
-    "k8s/postgres-statefulset.yaml",
-    "k8s/postgres-service.yaml",
-    "k8s/postgres-secret.yaml"
-  ],
-  "test_endpoints": ["/api/health"]
-}}
-```
-
-Important notes for the output:
-- docker_images: Include one entry per service/Dockerfile. For multi-service repos, list all services with their respective Dockerfiles and build contexts.
-- kubernetes_files: List ALL generated manifest files, including those for discovered dependencies (databases, caches, etc.)
-- test_endpoints: List of paths that are accessible via Ingress routes - verify before specifying. ONLY include endpoints for services that have Ingress resources (i.e., web-accessible services). Do NOT include endpoints for internal services like databases or caches. Include one endpoint per web-accessible service (e.g., if you have backend and frontend services both with Ingress, provide 2 endpoints). All endpoints will be tested via HTTP and the score will be proportional to how many respond successfully.
-- build_context: Use "." for single-service repos, or the service directory (e.g., "backend", "frontend") for multi-service repos. Remember: when build_context is set to a subdirectory, Docker executes the build from that directory, so all COPY paths in the Dockerfile must be relative to that context (not the repo root).
-
-BEFORE submitting your final JSON output, verify:
-- All file paths referenced in COPY instructions actually exist in the repository
-- All ports are correctly aligned between Dockerfile EXPOSE, Kubernetes containerPort, and Service targetPort
-- All health check endpoints you specified actually exist in the application code
-- Security context settings match the Dockerfile USER directive (or omit if running as root)
-- All discovered dependencies have complete resources (StatefulSet, Service, Secret, PVC)
-- All test_endpoints are real endpoints that:
-  * Exist in the application code
-  * Are accessible via the Ingress routes you created
-  * Will return successful responses (2xx status codes)
 
 BEST PRACTICES CHECKLIST (apply when relevant and safe):
 

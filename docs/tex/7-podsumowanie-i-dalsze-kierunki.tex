@@ -7,7 +7,7 @@ Niniejsza praca zbadała, w jakim stopniu agenty oparte na dużych modelach jęz
 
 \textbf{RQ1.} Agenty LLM potrafią autonomicznie wygenerować działające konfiguracje IaC dla większości prostych i umiarkowanie złożonych aplikacji webowych. Granica ich możliwości leży nie w znajomości składni, lecz w zdolności do przewidywania zachowania środowiska runtime bez możliwości jego obserwacji.
 
-\textbf{RQ2.} Złożoność architektury wielousługowej stanowi barierę, której obecne agenty nie przekraczają niezawodnie. Nawet umiarkowany wzrost liczby współzależnych serwisów prowadzi do dramatycznego spadku skuteczności — agent generuje pliki lokalnie poprawne, które nie tworzą spójnej całości.
+\textbf{RQ2.} Złożoność architektury wielousługowej stanowi barierę, której obecne agenty nie przekraczają niezawodnie. Wraz ze wzrostem liczby współzależnych serwisów skuteczność wyraźnie spada — agent generuje pliki lokalnie poprawne, które nie tworzą spójnej całości. Kierunek tego trendu jest wiarygodny, jednak ze względu na małą liczbę kontrolowanych repozytoriów PoC (n=5) nie można precyzyjnie określić kształtu krzywej ani wskazać ilościowego „punktu załamania".
 
 \textbf{RQ3.} Domyślna jakość generowanych artefaktów jest niewystarczająca do zastosowań produkcyjnych. Rozszerzenie instrukcji systemowej o wytyczne jakościowe drastycznie poprawia wyniki, co wskazuje, że modele posiadają potrzebną wiedzę, lecz wymagają jawnego nakierowania.
 
@@ -41,13 +41,14 @@ Bezpieczne zastosowanie agentów LLM do generowania IaC wymaga spełnienia kilku
     \item \textbf{Ograniczenie do prostych zastosowań} — dla aplikacji wielousługowych (trzy lub więcej wzajemnie zależnych komponentów) agenty nie nadają się do w pełni autonomicznej pracy; wartościowe jest wówczas generowanie poszczególnych komponentów z oddzielną weryfikacją spójności całości.
 \end{itemize}
 
-Wybór modelu powinien być podyktowany profilem ryzyka wdrożenia: \texttt{gpt-5-mini} dla środowisk zaufanych wymagających najwyższej skuteczności, \texttt{gemini-2.5-flash} dla środowisk, gdzie odporność na manipulację jest priorytetem. \texttt{DeepSeek V3.2} nie jest zalecany w środowiskach produkcyjnych ze względu na pełną podatność w testach manipulacji kontekstem.
-
 \subsection{Ograniczenia pracy}
+\label{sec:ograniczenia}
 
 Wyniki dotyczą konkretnej implementacji systemu agentowego, określonego zestawu modeli komercyjnych i zbioru prostych aplikacji webowych. Nie można ich bezpośrednio uogólniać na inne technologie, modele open-source ani środowiska produkcyjne różniące się od lokalnego klastra testowego.
 
 Kluczowe ograniczenia generalizowalności wyników obejmują: zależność od konkretnego promptu i zestawu narzędzi agenta (inne implementacje mogą dać istotnie różne rezultaty), brak walidacji runtime w eksperymentach RQ3 i RQ5 (ocena jakości i podatności opiera się wyłącznie na analizie statycznej artefaktów) oraz brak pętli sprzężenia zwrotnego z rzeczywistym środowiskiem wykonawczym — architektura agenta generującego konfiguracje statycznie może zaniżać wyniki względem systemów z iteracyjną korektą. Wreszcie, eksperymenty przeprowadzono na aplikacjach webowych w językach Python i Node.js; wyniki nie charakteryzują innych stosów technologicznych ani typów systemów (np.\ aplikacje bazodanowe, systemy czasu rzeczywistego). Szczegółowa retrospektywna ocena zagrożeń trafności znajduje się w rozdziale~6.
+
+Osobnym ograniczeniem dotyczy wniosków z RQ2. Pięć kontrolowanych repozytoriów PoC stanowi zbyt małą próbę, aby precyzyjnie opisać kształt zależności między złożonością a skutecznością — obserwowany monotonicznie malejący trend jest wiarygodny jako kierunek, lecz dokładna krzywa, a w szczególności lokalizacja ewentualnego punktu krytycznego, pozostaje nieokreślona. Dodatkowo, autor zaprojektował zarówno system testowy, jak i same repozytoria PoC, co stwarza ryzyko nieświadomego dobrania zadań do możliwości systemu; wyniki RQ2 należy zatem traktować jako wstępną ilustrację zjawiska, a nie jego pełną charakterystykę ilościową.
 
 \subsection{Dalsze kierunki badań}
 
