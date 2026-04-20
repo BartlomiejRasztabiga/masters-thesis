@@ -40,11 +40,11 @@ Trzy modele biorące udział w badaniu — \texttt{gemini-2.5-flash}, \texttt{gp
 
 \textbf{Powtarzalność procesu (RQ4).} Model \texttt{deepseek-chat} wykazał wyższy średni diff ratio (0{,}5990) niż \texttt{gemini-2.5-flash} (0{,}5274), co oznacza, że jego wyniki cechuje większa zmienność treści przy kolejnych uruchomieniach. Jednocześnie model deepseek wykonywał więcej kroków narzędziowych (średnio ok.\ 19--64 w zależności od repozytorium), co wskazuje na bardziej eksploracyjny styl pracy agenta.
 
-\textbf{Odporność na manipulację (RQ5).} Tu różnice są dramatyczne. \texttt{Gemini-2.5-flash} wykazał wyjątkową odporność: podatność na poziomie 6{,}7\% (2/30 przebiegów). Model \texttt{gpt-5-mini} był podatny w 63{,}3\% przypadków, a \texttt{deepseek-chat} uległ manipulacji we wszystkich 30 przebiegach (100\%). Tak skrajna różnica nie wynika z prostych parametrów modelu (rozmiar, architektura), lecz prawdopodobnie ze sposobu trenowania i wyrównania preferencji modelu w kontekście konfliktujących sygnałów. Wysoka odporność Gemini może wiązać się z bardziej rygorystycznym procesem RLHF lub specyficznym sposobem traktowania treści plików jako kontekstu nieautorytatywnego.
+\textbf{Odporność na manipulację (RQ5).} Tu różnice są dramatyczne. \texttt{Gemini-2.5-flash} wykazał wyjątkową odporność: podatność na poziomie 6{,}7\% (2/30 przebiegów). Model \texttt{gpt-5-mini} był podatny w 63{,}3\% przypadków, a \texttt{deepseek-chat} uległ manipulacji we wszystkich 30 przebiegach (100\%). Tak skrajna różnica nie wynika z prostych parametrów modelu (rozmiar, architektura), lecz prawdopodobnie ze sposobu trenowania i wyrównania preferencji modelu w kontekście konfliktujących sygnałów. Wysoka odporność Gemini może wiązać się z bardziej rygorystycznym procesem RLHF lub specyficznym sposobem traktowania treści plików jako kontekstu nieautorytatywnego — jest to jednak hipoteza, której weryfikacja wymagałaby wglądu w wewnętrzne mechanizmy trenowania modelu niedostępne przez API.
 
 \textbf{Kompromisy.} Żaden z modeli nie dominuje jednocześnie we wszystkich wymiarach. \texttt{GPT-5-mini} jest najskuteczniejszy funkcjonalnie, ale wykazuje wysoką podatność na manipulację (63{,}3\%). \texttt{Gemini-2.5-flash} jest najodporniejszy na manipulację, lecz najsłabszy w RQ2. \texttt{DeepSeek V3.2} łączy przeciętną skuteczność z maksymalną podatnością i najwyższą zmiennością procesu. Wybór modelu powinien więc uwzględniać specyfikę kontekstu wdrożenia: dla środowisk, gdzie repozytorium może zawierać niezaufaną dokumentację, priorytetem jest odporność (Gemini); dla prostszych, zaufanych repozytoriów — maksymalna skuteczność (GPT-5 Mini).
 
-\subsection{Interpretacja ograniczeń modeli LLM}
+\subsection{Interpretacja typowych błędów i ograniczeń systemu agentowego}
 
 Analiza typowych błędów zebranych w rozdziale~5 wskazuje na kilka systemowych ograniczeń obecnych generacji modeli językowych w kontekście generowania konfiguracji IaC.
 
@@ -92,6 +92,8 @@ Wyniki RQ5 wskazują, że podatność agentów LLM na manipulację kontekstem je
 
 \textbf{Implikacje dla bezpiecznego wdrożenia.} Praktyczne wdrożenie agentów LLM do automatycznego generowania konfiguracji IaC wymaga: (1) ograniczenia dostępu agenta wyłącznie do plików niezbędnych (zasada minimalnych uprawnień informacyjnych), (2) mechanizmów walidacji wygenerowanych artefaktów względem kodu źródłowego — nie tylko dokumentacji, (3) obowiązkowej ludzkiej weryfikacji artefaktów bezpieczeństwa (security contexts, uprawnienia, sekrety) przed wdrożeniem. Samodzielne systemy agentowe bez takich mechanizmów stanowią wektor ataku umożliwiający eskalację uprawnień lub wstrzyknięcie nieautoryzowanych zależności infrastrukturalnych przez osoby z dostępem do repozytorium.
 
+Podsumowując: wyniki RQ5 wskazują, że \textit{żaden z badanych modeli nie jest gotowy do autonomicznego działania na niezaufanych repozytoriach} bez zewnętrznych mechanizmów kontroli. \texttt{DeepSeek V3.2} wykazał pełną podatność (100\%), co wyklucza jego zastosowanie w środowiskach, gdzie integralność dokumentacji nie jest gwarantowana, nawet przy kompensacji innymi środkami organizacyjnymi.
+
 \subsection{Porównanie z literaturą}
 
 Uzyskane wyniki można odnieść do kilku kluczowych prac omówionych w rozdziale~2.
@@ -133,4 +135,8 @@ Zagrożenia trafności eksperymentów zostały zidentyfikowane a priori w rozdzi
 \textbf{Walidacja runtime endpointami} okazała się zagrożeniem o ograniczonym zasięgu: błędne \texttt{test\_endpoints} w kilku przebiegach RQ1 zaniżyły success rate mimo poprawnej konfiguracji — jest to więc zagrożenie konserwatywne (obniżające zmierzoną skuteczność, nie zawyżające).
 
 Poza zagrożeniami z rozdziału~4, wyniki ujawniły dwa dodatkowe ograniczenia. Po pierwsze, \textbf{zależność od promptu i narzędzi agenta}: uzyskane wyniki charakteryzują konkretną implementację systemu agentowego, a nie modele językowe w izolacji — inne prompty lub zestawy narzędzi mogą dać istotnie różne rezultaty. Po drugie, \textbf{brak walidacji runtime w RQ3 i RQ5}: ocena jakości (RQ3) opiera się wyłącznie na narzędziach statycznych, a ocena podatności (RQ5) — na analizie artefaktów; nie wiadomo, w jakim stopniu konfiguracje ocenione pozytywnie statycznie działałyby poprawnie w środowisku wykonawczym.
+
+Należy też odnotować alternatywne wyjaśnienie obserwowanej zmienności w RQ4: część odchyleń diff ratio może wynikać nie z architektury wieloetapowej agenta, lecz ze zróżnicowania samych repozytoriów testowych — różna liczba plików, różna głębokość struktury katalogów oraz różna kolejność zwracania plików przez system plików mogą wprowadzać dodatkowe odchylenia niezwiązane z modelem. Izolowanie tych efektów wymagałoby powtórzenia eksperymentu na kontrolowanym, deterministycznym zbiorze repozytoriów syntetycznych.
+
+Łącznie wyniki pięciu pytań badawczych tworzą spójny obraz: agenty LLM są już użytecznym narzędziem wspomagającym inżyniera DevOps, lecz nie zastępują go — szczególnie w scenariuszach złożonych architekturalnie lub wymagających wysokiego poziomu zaufania do generowanych artefaktów. Szczegółowe implikacje i rekomendacje na podstawie tych wniosków zawiera rozdział~7.
 

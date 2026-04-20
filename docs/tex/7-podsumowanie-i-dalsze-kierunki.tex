@@ -15,6 +15,14 @@ Niniejsza praca zbadała, w jakim stopniu agenty oparte na dużych modelach jęz
 
 \textbf{RQ5.} Agenty są podatne na manipulację dokumentacją repozytorium. Fałszywe wymagania osadzone w plikach tekstowych skutecznie wpływają na generowane konfiguracje bez konieczności exploitowania modelu, przy czym podatność jest silnie zróżnicowana między modelami.
 
+\subsection{Odpowiedź na główne pytanie badawcze}
+
+Niniejsza praca stawiała pytanie, czy agenty LLM są w stanie — bez ingerencji człowieka — wygenerować funkcjonalne, bezpieczne i zgodne z dobrymi praktykami konfiguracje wdrożeniowe dla rzeczywistych aplikacji webowych. Odpowiedź jest warunkowa: \textbf{tak, dla prostych aplikacji jednokomponentowych z czytelną strukturą kodu; nie, dla złożonych systemów wielousługowych oraz środowisk o podwyższonych wymaganiach bezpieczeństwa lub z niezaufaną dokumentacją}.
+
+Przy prostych aplikacjach agenty osiągają ponad 60\% end-to-end success rate i mogą generować konfiguracje nadające się do wdrożenia bez interwencji człowieka. Przy rosnącej złożoności skuteczność spada drastycznie (do 0\% dla najbardziej złożonych przypadków), domyślna jakość artefaktów jest niewystarczająca bez odpowiedniego prompt engineeringu, a podatność na manipulację kontekstem czyni w pełni autonomiczne zastosowanie ryzykownym wszędzie tam, gdzie repozytorium może zawierać niezaufaną dokumentację.
+
+Warto jednak zastrzec, że obserwowane ograniczenia nie są koniecznie ograniczeniami samych modeli językowych — lecz architektury systemu agentowego, w którym są osadzone. Kluczowym czynnikiem jest brak pętli sprzężenia zwrotnego z runtime: agent generuje konfiguracje statycznie, nie mogąc obserwować ani reagować na błędy budowania kontenera czy awarie wdrożeniowe. Iteracyjna korekta oparta na faktycznym wyjściu systemu — jak w projektach takich jak Repo2Run — mogłaby istotnie podnieść skuteczność przy niezmienionych modelach bazowych. W tym sensie wyniki pracy charakteryzują konkretną architekturę agentową, a nie granicę możliwości LLM jako takich.
+
 \subsection{Kluczowe wnioski}
 
 Wyniki wskazują, że agenty LLM stanowią realne, lecz ograniczone narzędzie do automatyzacji IaC. Są użyteczne jako asystent inżyniera przy prostych, jednokomponentowych aplikacjach — skracając czas tworzenia szkieletu konfiguracji — ale nie zastępują człowieka w scenariuszach złożonych lub wymagających wysokiego poziomu bezpieczeństwa. Kluczowym odkryciem jest asymetria między tym, co model \textit{potrafi} (zna składnię, zna dobre praktyki), a tym, co \textit{robi bez nakierowania} (generuje konfiguracje poniżej standardu, ulega manipulacji). Ta asymetria oznacza, że jakość systemu agentowego zależy w dużej mierze od jakości jego projektu — instrukcji, zestawu narzędzi i mechanizmów walidacji — a nie tylko od wyboru modelu bazowego.
@@ -23,11 +31,23 @@ Wyniki wskazują, że agenty LLM stanowią realne, lecz ograniczone narzędzie d
 
 \subsection{Implikacje praktyczne}
 
-Bezpieczne zastosowanie agentów LLM do generowania IaC wymaga: ograniczenia kontekstu wejściowego wyłącznie do kodu źródłowego, rozbudowanej instrukcji systemowej z wytycznymi jakościowymi, obowiązkowej walidacji statycznej wygenerowanych artefaktów oraz ludzkiego przeglądu konfiguracji bezpieczeństwa przed wdrożeniem. Zastosowanie bez tych mechanizmów kontrolnych nie jest zalecane w środowiskach produkcyjnych. Szczegółowe rekomendacje i omówienie kompromisów między modelami zawiera rozdział~6.
+Bezpieczne zastosowanie agentów LLM do generowania IaC wymaga spełnienia kilku warunków jednocześnie:
+
+\begin{itemize}
+    \item \textbf{Ograniczony kontekst wejściowy} — agent powinien mieć dostęp wyłącznie do plików kodu źródłowego, bez dokumentacji i historii repozytorium, co istotnie ogranicza podatność na manipulację (RQ5).
+    \item \textbf{Rozbudowana instrukcja systemowa} — prompt zawierający konkretną, sprawdzalną checklistę dobrych praktyk redukuje liczbę ostrzeżeń statycznych o ponad 79\% i trzykrotnie zwiększa odsetek konfiguracji wolnych od ostrzeżeń (RQ3).
+    \item \textbf{Obowiązkowa walidacja statyczna} — narzędzia takie jak Hadolint i Kube-linter powinny być elementem pipeline CI/CD dla każdej konfiguracji IaC generowanej przez LLM.
+    \item \textbf{Ludzki przegląd konfiguracji bezpieczeństwa} — artefakty zawierające security contexts, uprawnienia i sekrety wymagają weryfikacji człowieka przed wdrożeniem, niezależnie od zastosowanego modelu.
+    \item \textbf{Ograniczenie do prostych zastosowań} — dla aplikacji wielousługowych (trzy lub więcej wzajemnie zależnych komponentów) agenty nie nadają się do w pełni autonomicznej pracy; wartościowe jest wówczas generowanie poszczególnych komponentów z oddzielną weryfikacją spójności całości.
+\end{itemize}
+
+Wybór modelu powinien być podyktowany profilem ryzyka wdrożenia: \texttt{gpt-5-mini} dla środowisk zaufanych wymagających najwyższej skuteczności, \texttt{gemini-2.5-flash} dla środowisk, gdzie odporność na manipulację jest priorytetem. \texttt{DeepSeek V3.2} nie jest zalecany w środowiskach produkcyjnych ze względu na pełną podatność w testach manipulacji kontekstem.
 
 \subsection{Ograniczenia pracy}
 
-Wyniki dotyczą konkretnej implementacji systemu agentowego, określonego zestawu modeli komercyjnych i zbioru prostych aplikacji webowych. Nie można ich bezpośrednio uogólniać na inne technologie, modele open-source ani środowiska produkcyjne różniące się od lokalnego klastra testowego. Szczegółowa retrospektywna ocena zagrożeń trafności znajduje się w rozdziale~6.
+Wyniki dotyczą konkretnej implementacji systemu agentowego, określonego zestawu modeli komercyjnych i zbioru prostych aplikacji webowych. Nie można ich bezpośrednio uogólniać na inne technologie, modele open-source ani środowiska produkcyjne różniące się od lokalnego klastra testowego.
+
+Kluczowe ograniczenia generalizowalności wyników obejmują: zależność od konkretnego promptu i zestawu narzędzi agenta (inne implementacje mogą dać istotnie różne rezultaty), brak walidacji runtime w eksperymentach RQ3 i RQ5 (ocena jakości i podatności opiera się wyłącznie na analizie statycznej artefaktów) oraz brak pętli sprzężenia zwrotnego z rzeczywistym środowiskiem wykonawczym — architektura agenta generującego konfiguracje statycznie może zaniżać wyniki względem systemów z iteracyjną korektą. Wreszcie, eksperymenty przeprowadzono na aplikacjach webowych w językach Python i Node.js; wyniki nie charakteryzują innych stosów technologicznych ani typów systemów (np.\ aplikacje bazodanowe, systemy czasu rzeczywistego). Szczegółowa retrospektywna ocena zagrożeń trafności znajduje się w rozdziale~6.
 
 \subsection{Dalsze kierunki badań}
 
@@ -44,3 +64,5 @@ Wyniki pracy otwierają kilka kierunków dalszych badań:
 
     \item \textbf{Integracja z praktykami CI/CD.} Ocena agentów LLM jako elementu automatycznego pipeline wdrożeniowego w rzeczywistych projektach, z pomiarem wpływu na czas i jakość konfiguracji.
 \end{itemize}
+
+Agenty LLM już dziś mogą pełnić rolę użytecznego asystenta inżyniera DevOps — pod warunkiem świadomego projektowania systemu, właściwej kontroli kontekstu i obowiązkowej walidacji artefaktów. Pełna autonomia, rozumiana jako zastąpienie człowieka w całym procesie tworzenia i wdrażania konfiguracji infrastrukturalnej, pozostaje celem wymagającym rozwiązania otwartych problemów koordynacji wielousługowej, powtarzalności procesu i odporności na manipulację.
