@@ -70,6 +70,8 @@ Wyniki RQ3 stanowią bezpośredni dowód empiryczny na wpływ prompt engineering
 
 \subsection{Niezawodność i deterministyczność procesu agentowego}
 
+Eksperyment RQ4 objął dwa modele — \texttt{gemini-2.5-flash} i \texttt{deepseek-chat} — z wyłączeniem \texttt{gpt-5-mini}, który nie wspiera parametru \texttt{temperature=0} na poziomie API (szczegóły w sekcji~\ref{sec:rq4-design} rozdziału~4).
+
 Wyniki RQ4 kwestionują intuicyjne założenie, że ustawienie temperature=0 w modelu językowym zapewnia w pełni deterministyczne działanie systemu agentowego. Średni diff ratio 0{,}5632 oznacza, że w typowym przebiegu ponad połowa linii wygenerowanych artefaktów różni się między powtórzeniami dla tego samego wejścia.
 
 \textbf{Dlaczego temperature=0 nie gwarantuje pełnej deterministyczności.} Współczesne modele językowe działają na sprzęcie z obliczeniami zmiennoprzecinkowymi, gdzie operacje równoległe mogą prowadzić do nieidentycznych wyników przy kolejnych wywołaniach nawet przy tych samych parametrach \cite{zhao_survey_2025}. Jednak w kontekście systemu agentowego kluczowym dodatkowym źródłem zmienności jest \textit{wieloetapowy charakter procesu}: agent wielokrotnie czyta pliki, zapisuje je, modyfikuje i weryfikuje — każde wywołanie narzędziowe dostarcza nowe informacje do kontekstu kolejnego wywołania modelu. Nawet drobna fluktuacja na wcześniejszym etapie propaguje się i amplifikuje w kolejnych krokach.
