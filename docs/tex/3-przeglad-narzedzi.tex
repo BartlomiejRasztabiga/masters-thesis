@@ -152,7 +152,7 @@ Cała logika sterowania eksperymentami, w tym implementacja agentów, wywoływan
 Interakcje z modelami LLM odbywały się za pośrednictwem dwóch głównych ścieżek:
 \begin{itemize}
     \item \textbf{Bezpośrednie API:} W przypadku modeli komercyjnych, które oferują własne dedykowane API (np. OpenAI GPT-5 Mini, Google Gemini 2.5 Flash), korzystano z ich natywnych interfejsów programistycznych.
-    \item \textbf{OpenRouter:} Dla modeli open-source (np. Mistral, Meta Llama), które często nie posiadają własnych komercyjnych API lub ich infrastruktura do hostingu jest zbyt kosztowna dla pojedynczego badacza, wykorzystano platformę \textbf{OpenRouter}. OpenRouter działa jako brama API (API Gateway), agregująca dostęp do wielu modeli od różnych dostawców za pośrednictwem ujednoliconego interfejsu API, co znacząco ułatwiało testowanie różnorodnych modeli bez konieczności integracji z wieloma odrębnymi API.
+    \item \textbf{OpenRouter:} Dla modeli open-source niedysponujących własnym dedykowanym API komercyjnym wykorzystano platformę \textbf{OpenRouter}. OpenRouter działa jako brama API (API Gateway), agregująca dostęp do wielu modeli od różnych dostawców za pośrednictwem ujednoliconego interfejsu API, co znacząco ułatwiało testowanie różnorodnych modeli bez konieczności integracji z wieloma odrębnymi API.
 \end{itemize}
 
 W trakcie prowadzenia badań i eksperymentów wykorzystano również szereg narzędzi wspomagających, które były cenne dla efektywnego zarządzania procesem badawczym i analizą wyników:
