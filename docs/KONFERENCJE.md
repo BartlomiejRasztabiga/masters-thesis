@@ -1,24 +1,29 @@
 # Możliwości publikacji — research konferencji i journali 2026
 
-> Stan na: 19 kwietnia 2026. Terminy przeszłe oznaczone jako ~~przekreślone~~.
+> Stan na: 4 maja 2026. Dane zweryfikowane na oficjalnych stronach konferencji i czasopisma. Dla MSR i SANER pokazana jest najbliższa oficjalnie ogłoszona edycja.
 
 ---
 
-## Podsumowanie — co jest jeszcze możliwe
+## Podsumowanie — co jest jeszcze realnie otwarte
 
-| Venue | Deadline | Status |
-|-------|----------|--------|
-| **ESEM 2026** — Technical Track | 18 maja 2026 (pełny artykuł) | ✅ Otwarty |
-| **ESEM 2026** — SE in Practice | 27 maja 2026 | ✅ Otwarty |
-| **ESEM 2026** — Emerging Results / Vision | 29 maja 2026 | ✅ Otwarty |
-| **ASE 2026** — Tools & Datasets | 11 maja 2026 | ✅ Otwarty |
-| **ASE 2026** — Industry Showcase | 23 kwietnia 2026 | ⚠️ Za kilka dni |
-| **ASE 2026** — Research Papers (rewizja) | 16 lipca 2026 | ℹ️ Tylko dla zaproszonych do rewizji |
-| **EMSE Journal** — Regular Papers | Rolling (brak deadline'ów) | ✅ Otwarty |
-| **EMSE — Special Issue: Agentic SE** | **28 września 2026** | ✅ Otwarty — **IDEALNE DOPASOWANIE** |
-| ~~ASE 2026 — Research Papers~~ | ~~26 marca 2026~~ | ❌ Minął |
-| ~~MSR 2026~~ | Cała konferencja | ❌ Odbyła się 13–14 kwietnia 2026 |
-| ~~SANER 2026~~ | Cała konferencja | ❌ Odbyła się 17–20 marca 2026 |
+| Venue | Najbliższa edycja / ścieżka | Deadline | Status |
+|-------|------------------------------|----------|--------|
+| **ESEM 2026** | Technical Track | **11 maja 2026** (abstract), **18 maja 2026** (full paper) | ✅ Otwarte |
+| **ESEM 2026** | Software Engineering in Practice | **20 maja 2026** (abstract), **27 maja 2026** (full paper) | ✅ Otwarte |
+| **ESEM 2026** | Emerging Results / Vision / Reflection | **22 maja 2026** (abstract), **29 maja 2026** (full paper) | ✅ Otwarte |
+| **ESEM 2026** | Journal First | **1 lipca 2026** | ✅ Otwarte |
+| **ASE 2026** | Tools and Datasets | **11 maja 2026** | ✅ Otwarte |
+| **ASE 2026** | Doctoral Symposium | **30 czerwca 2026** | ✅ Otwarte |
+| **ASE 2026** | Journal First | **6 lipca 2026** | ✅ Otwarte |
+| **ASE 2026** | Student Research Competition | **23 lipca 2026** | ✅ Otwarte |
+| **EMSE Journal** | Regular Papers | Rolling | ✅ Otwarte |
+| **EMSE Special Issue** | Agentic Software Engineering | **28 września 2026** | ✅ Otwarte — bardzo dobre dopasowanie |
+| **MSR 2027** | Najbliższa ogłoszona edycja | CFP jeszcze nieopublikowany | ℹ️ Obserwować |
+| **SANER 2027** | Najbliższa ogłoszona edycja | CFP jeszcze nieopublikowany | ℹ️ Obserwować |
+| ~~ASE 2026 — Industry Showcase~~ | ~~Paper submission~~ | ~~30 kwietnia 2026~~ | ❌ Zamknięte |
+| ~~ASE 2026 — Research Papers~~ | ~~Paper submission~~ | ~~26 marca 2026~~ | ❌ Zamknięte |
+| ~~MSR 2026~~ | ~~cała konferencja~~ | ~~13–14 kwietnia 2026~~ | ❌ Odbyła się |
+| ~~SANER 2026~~ | ~~cała konferencja~~ | ~~17–20 marca 2026~~ | ❌ Odbyła się |
 
 ---
 
@@ -26,25 +31,30 @@
 
 **41st IEEE/ACM International Conference on Automated Software Engineering**
 
-- **Termin:** 12–16 października 2026, Monachium, Niemcy (Holiday Inn Munich – City Center)
-- **Poziom trudności:** Najwyższy (zgodnie z opinią promotora)
+- **Termin konferencji:** 12–16 października 2026
+- **Miejsce:** Monachium, Niemcy
+- **Venue:** Holiday Inn Munich – City Center
+- **Poziom trudności:** bardzo wysoki
 
-### Ścieżki i deadline'y
+### Ścieżki, które nadal mają sens
 
-| Track | Deadline |
-|-------|----------|
-| Research Papers — pierwsze zgłoszenie | ~~26 marca 2026~~ ❌ |
-| Research Papers — rewizja (tylko dla zaproszonych) | **16 lipca 2026** |
-| Industry Showcase | **23 kwietnia 2026** ⚠️ |
-| Tools and Datasets | **11 maja 2026** ✅ |
-| Co-Located Events (proposals) | ~~15 kwietnia 2026~~ ❌ |
+| Track | Deadline | Komentarz |
+|-------|----------|-----------|
+| **Tools and Datasets** | **11 maja 2026** | Najbardziej sensowna ścieżka, jeśli głównym wkładem jest narzędzie, benchmark albo dataset |
+| **Doctoral Symposium** | **30 czerwca 2026** | Tylko jeśli zgłoszenie ma formę doktorancką |
+| **Journal First** | **6 lipca 2026** | Dla już zaakceptowanego artykułu journalowego |
+| **Student Research Competition** | **23 lipca 2026** | Opcja dla studenta, ale to nie jest pełny research paper |
+| Research Papers — major revision only | **16 lipca 2026** | Tylko dla wcześniej zaproszonych do rewizji |
 
-### Rekomendowane ścieżki dla tej pracy
+### Co już się zamknęło
 
-- **Tools and Datasets** (11 maja) — jeśli praca zawiera nowe narzędzie lub dataset (np. narzędzie do analizy repozytoriów, zestaw danych z pomiarami)
-- **Industry Showcase** (23 kwietnia) — jeśli praca ma silny komponent praktyczny / przemysłowy
+- Research Papers: **26 marca 2026**
+- Industry Showcase: **23 kwietnia 2026** (abstract), **30 kwietnia 2026** (paper)
+- Co-Located Events: **15 kwietnia 2026**
 
-> **Uwaga:** Główny track Research Papers ma już zamknięty deadline (26 marca). Jedyną szansą na research paper jest zaproszenie do rewizji po wstępnym zgłoszeniu, które nie jest już możliwe w tym cyklu.
+### Ocena dla tej pracy
+
+Najbardziej realna ścieżka na ASE to teraz **Tools and Datasets**. Główny track research jest już faktycznie zamknięty, chyba że ktoś był już w rundzie rewizyjnej. Jeśli w pracy da się mocno wyeksponować artefakt badawczy, benchmark, pipeline albo dataset, to ASE nadal pozostaje opcją.
 
 ---
 
@@ -52,84 +62,81 @@
 
 **20th International Symposium on Empirical Software Engineering and Measurement**
 
-- **Termin:** 4–9 października 2026, Monachium, Niemcy (Science Congress Center Munich)
-- **Organizacja:** część tygodnia ESEIW 2026
-- **Poziom trudności:** Wysoki, ale bardziej dostępny niż ASE
-- **Wydawca:** Dagstuhl LIPIcs (od 2026, zmiana z ACM/IEEE)
+- **Termin konferencji:** 4–9 października 2026
+- **Miejsce:** Monachium, Niemcy
+- **Venue:** Science Congress Center Munich
+- **Organizacja:** część ESEIW 2026
+- **Poziom trudności:** wysoki, ale bardziej dostępny niż ASE
+- **Wydawca proceedings:** Dagstuhl LIPIcs
 
-### Ścieżki i deadline'y
+### Aktualne ścieżki i deadline'y
 
-| Track | Abstract | Pełny artykuł |
-|-------|----------|---------------|
-| **Technical Track** | **11 maja 2026** (obowiązkowy) | **18 maja 2026** |
-| **Software Engineering in Practice** | **20 maja 2026** | **27 maja 2026** |
-| **Emerging Results, Vision & Reflection** | **22 maja 2026** (obowiązkowy) | **29 maja 2026** |
-| Registered Reports | TBD | TBD |
-| Journal First | TBD | TBD |
-| IDoESE Doctoral Symposium | TBD | TBD |
+| Track | Deadline | Komentarz |
+|-------|----------|-----------|
+| **Technical Track** | **11 maja 2026** (mandatory abstract), **18 maja 2026** (submission) | Najmocniejsza opcja dla pracy empirycznej |
+| **Software Engineering in Practice** | **20 maja 2026** (abstract), **27 maja 2026** (submission) | Dobra, jeśli nacisk jest na zastosowanie praktyczne |
+| **Emerging Results, Vision, and Reflection** | **22 maja 2026** (mandatory abstract), **29 maja 2026** (submission) | Dobra opcja na krótszy lub mniej domknięty materiał |
+| **Journal First** | **1 lipca 2026** | Dla już przyjętego artykułu journalowego |
+| Registered Reports | **18 maja 2026** (response + revised report) | Tylko kontynuacja dla autorów, którzy złożyli etap 1 wcześniej |
+| IDoESE Doctoral Symposium | **3 lipca 2026** | Tylko dla ścieżki doktoranckiej |
 
-### Rekomendowane ścieżki dla tej pracy
+### Ocena dla tej pracy
 
-- **Technical Track** — **najbardziej pasujące**, jeśli praca ma solidny komponent empiryczny (eksperymenty, badania, pomiary)
-- **Software Engineering in Practice** — jeśli praca jest zorientowana na praktyczne zastosowania w przemyśle
-- **Emerging Results, Vision & Reflection** — jeśli to wczesna wersja wyników lub nowe spojrzenie na problem; krótszy artykuł, łatwiejszy do przygotowania
+- **Technical Track** pozostaje najlepszym dopasowaniem, jeśli rdzeniem pracy są eksperymenty, pomiary i porównania agentów.
+- **SE in Practice** ma sens, jeśli chcesz akcentować wykorzystanie agentów w realistycznych workflowach inżynierskich.
+- **Emerging Results / Vision / Reflection** to najłatwiejsza ścieżka czasowo, jeśli materiał nie jest jeszcze gotowy na pełny, dłuższy artykuł.
 
-> ESEM to "the premier empirical software engineering and measurement conference" — tematycznie bardzo bliska badaniom empirycznym w inżynierii oprogramowania.
-
----
-
-## 3. MSR 2026 — Mining Software Repositories
-
-**23rd International Mining Software Repositories Conference**
-
-- **Termin:** ~~13–14 kwietnia 2026, Rio de Janeiro, Brazylia~~ ❌ **Konferencja już się odbyła**
-- **Co-located with:** ICSE 2026
-
-### Status
-
-Wszystkie terminy zgłoszeń na MSR 2026 minęły. Konferencja odbyła się 13–14 kwietnia 2026.
-
-**Następna edycja:** MSR 2027 — brak jeszcze oficjalnej strony.
-
-### Ścieżki (dla przyszłej edycji — MSR 2027)
-
-- Technical Papers
-- Industry Track
-- Data and Tool Showcase Track
-- Mining Challenge
-- Registered Reports
-- Tutorials
-
-> MSR skupia się na analizie repozytoriów oprogramowania (kod, historia commitów, issue trackery, CI/CD). Pasuje jeśli praca wykorzystuje dane z repozytoriów GitHub/GitLab lub podobnych.
+Na dziś ESEM wygląda jako **najbardziej realistyczna konferencja 2026** z otwartym oknem submission.
 
 ---
 
-## 4. SANER 2026 — Software Analysis, Evolution and Reengineering
+## 3. MSR — Mining Software Repositories
 
-**33rd IEEE International Conference on Software Analysis, Evolution and Reengineering**
+### Najbliższa oficjalnie ogłoszona edycja: **MSR 2027**
 
-- **Termin:** ~~17–20 marca 2026, Limassol, Cypr~~ ❌ **Konferencja już się odbyła**
+- **Miejsce:** Dublin, Ireland
+- **Status:** seria konferencji oficjalnie pokazuje już **MSR 2027**, ale **CFP i terminy nie są jeszcze opublikowane**
 
-### Status
+### Co to oznacza praktycznie
 
-Wszystkie terminy zgłoszeń na SANER 2026 minęły. Konferencja odbyła się 17–20 marca 2026.
+MSR 2026 już się odbyło w dniach **13–14 kwietnia 2026** w Rio de Janeiro. Jeśli celem jest najbliższa kolejna możliwość publikacji w MSR, trzeba obserwować **MSR 2027**.
 
-**Następna edycja:** SANER 2027 — brak jeszcze oficjalnej strony.
+### Ocena dla tej pracy
 
-### Ścieżki (dla przyszłej edycji — SANER 2027)
+Tematycznie MSR nadal bardzo pasuje, jeśli nacisk położysz na:
 
-SANER oferuje 9 kategorii zgłoszeń:
-1. Research Papers
-2. Industrial / Practice Track
-3. Early Research Achievement (ERA) — krótkie artykuły, wczesne wyniki
-4. Short Papers
-5. Reproducibility Studies
-6. Workshops
-7. Journal-First Presentations
-8. Tool Demonstrations
-9. Registered Reports
+- analizę repozytoriów,
+- mining artefaktów generowanych przez agentów,
+- pull requesty, review, issue trackery, CI/CD,
+- obserwacyjne badania dużych zbiorów danych z GitHub.
 
-> SANER skupia się na analizie, ewolucji i przeprojektowaniu oprogramowania. Pasuje do badań nad jakością kodu, refactoringiem, technikami analizy statycznej.
+Problem nie jest merytoryczny, tylko czasowy: **najbliższe oficjalne okno submission jeszcze nie zostało opublikowane**.
+
+---
+
+## 4. SANER — Software Analysis, Evolution and Reengineering
+
+### Najbliższa oficjalnie ogłoszona edycja: **SANER 2027**
+
+- **Termin konferencji:** 9–12 marca 2027
+- **Miejsce:** Richmond, Virginia, USA
+- **Venue:** Virginia Commonwealth University
+- **Status:** oficjalna strona pokazuje **"No calls yet"**
+
+### Co to oznacza praktycznie
+
+SANER 2026 już się odbył w dniach **17–20 marca 2026** w Limassol. Najbliższa kolejna edycja jest już znana lokalizacyjnie i terminowo, ale **bez opublikowanego CFP**.
+
+### Ocena dla tej pracy
+
+SANER może pasować, jeśli praca będzie ustawiona bardziej pod:
+
+- analizę jakości artefaktów,
+- ewolucję kodu i konfiguracji,
+- utrzymanie i reengineering,
+- porównania technik lub workflowów wspieranych przez agentów.
+
+Na dziś to jednak opcja **na później**, a nie aktywne okno submission.
 
 ---
 
@@ -137,60 +144,76 @@ SANER oferuje 9 kategorii zgłoszeń:
 
 **Empirical Software Engineering (Springer)**
 
-- **Typ:** Journal (nie konferencja)
+- **Typ:** journal
 - **Wydawca:** Springer
-- **ISSN:** 1382-3256 (print) / 1573-7616 (electronic)
+- **ISSN:** 1382-3256 / 1573-7616
 - **Redaktorzy naczelni:** Robert Feldt, Thomas Zimmermann
-- **Kontakt:** emse-eic@googlegroups.com
 
-### ⭐ Special Issue: "Agentic Software Engineering: The Rise of AI Teammates"
+### Special Issue: "Agentic Software Engineering: The Rise of AI Teammates"
 
-**Deadline: 28 września 2026** (rolling review — można zgłosić wcześniej)
+- **Final submission deadline:** **28 września 2026**
+- **Proces:** rolling review, więc warto zgłaszać wcześniej niż na finalny deadline
 
-#### Dlaczego ta praca pasuje idealnie
+### Dlaczego to jest bardzo dobre dopasowanie
 
-Praca bada agenty LLM generujące IaC (Dockerfile, Kubernetes) i jest bezpośrednio zbieżna z tematyką SI:
+Ta praca wpisuje się bezpośrednio w oficjalnie wymienione obszary special issue:
 
-| Temat SI | Pokrycie w pracy |
-|----------|-----------------|
-| **Failure Patterns and Risks** — taksonomie błędów agentów, podatności bezpieczeństwa | RQ5: repo poisoning, podatność na manipulację dokumentacją |
-| **Quality and Maintenance** — ocena kodu tworzonego przez agentów | RQ3: jakość artefaktów, statyczna analiza, zgodność z best practices |
-| **Testing and Evaluation** — wydajność agentów na zadaniach repozytorium | RQ1–RQ2: funkcjonalność, ograniczenia złożonościowe |
-| **Safety, Ethics and Compliance** — wiarygodność AI-generowanego kodu | RQ5: bezpieczeństwo konfiguracji IaC w środowiskach produkcyjnych |
-| **Architectures for Agents** — narzędzia, pamięć, koordynacja | Rozdział 3: architektura systemu agentowego |
+- **Human-Agent Collaboration**
+- **Mining Agent-Generated Artifacts**
+- **Architectures for Agents**
+- **Quality and Maintenance**
+- **Review Dynamics**
+- **Failure Patterns and Risks**
+- **Testing and Evaluation**
+- **Safety, Ethics, and Compliance**
+- **Economic Cost and Impact**
 
-#### Tematy SI (pełna lista)
+Jeśli praca bada agentów LLM tworzących artefakty infrastrukturalne lub developerskie, ich skuteczność, błędy, review, bezpieczeństwo i ograniczenia, to to dopasowanie jest bardzo mocne.
 
-1. Human-Agent Collaboration
-2. Mining Agent-Generated Artifacts
-3. **Architectures for Agents** ✓
-4. **Quality and Maintenance** ✓
-5. Review Dynamics
-6. **Failure Patterns and Risks** ✓
-7. **Testing and Evaluation** ✓
-8. Production Operations
-9. **Safety, Ethics, and Compliance** ✓
+### Regular Papers
 
-### Pozostałe ścieżki zgłoszeń
+- **Regular Papers:** rolling submissions, bez sztywnego deadline'u
+- **Journal First na ESEM/ASE:** możliwy później, jeśli artykuł journalowy zostanie zaakceptowany odpowiednio wcześnie
 
-- **Regular Papers** — rolling submissions, brak stałego deadline'u
-- **Registered Reports** — pre-rejestracja badań przed zebraniem danych
-- **Open Science Initiative** — nacisk na otwartość danych i replikację
+### Ocena dla tej pracy
 
-### Dlaczego warto rozważyć EMSE
+EMSE daje:
 
-- Brak presji czasowej — można zgłosić kiedy praca jest dopracowana
-- Dłuższy format artykułu — możliwość pełnego opisania metodologii i wyników
-- Wysoki impact factor w obszarze empirical SE
-- Promotor sugeruje jako alternatywę do konferencji (bez konieczności podróży)
-- Proces recenzji jest dłuższy (kilka miesięcy), ale bardziej konstruktywny
+- najwięcej czasu na dopracowanie badań,
+- format lepszy dla pełnej metodologii i wyników,
+- bardzo dobre dopasowanie tematyczne przez special issue,
+- mniejsze ryzyko pośpiechu niż w przypadku ESEM 2026.
 
 ---
 
-## Rekomendacja (kolejność priorytetu)
+## Rekomendacja na dziś
 
-1. ⭐ **EMSE — Special Issue "Agentic Software Engineering"** — deadline **28 września 2026**, tematycznie najlepsze dopasowanie ze wszystkich opcji (agenty LLM, bezpieczeństwo, jakość IaC). Dużo czasu na dopracowanie artykułu.
-2. **ESEM 2026 — Technical Track** — deadline **18 maja 2026**, solidna konferencja empiryczna, wymaga szybkiego działania.
-3. **ASE 2026 — Tools & Datasets** — deadline **11 maja 2026**, jeśli praca zawiera narzędzie/dataset jako główny wkład.
-4. **EMSE — Regular Papers** — rolling, jako fallback jeśli SI nie pasuje.
-5. **MSR 2027 / SANER 2027** — następne edycje, jeśli 2026 odpada.
+1. **EMSE Special Issue "Agentic Software Engineering: The Rise of AI Teammates"**  
+   Najlepsze dopasowanie tematyczne i najbezpieczniejszy harmonogram. To obecnie najbardziej sensowna opcja strategiczna.
+
+2. **ESEM 2026 — Technical Track**  
+   Najlepsza aktywnie otwarta konferencja, jeśli materiał jest już blisko gotowości.
+
+3. **ESEM 2026 — SE in Practice albo Emerging Results / Vision / Reflection**  
+   Dobre opcje awaryjne, jeśli pełny technical paper nie zdąży się domknąć.
+
+4. **ASE 2026 — Tools and Datasets**  
+   Ma sens tylko wtedy, gdy centralnym wkładem jest artefakt, narzędzie lub dataset.
+
+5. **MSR 2027 / SANER 2027**  
+   Warto śledzić, ale na dziś nie są to jeszcze aktywne call for papers.
+
+---
+
+## Źródła oficjalne
+
+- ASE 2026: `https://conf.researchr.org/dates/ase-2026`
+- ASE 2026 Tools and Datasets: `https://conf.researchr.org/track/ase-2026/ase-2026-tools-and-data-sets`
+- ASE 2026 Journal First: `https://conf.researchr.org/track/ase-2026/ase-2026-journal-first`
+- ESEIW / ESEM 2026 dates: `https://conf.researchr.org/dates/eseiw-2026`
+- ESEM 2026 Technical Track: `https://conf.researchr.org/track/eseiw-2026/eseiw-2026-esem---technical-track`
+- ESEM 2026 SEIP Track: `https://conf.researchr.org/track/eseiw-2026/eseiw-2026-esem---seip-track`
+- ESEM 2026 Journal First: `https://conf.researchr.org/track/eseiw-2026/eseiw-2026-esem---journal-first-track`
+- MSR series: `https://www.msrconf.org/`
+- SANER 2027: `https://conf.researchr.org/home/saner-2027`
+- EMSE Special Issue: `https://emsejournal.github.io/special_issues/2026_SI_Agentic_SE.html`
