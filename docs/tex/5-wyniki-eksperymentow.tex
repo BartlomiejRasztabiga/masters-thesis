@@ -126,14 +126,14 @@ Rozkład skuteczności dla poszczególnych projektów pokazuje tabela~\ref{tab:h
 Poniżej zebrano najczęstsze przyczyny niepowodzeń obserwowane w RQ1:
 
 \begin{itemize}
-    \item \textbf{Problemy z zależnościami NPM:} agent używa \texttt{npm ci} lub \texttt{npm ci --omit=dev}, co zawodzi przy braku \texttt{package-lock.json} lub gdy zależności są błędnie oznaczone jako dev (np. brak \texttt{vite} w runtime).
-    \item \textbf{Błędne kopiowanie plików:} próba kopiowania \texttt{package-lock.json}, gdy nie istnieje, oraz kopiowanie z niepoprawnego kontekstu budowania (np. \texttt{COPY back-end/ ./} przy braku katalogu).
-    \item \textbf{Konflikt użytkownika w kontenerze:} błąd \texttt{runAsNonRoot} w Kubernetes przy obrazie uruchamianym jako root.
-    \item \textbf{Read-only filesystem w runtime:} aplikacje oparte o Nginx nie mogą utworzyć katalogów roboczych (np. \texttt{/var/cache/nginx/client\_temp}).
-    \item \textbf{Nieprawidłowe \texttt{imagePullPolicy}:} ustawienie \texttt{Never} uniemożliwia pobranie obrazu.
-    \item \textbf{Nieaktualne obrazy bazowe:} zbyt stary base image powoduje błędy \texttt{apt} podczas budowy.
-    \item \textbf{Niezgodne wersje środowiska:} agent nie rozpoznaje konfliktów wersji (np. Node 18 w base image nie wspiera zależności aplikacji), brakuje mu wiarygodnego źródła informacji o takich ograniczeniach.
-    \item \textbf{Błędne \texttt{test\_endpoints}:} agent wybiera niepoprawny endpoint zdrowia mimo działającej aplikacji pod \texttt{/}.
+    \item \textbf{Problemy z zależnościami NPM:} agent używa \texttt{npm ci} lub \texttt{npm ci --omit=dev}, co zawodzi przy braku \texttt{package-lock.json} lub gdy zależności są błędnie oznaczone jako dev (np. brak \texttt{vite} w runtime),
+    \item \textbf{Błędne kopiowanie plików:} próba kopiowania \texttt{package-lock.json}, gdy nie istnieje, oraz kopiowanie z niepoprawnego kontekstu budowania (np. \texttt{COPY back-end/ ./} przy braku katalogu),
+    \item \textbf{Konflikt użytkownika w kontenerze:} błąd \texttt{runAsNonRoot} w Kubernetes przy obrazie uruchamianym jako root,
+    \item \textbf{Read-only filesystem w runtime:} aplikacje oparte o Nginx nie mogą utworzyć katalogów roboczych (np. \texttt{/var/cache/nginx/client\_temp}),
+    \item \textbf{Nieprawidłowe \texttt{imagePullPolicy}:} ustawienie \texttt{Never} uniemożliwia pobranie obrazu,
+    \item \textbf{Nieaktualne obrazy bazowe:} zbyt stary base image powoduje błędy \texttt{apt} podczas budowy,
+    \item \textbf{Niezgodne wersje środowiska:} agent nie rozpoznaje konfliktów wersji (np. Node 18 w base image nie wspiera zależności aplikacji), brakuje mu wiarygodnego źródła informacji o takich ograniczeniach,
+    \item \textbf{Błędne \texttt{test\_endpoints}:} agent wybiera niepoprawny endpoint zdrowia mimo działającej aplikacji pod \texttt{/},
     \item \textbf{Błędy importu w Pythonie:} uruchamianie modułów z relatywnymi importami bez pakietu (np. \texttt{ImportError: attempted relative import with no known parent package}).
 \end{itemize}
 
@@ -262,13 +262,13 @@ Dane wskazują na bardzo wyraźny trend spadkowy skuteczności wraz ze wzrostem 
 \subsubsection{Typowe problemy i przyczyny awarii}
 
 \begin{itemize}
-    \item Błędna składnia sekretów w Kubernetes: niepoprawnie zakodowane pola \texttt{data} (np. \texttt{illegal base64 data}) zamiast poprawnego Base64 lub użycia \texttt{stringData}.
-    \item Niepoprawne polecenie \texttt{COPY} w Dockerfile (np. brak ścieżki docelowej), co kończy się błędem \texttt{At least two arguments are required for COPY}.
-    \item Uruchomienie \texttt{npm ci} bez pliku \texttt{package-lock.json} (lub bez skopiowania lockfile do obrazu), co blokuje instalację zależności.
-    \item Brak nazw portów w \texttt{Service} z wieloma portami, co powoduje walidację \texttt{spec.ports[*].name: Required value}.
-    \item Niezgodna wersja Pythona z adnotacjami typów (np. \texttt{models.User | None} w Pythonie < 3.10), skutkująca \texttt{TypeError}.
-    \item Błędne umieszczenie dyrektywy \texttt{server} w \texttt{nginx.conf} (poza blokiem \texttt{http}), co kończy się \texttt{directive is not allowed here}.
-    \item Brak usługi/bazy w Kubernetes (np. brak \texttt{Service} o nazwie \texttt{notes-db}) lub brak zmiennej środowiskowej z adresem DB, skutkujące \texttt{could not translate host name}.
+    \item Błędna składnia sekretów w Kubernetes: niepoprawnie zakodowane pola \texttt{data} (np. \texttt{illegal base64 data}) zamiast poprawnego Base64 lub użycia \texttt{stringData},
+    \item Niepoprawne polecenie \texttt{COPY} w Dockerfile (np. brak ścieżki docelowej), co kończy się błędem \texttt{At least two arguments are required for COPY},
+    \item Uruchomienie \texttt{npm ci} bez pliku \texttt{package-lock.json} (lub bez skopiowania lockfile do obrazu), co blokuje instalację zależności,
+    \item Brak nazw portów w \texttt{Service} z wieloma portami, co powoduje walidację \texttt{spec.ports[*].name: Required value},
+    \item Niezgodna wersja Pythona z adnotacjami typów (np. \texttt{models.User | None} w Pythonie < 3.10), skutkująca \texttt{TypeError},
+    \item Błędne umieszczenie dyrektywy \texttt{server} w \texttt{nginx.conf} (poza blokiem \texttt{http}), co kończy się \texttt{directive is not allowed here},
+    \item Brak usługi/bazy w Kubernetes (np. brak \texttt{Service} o nazwie \texttt{notes-db}) lub brak zmiennej środowiskowej z adresem DB, skutkujące \texttt{could not translate host name},
     \item Błędne przekazanie zmiennych środowiskowych do bazy (np. literalne \texttt{"\$(POSTGRES\_USER)"}), co daje \texttt{password authentication failed}.
 \end{itemize}
 

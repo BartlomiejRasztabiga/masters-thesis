@@ -30,10 +30,10 @@ Wyniki wskazują, że agenty LLM stanowią realne, lecz ograniczone narzędzie d
 Bezpieczne zastosowanie agentów LLM do generowania IaC wymaga spełnienia kilku warunków jednocześnie:
 
 \begin{itemize}
-    \item \textbf{Ograniczony kontekst wejściowy} — agent powinien mieć dostęp wyłącznie do plików kodu źródłowego, bez dokumentacji i historii repozytorium, co istotnie ogranicza podatność na manipulację (RQ5).
-    \item \textbf{Rozbudowana instrukcja systemowa} — prompt zawierający konkretną, sprawdzalną checklistę dobrych praktyk redukuje liczbę ostrzeżeń statycznych o ponad 79\% i trzykrotnie zwiększa odsetek konfiguracji wolnych od ostrzeżeń (RQ3).
-    \item \textbf{Obowiązkowa walidacja statyczna} — narzędzia takie jak Hadolint i Kube-linter powinny być elementem pipeline CI/CD dla każdej konfiguracji IaC generowanej przez LLM.
-    \item \textbf{Ludzki przegląd konfiguracji bezpieczeństwa} — artefakty zawierające security contexts, uprawnienia i sekrety wymagają weryfikacji człowieka przed wdrożeniem, niezależnie od zastosowanego modelu.
+    \item \textbf{Ograniczony kontekst wejściowy} — agent powinien mieć dostęp wyłącznie do plików kodu źródłowego, bez dokumentacji i historii repozytorium, co istotnie ogranicza podatność na manipulację (RQ5),
+    \item \textbf{Rozbudowana instrukcja systemowa} — prompt zawierający konkretną, sprawdzalną checklistę dobrych praktyk redukuje liczbę ostrzeżeń statycznych o ponad 79\% i trzykrotnie zwiększa odsetek konfiguracji wolnych od ostrzeżeń (RQ3),
+    \item \textbf{Obowiązkowa walidacja statyczna} — narzędzia takie jak Hadolint i Kube-linter powinny być elementem pipeline CI/CD dla każdej konfiguracji IaC generowanej przez LLM,
+    \item \textbf{Ludzki przegląd konfiguracji bezpieczeństwa} — artefakty zawierające security contexts, uprawnienia i sekrety wymagają weryfikacji człowieka przed wdrożeniem, niezależnie od zastosowanego modelu,
     \item \textbf{Ograniczenie do prostych zastosowań} — dla aplikacji wielousługowych (trzy lub więcej wzajemnie zależnych komponentów) agenty nie nadają się do w pełni autonomicznej pracy; wartościowe jest wówczas generowanie poszczególnych komponentów z oddzielną weryfikacją spójności całości.
 \end{itemize}
 
@@ -49,13 +49,13 @@ Osobnym ograniczeniem są wnioski z RQ2. Pięć kontrolowanych repozytoriów PoC
 Wyniki pracy otwierają kilka kierunków dalszych badań:
 
 \begin{itemize}
-    \item \textbf{Architektura wieloagentowa z podziałem ról.} Zbadanie, czy separacja ról planowania, generowania i walidacji między wyspecjalizowanymi agentami redukuje zmienność i poprawia koordynację wielousługową.
+    \item \textbf{Architektura wieloagentowa z podziałem ról.} Zbadanie, czy separacja ról planowania, generowania i walidacji między wyspecjalizowanymi agentami redukuje zmienność i poprawia koordynację wielousługową,
 
-    \item \textbf{Pętla sprzężenia zwrotnego z runtime.} Rozszerzenie systemu o iteracyjną korektę na podstawie wyników faktycznego uruchomienia kontenera, co może istotnie zwiększyć skuteczność etapu runtime.
+    \item \textbf{Pętla sprzężenia zwrotnego z runtime.} Rozszerzenie systemu o iteracyjną korektę na podstawie wyników faktycznego uruchomienia kontenera, co może istotnie zwiększyć skuteczność etapu runtime,
 
-    \item \textbf{Mechanizmy obronne przed manipulacją kontekstem.} Opracowanie i ocena technik wykrywania lub neutralizowania repo poisoning — weryfikacja spójności między kodem a dokumentacją, analiza anomalii lub ograniczenie uprawnień informacyjnych agenta.
+    \item \textbf{Mechanizmy obronne przed manipulacją kontekstem.} Opracowanie i ocena technik wykrywania lub neutralizowania repo poisoning — weryfikacja spójności między kodem a dokumentacją, analiza anomalii lub ograniczenie uprawnień informacyjnych agenta,
 
-    \item \textbf{Fine-tuning i szerszy zestaw modeli.} Porównanie modeli ogólnych z modelami dostrojonymi na zbiorach konfiguracji IaC oraz weryfikacja wyników na modelach open-source i innych stosach technologicznych.
+    \item \textbf{Fine-tuning i szerszy zestaw modeli.} Porównanie modeli ogólnych z modelami dostrojonymi na zbiorach konfiguracji IaC oraz weryfikacja wyników na modelach open-source i innych stosach technologicznych,
 
     \item \textbf{Integracja z praktykami CI/CD.} Ocena agentów LLM jako elementu automatycznego pipeline wdrożeniowego w rzeczywistych projektach, z pomiarem wpływu na czas i jakość konfiguracji.
 \end{itemize}
