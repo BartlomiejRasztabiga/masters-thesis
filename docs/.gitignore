@@ -41,6 +41,24 @@ slides.snm
 slides.synctex.gz
 slides.toc
 
+slides_obrona.app
+slides_obrona.aux
+slides_obrona.bbl
+slides_obrona.bbl-SAVE-ERROR
+slides_obrona.bcf
+slides_obrona.blg
+slides_obrona.fdb_latexmk
+slides_obrona.fls
+slides_obrona.log
+slides_obrona.nav
+slides_obrona.out
+slides_obrona.run.xml
+slides_obrona.pdf
+slides_obrona.snm
+slides_obrona.synctex.gz
+slides_obrona.toc
+
 **/.DS_Store
 .idea
 _minted
+.superpowers/
