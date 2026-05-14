@@ -310,7 +310,7 @@
             bar width=18pt,
             width=\columnwidth, height=4.5cm,
             ytick=data,
-            symbolic y coords={W2,W1,W3},
+            symbolic y coords={W3,W2,W1},
             y tick label style={font=\small},
             nodes near coords,
             nodes near coords style={font=\small, anchor=west},
@@ -320,8 +320,8 @@
             xlabel={\% przebiegów z odchyleniem},
         ]
         \addplot[fill=orange!65!white, draw=orange!80!black] coordinates {
-            (33.3,W2)
             (66.7,W1)
+            (33.3,W2)
             (70.0,W3)
         };
         \end{axis}
