@@ -336,4 +336,57 @@
     \end{columns}
 \end{frame}
 
+\begin{frame}{Wnioski i implikacje praktyczne}
+    \textbf{Odpowiedź na główne pytanie badawcze:}\\[0.3em]
+    \begin{block}{}
+        \textbf{Tak} --- dla prostych aplikacji jednokomponentowych z czytelną strukturą kodu.\\
+        \textbf{Nie} --- dla złożonych systemów wielousługowych oraz środowisk z podwyższonymi wymaganiami bezpieczeństwa lub niezaufaną dokumentacją.
+    \end{block}
+    \vspace{0.4em}
+    \textbf{Implikacje praktyczne:}
+    \begin{itemize}
+        \item \textbf{Ograniczony kontekst wejściowy} --- tylko pliki kodu, bez dokumentacji i historii (ogranicza RQ5)
+        \item \textbf{Rozbudowana instrukcja systemowa} --- konkretna checklista dobrych praktyk redukuje ostrzeżenia o $>79\%$ (RQ3)
+        \item \textbf{Obowiązkowa walidacja statyczna} --- Hadolint + Kube-linter jako element CI/CD
+        \item \textbf{Ludzki przegląd} --- artefakty z security context i uprawnieniami wymagają weryfikacji
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Zagrożenia trafności}
+    \begin{itemize}
+        \item Zbiór RQ1: 25 prostych aplikacji może nie uogólniać się na złożone systemy produkcyjne
+        \item Walidacja runtime pojedynczym \texttt{curl} nie weryfikuje w pełni dostępności usługi
+        \item 5 repozytoriów PoC (RQ2) --- zbyt mała próba do precyzyjnej charakterystyki punktu krytycznego złożoności
+        \item Brak pętli sprzężenia zwrotnego z runtime --- architektura one-shot może zaniżać wyniki względem systemów iteracyjnych
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Wkład do wiedzy i dalsze kierunki}
+    \begin{columns}[T]
+        \column{0.52\textwidth}
+        \textbf{Wkład do wiedzy:}
+        \begin{itemize}
+            \item Pierwsza empiryczna weryfikacja \textit{repo poisoning} (indirect prompt injection) w kontekście IaC
+            \item Walidacja end-to-end z testami runtime --- ujawnia błędy niewidoczne dla narzędzi statycznych
+            \item Ilościowy pomiar wpływu prompt engineeringu na jakość IaC ($-79{,}6\%$ ostrzeżeń)
+        \end{itemize}
+        \column{0.45\textwidth}
+        \textbf{Dalsze kierunki:}
+        \begin{itemize}
+            \item Pętla sprzężenia zwrotnego z runtime --- agent reaguje na błędy wdrożenia
+            \item Stabilizacja wyników przez wielokrotne generacje i agregację
+            \item Zastosowanie w systemie PaaS --- automatyczne wdrożenie po podaniu linku do repozytorium
+        \end{itemize}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{}
+    \centering
+    \large Dziękuję za uwagę.
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Bibliografia}
+    \printbibliography
+\end{frame}
+
 \end{document}
