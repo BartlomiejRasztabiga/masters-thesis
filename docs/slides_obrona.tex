@@ -27,4 +27,100 @@
     \supervisor
 \end{frame}
 
+\begin{frame}{Agenda}
+    \begin{itemize}
+        \item Motywacja i cel pracy
+        \item Przegląd literatury i luki badawcze
+        \item Pytania badawcze
+        \item Metodyka i system badawczy
+        \item Wyniki (RQ1–RQ5)
+        \item Wnioski i implikacje praktyczne
+        \item Wkład do wiedzy i dalsze kierunki
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Motywacja i cel pracy}
+    \begin{columns}[T]
+        \column{0.55\textwidth}
+        \textbf{Problem:}
+        \begin{itemize}
+            \item IaC (Dockerfile, manifesty K8s) jest złożone i podatne na błędy przy ręcznym tworzeniu
+            \item LLM obiecują automatyzację, lecz brak twardej oceny end-to-end w literaturze
+            \item Generowanie kodu aplikacyjnego przez LLM jest dobrze zbadane --- generowanie infrastruktury znacznie słabiej
+        \end{itemize}
+        \column{0.45\textwidth}
+        \textbf{Cel pracy:}\\
+        Ocena możliwości i ograniczeń agentów LLM w autonomicznej generacji konfiguracji IaC (Dockerfile + Kubernetes).
+        \vspace{1em}
+
+        \textbf{Główne pytanie:}\\
+        \textit{Czy agent LLM może --- bez ingerencji człowieka --- wygenerować funkcjonalne, bezpieczne i zgodne z dobrymi praktykami konfiguracje wdrożeniowe?}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Przegląd literatury i luki badawcze}
+    \begin{columns}[T]
+        \column{0.48\textwidth}
+        \textbf{Kluczowe prace:}
+        \begin{itemize}
+            \item \textbf{Repo2Run} \cite{hu_llm-based_2025} --- generacja środowisk Docker z repozytoriów
+            \item \textbf{Don't Train, Just Prompt} \cite{kratzke_dont_2024} --- prompt engineering dla IaC
+            \item \textbf{GenKubeSec} \cite{malul_genkubesec_2024} --- LLM a bezpieczeństwo K8s
+            \item \textbf{CloudEval-YAML} \cite{xu_cloudeval-yaml_2023} --- benchmark dla konfiguracji chmurowych
+        \end{itemize}
+        \column{0.48\textwidth}
+        \textbf{Luki badawcze:}
+        \begin{itemize}
+            \item Brak oceny autonomicznej --- agenty czytające kod, nie tylko opis słowny
+            \item Dominuje walidacja statyczna/składniowa, brak weryfikacji \textbf{runtime}
+            \item Brak ilościowej analizy powtarzalności i podatności na manipulację kontekstem
+        \end{itemize}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Pytania badawcze}
+    \begin{itemize}
+        \item \textbf{RQ1:} Na ile agent generuje działające konfiguracje IaC end-to-end?
+        \item \textbf{RQ2:} Jak złożoność systemu wpływa na skuteczność agenta?
+        \item \textbf{RQ3:} Jaka jest jakość konfiguracji i czy \textit{prompt engineering} ją poprawia?
+        \item \textbf{RQ4:} Na ile powtarzalny jest proces przy deterministycznych parametrach?
+        \item \textbf{RQ5:} Jak podatny jest agent na manipulację kontekstem repozytorium?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Metodyka i system badawczy}
+    \begin{columns}[T]
+        \column{0.45\textwidth}
+        \textbf{Modele:}
+        \begin{itemize}
+            \item OpenAI GPT-5 Mini
+            \item Google Gemini 2.5 Flash
+            \item DeepSeek V3.2
+        \end{itemize}
+        \vspace{0.5em}
+        \textbf{Środowisko:} MicroK8s, lokalny rejestr obrazów\\[0.3em]
+        \textbf{Podejście:} Jeden strzał (one-shot), brak pętli sprzężenia zwrotnego\\[0.3em]
+        \textbf{Walidacja:} lint $\to$ build $\to$ apply $\to$ runtime (HTTP)
+
+        \column{0.52\textwidth}
+        \centering
+        \begin{tikzpicture}[
+            node distance=0.55cm and 0.3cm,
+            box/.style={draw, rounded corners, align=center, font=\footnotesize,
+                        minimum width=3.2cm, minimum height=0.65cm}
+        ]
+            \node[box] (repo) {Repozytorium (kod)};
+            \node[box, below=of repo] (agent) {Agent LLM + narzędzia};
+            \node[box, below=of agent] (cfg) {Dockerfile + manifesty K8s};
+            \node[box, below=of cfg] (val) {Walidacja\\build / apply / runtime};
+            \node[box, below=of val] (out) {Metryki + raport};
+            \draw[->] (repo) -- (agent);
+            \draw[->] (agent) -- (cfg);
+            \draw[->] (cfg) -- (val);
+            \draw[->] (val) -- (out);
+            \node[font=\scriptsize, right=0.1cm of val] {MicroK8s};
+        \end{tikzpicture}
+    \end{columns}
+\end{frame}
+
 \end{document}
