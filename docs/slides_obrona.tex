@@ -170,6 +170,40 @@
     \end{columns}
 \end{frame}
 
+\begin{frame}{RQ1 --- Typowe przyczyny awarii}
+    \begin{columns}[T]
+        \column{0.48\textwidth}
+        \textbf{Etap build:}
+        \begin{itemize}
+            \item \texttt{npm ci} bez \texttt{package-lock.json} lub z zależnościami dev oznaczonymi nieprawidłowo (brak \texttt{vite} w runtime)
+            \item Niezgodna wersja środowiska (Node 18 nie wspiera zależności aplikacji; Python \textless{} 3.10 i składnia \texttt{X | None})
+            \item Błędy relatywnych importów Python (\texttt{ImportError: attempted relative import})
+        \end{itemize}
+        \vspace{0.4em}
+        \textbf{Etap runtime:}
+        \begin{itemize}
+            \item Brak lub błędna zmienna środowiskowa z adresem DB (\texttt{could not translate host name})
+            \item Literalne \texttt{"\$(POSTGRES\_USER)"} zamiast wartości (\texttt{password authentication failed})
+        \end{itemize}
+
+        \column{0.48\textwidth}
+        \textbf{Etap K8s apply:}
+        \begin{itemize}
+            \item Brak nazw portów w \texttt{Service} z wieloma portami (\texttt{spec.ports[*].name: Required})
+            \item Brak \texttt{Service} dla zależności (np. \texttt{notes-db})
+        \end{itemize}
+        \vspace{0.4em}
+        \textbf{Etap build $\to$ runtime:}
+        \begin{itemize}
+            \item \texttt{runAsNonRoot} w K8s przy obrazie uruchamianym jako root
+        \end{itemize}
+        \vspace{0.6em}
+        \begin{block}{}
+            \small Dominują błędy \textbf{semantyczne} (środowisko, zależności), nie składniowe --- niewidoczne dla walidacji statycznej.
+        \end{block}
+    \end{columns}
+\end{frame}
+
 \begin{frame}{RQ2 --- Wpływ złożoności na skuteczność}
     \begin{columns}[T]
         \column{0.55\textwidth}
@@ -341,6 +375,60 @@
             \item W1: błędny port 9000 zamiast 8080 --- agent przepisuje spójnie do całej konfiguracji
             \item W3: dodaje Redis bez żadnej zależności w kodzie
             \item Nieskomplikowane techniki = realne zagrożenie
+        \end{itemize}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Porównanie modeli}
+    \begin{columns}[T]
+        \column{0.58\textwidth}
+        \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            ymin=0, ymax=110,
+            bar width=13pt,
+            width=\columnwidth, height=5.2cm,
+            xtick=data,
+            symbolic x coords={{Gemini 2.5 Flash},{GPT-5 Mini},{DeepSeek V3.2}},
+            x tick label style={font=\tiny, rotate=15, anchor=east},
+            nodes near coords,
+            nodes near coords style={font=\tiny, anchor=south},
+            ymajorgrids=true, grid style=dashed,
+            enlarge x limits=0.2,
+            legend style={font=\tiny, at={(0.5,-0.28)}, anchor=north},
+            legend columns=2,
+            ylabel style={font=\footnotesize},
+            ylabel={\%},
+        ]
+        \addplot[fill=green!55!black, draw=green!70!black] coordinates {
+            ({Gemini 2.5 Flash},62.0)
+            ({GPT-5 Mini},68.0)
+            ({DeepSeek V3.2},58.0)
+        };
+        \addplot[fill=red!60!white, draw=red!80!black] coordinates {
+            ({Gemini 2.5 Flash},6.7)
+            ({GPT-5 Mini},63.3)
+            ({DeepSeek V3.2},100.0)
+        };
+        \legend{RQ1: skuteczność runtime, RQ5: podatność na manipulację}
+        \end{axis}
+        \end{tikzpicture}
+
+        \column{0.39\textwidth}
+        \textbf{Skuteczność (RQ1):}
+        \begin{itemize}
+            \item GPT-5 Mini: \textbf{68,0\%}
+            \item Gemini 2.5 Flash: 62,0\%
+            \item DeepSeek V3.2: 58,0\%
+            \item Różnica między modelami umiarkowana ($\leq$10 p.p.)
+        \end{itemize}
+        \vspace{0.5em}
+        \textbf{Podatność (RQ5):}
+        \begin{itemize}
+            \item Gemini: \textbf{6,7\%} --- wyraźnie odporny
+            \item GPT-5 Mini: 63,3\%
+            \item DeepSeek: \textbf{100\%} --- zawsze manipulowalny
+            \item Różnica krytyczna: 93 p.p.
         \end{itemize}
     \end{columns}
 \end{frame}
