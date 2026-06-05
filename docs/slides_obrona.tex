@@ -31,6 +31,7 @@
     \supervisor
 \end{frame}
 
+
 \begin{frame}{Agenda}
     \begin{itemize}
         \item Motywacja i cel pracy
@@ -163,44 +164,10 @@
         \vspace{0.5em}
         \begin{itemize}
             \item Największy spadek: etap \textbf{runtime} (62,7\%)
-            \item Problemy semantyczne, nie składniowe --- błędy widoczne dopiero przy uruchomieniu
-            \item Zmienne środowiskowe, zależności, konflikty wersji
+            \item Dominują błędy \textbf{semantyczne} --- niewidoczne dla walidacji statycznej
+            \item Typowe: błędne zm. środowiskowe DB, niezgodne wersje środowiska, \texttt{runAsNonRoot} przy obrazie root
             \item Jeśli build $\to$ apply prawie zawsze (97,5\%)
         \end{itemize}
-    \end{columns}
-\end{frame}
-
-\begin{frame}{RQ1 --- Typowe przyczyny awarii}
-    \begin{columns}[T]
-        \column{0.48\textwidth}
-        \textbf{Etap build:}
-        \begin{itemize}
-            \item \texttt{npm ci} bez \texttt{package-lock.json} lub z zależnościami dev oznaczonymi nieprawidłowo (brak \texttt{vite} w runtime)
-            \item Niezgodna wersja środowiska (Node 18 nie wspiera zależności aplikacji; Python \textless{} 3.10 i składnia \texttt{X | None})
-            \item Błędy relatywnych importów Python (\texttt{ImportError: attempted relative import})
-        \end{itemize}
-        \vspace{0.4em}
-        \textbf{Etap runtime:}
-        \begin{itemize}
-            \item Brak lub błędna zmienna środowiskowa z adresem DB (\texttt{could not translate host name})
-            \item Literalne \texttt{"\$(POSTGRES\_USER)"} zamiast wartości (\texttt{password authentication failed})
-        \end{itemize}
-
-        \column{0.48\textwidth}
-        \textbf{Etap K8s apply:}
-        \begin{itemize}
-            \item Brak nazw portów w \texttt{Service} z wieloma portami (\texttt{spec.ports[*].name: Required})
-            \item Brak \texttt{Service} dla zależności (np. \texttt{notes-db})
-        \end{itemize}
-        \vspace{0.4em}
-        \textbf{Etap build $\to$ runtime:}
-        \begin{itemize}
-            \item \texttt{runAsNonRoot} w K8s przy obrazie uruchamianym jako root
-        \end{itemize}
-        \vspace{0.6em}
-        \begin{block}{}
-            \small Dominują błędy \textbf{semantyczne} (środowisko, zależności), nie składniowe --- niewidoczne dla walidacji statycznej.
-        \end{block}
     \end{columns}
 \end{frame}
 
