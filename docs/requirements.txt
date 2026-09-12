@@ -1,3 +1,11 @@
-Jinja2>=3.0.0
-pdfminer.six>=2021
-SCons>=4.0.0
+cffi==2.0.0
+charset-normalizer==3.4.9
+cryptography==50.0.0
+Jinja2==3.1.6
+MarkupSafe==3.0.3
+packaging==26.2
+pdfminer.six==20251107
+pycparser==2.23
+pycryptodome==3.23.0
+SCons==4.10.1
+typing_extensions==4.16.0
