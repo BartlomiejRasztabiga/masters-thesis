@@ -417,7 +417,7 @@
         \item \textbf{Ograniczony kontekst wejściowy} -- tylko pliki kodu, bez dokumentacji i historii (zmniejsza podatność na manipulację, RQ5)
         \item \textbf{Rozbudowana instrukcja systemowa} -- konkretna checklista dobrych praktyk redukuje ostrzeżenia o $>79\%$ (RQ3)
         \item \textbf{Obowiązkowa walidacja statyczna} -- Hadolint + Kube-linter jako element CI/CD
-        \item \textbf{Ludzki przegląd} -- artefakty z security context i uprawnieniami wymagają weryfikacji
+        \item \textbf{Ludzki przegląd} -- ustawienia uprawnień i bezpieczeństwa (np. \texttt{securityContext}) wymagają weryfikacji
     \end{itemize}
 \end{frame}
 
@@ -425,11 +425,10 @@
     \begin{itemize}
         \setlength{\itemsep}{0.5em}
         \item Zbiór RQ1: 25 prostych aplikacji może nie uogólniać się na złożone systemy produkcyjne
-        \item Mała liczba powtórzeń (RQ1: 2, RQ2: 3, RQ3: 1) -- szerokie przedziały ufności
+        \item Mała liczba powtórzeń na konfigurację model--repozytorium (RQ1: 2, RQ2: 3, RQ3: 1) -- szerokie przedziały ufności
         \item Walidacja runtime żądaniami HTTP do endpointów wskazanych przez agenta nie weryfikuje w pełni działania usługi
         \item 5 repozytoriów PoC (RQ2) zaprojektowanych przez autora -- zbyt mała próba do lokalizacji progu złożoności i ryzyko dopasowania zadań do systemu
-        \item RQ3 i RQ5 bez walidacji runtime -- ocena wyłącznie na artefaktach
-        \item Brak pętli sprzężenia zwrotnego z runtime -- architektura one-shot może zaniżać wyniki względem systemów iteracyjnych
+        \item Brak pętli sprzężenia zwrotnego z runtime -- architektura one-shot może zaniżać wyniki względem systemów z iteracyjną korektą
     \end{itemize}
 \end{frame}
 
@@ -438,7 +437,7 @@
         \column{0.52\textwidth}
         \textbf{Wkład do wiedzy:}
         \begin{itemize}
-            \item Empiryczna weryfikacja \textit{repo poisoning} w kontekście IaC -- instancja indirect prompt injection \parencite{greshake_not_2023}, nieznaleziona w przeglądzie literatury IaC
+            \item Empiryczne badanie ataku \textit{repo poisoning} w kontekście IaC (odmiana pośredniego wstrzykiwania promptów \parencite{greshake_not_2023}); w przeglądzie literatury nie odnaleziono takich badań dla IaC
             \item Walidacja end-to-end z testami runtime -- ujawnia błędy niewidoczne dla narzędzi statycznych
             \item Ilościowy pomiar wpływu prompt engineeringu na jakość IaC ($-79{,}6\%$ ostrzeżeń)
             \item Kontrolowany eksperyment z pięcioma poziomami złożoności
