@@ -33,6 +33,11 @@
         legend style={font=\footnotesize, draw=gray!40},
         ymajorgrids=true, grid style={dashed, gray!30},
         axis line style={gray!60},
+        /pgf/number format/use comma,
+    },
+    every node near coord/.append style={
+        /pgf/number format/fixed, /pgf/number format/fixed zerofill,
+        /pgf/number format/precision=1,
     },
 }
 
@@ -302,7 +307,7 @@
             symbolic x coords={POC1,POC2,POC3,POC4,POC5},
             nodes near coords,
             nodes near coords style={font=\scriptsize, anchor=south,
-                /pgf/number format/.cd, fixed, precision=2},
+                /pgf/number format/precision=2},
             enlarge x limits=0.15,
             ylabel={Średni diff ratio},
         ]
@@ -458,7 +463,7 @@
         \column{0.52\textwidth}
         \textbf{Wkład do wiedzy:}
         \begin{itemize}
-            \item Empiryczne badanie ataku \textit{repo poisoning} w kontekście IaC (odmiana pośredniego wstrzykiwania promptów \parencite{greshake_not_2023}); w przeglądzie literatury nie odnaleziono takich badań dla IaC
+            \item Empiryczne badanie ataku \textit{repo poisoning} w kontekście IaC (odmiana pośredniego wstrzykiwania promptów, \cite{greshake_not_2023}); w przeglądzie literatury nie odnaleziono takich badań dla IaC
             \item Walidacja end-to-end z testami runtime -- ujawnia błędy niewidoczne dla narzędzi statycznych
             \item Ilościowy pomiar wpływu prompt engineeringu na jakość IaC ($-79{,}6\%$ ostrzeżeń)
             \item Kontrolowany eksperyment z pięcioma poziomami złożoności
@@ -502,10 +507,10 @@
         \textbf{Potok walidacyjny (7 kroków):}
         {\footnotesize
         \begin{enumerate}
-            \item Składnia Dockerfile (\texttt{docker build --check})
+            \item Składnia Dockerfile (\texttt{docker build -{}-check})
             \item Hadolint
             \item Budowa obrazów i publikacja do lokalnego rejestru
-            \item Składnia manifestów (\texttt{kubectl apply --dry-run=server})
+            \item Składnia manifestów (\texttt{kubectl apply -{}-dry-run=server})
             \item Kube-linter
             \item \texttt{kubectl apply} w osobnym namespace (MicroK8s)
             \item Runtime: żądania HTTP do \texttt{test\_endpoints}
@@ -725,9 +730,10 @@
 \end{frame}
 
 \begin{frame}[fragile]{Dodatek G: Typowa awaria runtime w RQ1}
+    \framesubtitle{Przykład ilustracyjny łączący typowe błędy opisane w pracy}
     \begin{columns}[T]
         \column{0.34\textwidth}
-        \textbf{Dockerfile} {\scriptsize(wygenerowany)}
+        \textbf{Dockerfile}
         \begin{Verbatim}[fontsize=\scriptsize, frame=single, rulecolor=\color{gray!50}]
 FROM node:18-alpine
 WORKDIR /app
@@ -748,11 +754,12 @@ containers:
   - containerPort: 3000
   securityContext:
     runAsNonRoot: true
-  livenessProbe:
-    httpGet: {path: /health,
-              port: 3000}
         \end{Verbatim}
-        {\scriptsize Dobre praktyki obecne, ale sprzeczne z obrazem.}
+        \textbf{Wyjście agenta} {\scriptsize(fragment)}
+        \begin{Verbatim}[fontsize=\scriptsize, frame=single, rulecolor=\color{gray!50}]
+"test_endpoints": ["/health"]
+        \end{Verbatim}
+        {\scriptsize \texttt{runAsNonRoot} sprzeczne z obrazem; aplikacja nie udostępnia \texttt{/health}.\par}
         \column{0.3\textwidth}
         \textbf{Wynik walidacji}
         {\footnotesize
@@ -767,7 +774,7 @@ CreateContainerConfigError:
 container has runAsNonRoot
 and image will run as root
         \end{Verbatim}
-        Po dodaniu \texttt{USER}: 404 na \texttt{/health}, bo aplikacja nie ma takiego endpointu.\\[0.3em]
+        Nawet z poprawnym \texttt{USER} test runtime zwróciłby 404: \texttt{test\_endpoints} wskazuje nieistniejący \texttt{/health}.\\[0.3em]
         \textbf{Sedno:} błędy semantyczne, niewidoczne dla lintera i \texttt{-{}-dry-run}.}
     \end{columns}
 \end{frame}
@@ -781,17 +788,18 @@ FROM python:3.12-slim
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install \
+    --no-cache-dir \
     -r requirements.txt
 COPY . .
-RUN useradd -r app
-USER app
+RUN useradd -r -u 1001 app
+USER 1001
 EXPOSE 8080
 CMD ["gunicorn", "app:app",
      "-b", ":8080"]
         \end{Verbatim}
         {\scriptsize
         \textcolor{green!60!black}{\checkmark} build, apply, runtime\\
-        \textcolor{green!60!black}{\checkmark} Hadolint, Kube-linter: 0 ostrzeżeń}
+        \textcolor{green!60!black}{\checkmark} Hadolint: 0 ostrzeżeń\par}
         \column{0.36\textwidth}
         \textbf{Deployment} {\scriptsize(fragment)}
         \begin{Verbatim}[fontsize=\scriptsize, frame=single, rulecolor=\color{gray!50}]
@@ -824,9 +832,9 @@ spec:
 kind: Ingress
 spec:
   rules:
-  - host: app.<domena>
+  - host: <repo>.<domena>
         \end{Verbatim}
-        {\scriptsize Przypięty obraz, użytkownik nieuprzywilejowany, limity zasobów, probe, spójny port: kod $\to$ \texttt{EXPOSE} $\to$ \texttt{containerPort} $\to$ \texttt{Service}.}
+        {\scriptsize Przypięty obraz, użytkownik nieuprzywilejowany z numerycznym UID (wymagane przez \texttt{runAsNonRoot}), limity zasobów, probe, spójny port: kod $\to$ \texttt{EXPOSE} $\to$ \texttt{containerPort} $\to$ \texttt{Service}.\par}
     \end{columns}
 \end{frame}
 
