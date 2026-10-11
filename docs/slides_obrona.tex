@@ -35,7 +35,7 @@
     },
 }
 
-\title{Zastosowanie dużych modeli językowych\\do generowania konfiguracji Docker i Kubernetes}
+\title{Zastosowanie dużych modeli językowych (LLM)\\do generowania konfiguracji Docker i Kubernetes}
 \author{Bartłomiej Rasztabiga}
 \newcommand{\supervisor}{Promotor: dr inż. Mateusz Modrzejewski}
 \institute{Instytut Automatyki i Informatyki Stosowanej\\Politechnika Warszawska}
@@ -70,7 +70,7 @@
         \begin{itemize}
             \item IaC (Dockerfile, manifesty K8s) jest złożone i podatne na błędy przy ręcznym tworzeniu
             \item LLM obiecują automatyzację, lecz brak twardej oceny end-to-end w literaturze
-            \item Generowanie kodu aplikacyjnego przez LLM jest dobrze zbadane --- generowanie infrastruktury znacznie słabiej
+            \item Generowanie kodu aplikacyjnego przez LLM jest dobrze zbadane -- generowanie infrastruktury znacznie słabiej
         \end{itemize}
         \column{0.45\textwidth}
         \textbf{Cel pracy:}\\
@@ -78,7 +78,7 @@
         \vspace{1em}
 
         \textbf{Główne pytanie:}\\
-        \textit{Czy agent LLM może --- bez ingerencji człowieka --- wygenerować funkcjonalne, bezpieczne i zgodne z dobrymi praktykami konfiguracje wdrożeniowe?}
+        \textit{Czy agent LLM może -- bez ingerencji człowieka -- wygenerować funkcjonalne, bezpieczne i zgodne z dobrymi praktykami konfiguracje wdrożeniowe?}
     \end{columns}
 \end{frame}
 
@@ -87,16 +87,16 @@
         \column{0.48\textwidth}
         \textbf{Kluczowe prace:}
         \begin{itemize}
-            \item \textbf{Repo2Run} \parencite{hu_llm-based_2025} --- generacja środowisk Docker z repozytoriów
-            \item \textbf{Don't Train, Just Prompt} \parencite{kratzke_dont_2024} --- prompt engineering dla IaC
-            \item \textbf{GenKubeSec} \parencite{malul_genkubesec_2024} --- LLM a bezpieczeństwo K8s
-            \item \textbf{CloudEval-YAML} \parencite{xu_cloudeval-yaml_2023} --- benchmark dla konfiguracji chmurowych
+            \item \textbf{Repo2Run} \parencite{hu_llm-based_2025} -- generacja środowisk Docker z repozytoriów
+            \item \textbf{Don't Train, Just Prompt} \parencite{kratzke_dont_2024} -- prompt engineering dla IaC
+            \item \textbf{GenKubeSec} \parencite{malul_genkubesec_2024} -- LLM a bezpieczeństwo K8s
+            \item \textbf{CloudEval-YAML} \parencite{xu_cloudeval-yaml_2023} -- benchmark dla konfiguracji chmurowych
         \end{itemize}
         \column{0.48\textwidth}
         \textbf{Luki badawcze:}
         \begin{itemize}
-            \item Brak oceny autonomicznej --- agenty czytające kod, nie tylko opis słowny
-            \item Dominuje walidacja statyczna/składniowa, brak weryfikacji \textbf{runtime}
+            \item Brak oceny autonomicznego agenta generującego \textbf{Dockerfile + manifesty K8s} -- Repo2Run: tylko Dockerfile, jednousługowe projekty Python
+            \item Walidacja zwykle statyczna/składniowa -- brak weryfikacji \textbf{wdrożenia na klastrze} i odpowiedzi HTTP
             \item Brak ilościowej analizy powtarzalności i podatności na manipulację kontekstem
         \end{itemize}
     \end{columns}
@@ -144,7 +144,7 @@
     \end{columns}
 \end{frame}
 
-\begin{frame}{RQ1 --- Skuteczność end-to-end}
+\begin{frame}{RQ1: Skuteczność end-to-end}
     \begin{columns}[T]
         \column{0.56\textwidth}
         \begin{tikzpicture}
@@ -186,7 +186,7 @@
     \end{columns}
 \end{frame}
 
-\begin{frame}{RQ2 --- Wpływ złożoności na skuteczność}
+\begin{frame}{RQ2: Wpływ złożoności na skuteczność}
     \begin{columns}[T]
         \column{0.55\textwidth}
         \begin{tikzpicture}
@@ -228,7 +228,7 @@
     \end{columns}
 \end{frame}
 
-\begin{frame}{RQ3 --- Jakość konfiguracji i prompt engineering}
+\begin{frame}{RQ3: Jakość konfiguracji i prompt engineering}
     \begin{columns}[T]
         \column{0.56\textwidth}
         \begin{tikzpicture}
@@ -268,7 +268,7 @@
     \end{columns}
 \end{frame}
 
-\begin{frame}{RQ4 --- Powtarzalność przy temperature=0}
+\begin{frame}{RQ4: Powtarzalność przy temperature=0}
     \begin{columns}[T]
         \column{0.5\textwidth}
         \begin{tikzpicture}
@@ -283,7 +283,7 @@
             nodes near coords style={font=\scriptsize, anchor=south,
                 /pgf/number format/.cd, fixed, precision=2},
             enlarge x limits=0.15,
-            ylabel={Średni diff ratio (udział zmienionych linii)},
+            ylabel={Średni diff ratio},
         ]
         \addplot[fill=pwnavy!70, draw=pwnavy] coordinates {
             (POC1,0.258) (POC2,0.462) (POC3,0.494) (POC4,0.878) (POC5,0.723)
@@ -297,15 +297,15 @@
         \vspace{0.3em}
         {\small
         \begin{itemize}
-            \item Średnia \textbf{0,56}: ponad połowa linii różni się między powtórzeniami
+            \item Średni diff ratio \textbf{0,56} (0 = identyczne) -- artefakty wyraźnie różnią się między powtórzeniami mimo \texttt{temperature=0}
             \item Zmienność generalnie rośnie ze złożonością
-            \item \texttt{temperature=0} nie gwarantuje determinizmu API (batching, arytmetyka FP)
+            \item \texttt{temperature=0} nie gwarantuje determinizmu API (obliczenia równoległe, arytmetyka FP)
             \item \textit{Hipoteza}: wieloetapowość agenta wzmacnia różnice
         \end{itemize}}
     \end{columns}
 \end{frame}
 
-\begin{frame}{RQ5 --- Podatność na manipulację kontekstem}
+\begin{frame}{RQ5: Podatność na manipulację kontekstem}
     \begin{columns}[T]
         \column{0.52\textwidth}
         \begin{tikzpicture}
@@ -342,7 +342,7 @@
         {\large\textbf{56,7\%}} przebiegów z krytycznym odchyleniem \textit{(51/90)}
         \vspace{0.5em}
         \begin{itemize}
-            \item Agent ufa dokumentacji bardziej niż kodowi
+            \item Agent traktuje dokumentację jako fakty równorzędne z kodem
             \item W1: błędny port przepisany spójnie do Dockerfile, \texttt{containerPort} i \texttt{Service}
             \item W3: pełny stos Redis bez śladu zależności w kodzie
             \item Proste techniki, bez exploitowania modelu = realne zagrożenie
@@ -408,16 +408,16 @@
 
 \begin{frame}{Wnioski i implikacje praktyczne}
     \begin{block}{Odpowiedź na główne pytanie badawcze}
-        \textbf{Częściowo tak} --- dla prostych monolitów (POC1: 100\%), ale nawet w prostych repozytoriach ponad 1/3 przebiegów kończy się porażką (RQ1: 62,7\% end-to-end).\\
-        \textbf{Nie} --- dla złożonych systemów wielousługowych oraz środowisk z podwyższonymi wymaganiami bezpieczeństwa lub niezaufaną dokumentacją.
+        \textbf{Warunkowo: tak} -- dla prostych monolitów (POC1: 100\%), ale nawet w prostych repozytoriach ponad 1/3 przebiegów kończy się porażką (RQ1: 62,7\% end-to-end).\\
+        \textbf{Nie} -- dla złożonych systemów wielousługowych oraz środowisk z podwyższonymi wymaganiami bezpieczeństwa lub niezaufaną dokumentacją.
     \end{block}
     \vspace{0.4em}
     \textbf{Implikacje praktyczne:}
     \begin{itemize}
-        \item \textbf{Ograniczony kontekst wejściowy} --- tylko pliki kodu, bez dokumentacji i historii (ogranicza RQ5)
-        \item \textbf{Rozbudowana instrukcja systemowa} --- konkretna checklista dobrych praktyk redukuje ostrzeżenia o $>79\%$ (RQ3)
-        \item \textbf{Obowiązkowa walidacja statyczna} --- Hadolint + Kube-linter jako element CI/CD
-        \item \textbf{Ludzki przegląd} --- artefakty z security context i uprawnieniami wymagają weryfikacji
+        \item \textbf{Ograniczony kontekst wejściowy} -- tylko pliki kodu, bez dokumentacji i historii (ogranicza RQ5)
+        \item \textbf{Rozbudowana instrukcja systemowa} -- konkretna checklista dobrych praktyk redukuje ostrzeżenia o $>79\%$ (RQ3)
+        \item \textbf{Obowiązkowa walidacja statyczna} -- Hadolint + Kube-linter jako element CI/CD
+        \item \textbf{Ludzki przegląd} -- artefakty z security context i uprawnieniami wymagają weryfikacji
     \end{itemize}
 \end{frame}
 
@@ -425,10 +425,11 @@
     \begin{itemize}
         \setlength{\itemsep}{0.5em}
         \item Zbiór RQ1: 25 prostych aplikacji może nie uogólniać się na złożone systemy produkcyjne
-        \item Mała liczba powtórzeń (RQ1: 2, RQ2: 3, RQ3: 1) --- szerokie przedziały ufności
+        \item Mała liczba powtórzeń (RQ1: 2, RQ2: 3, RQ3: 1) -- szerokie przedziały ufności
         \item Walidacja runtime żądaniami HTTP do endpointów wskazanych przez agenta nie weryfikuje w pełni działania usługi
-        \item 5 repozytoriów PoC (RQ2) --- zbyt mała próba do precyzyjnej lokalizacji progu złożoności
-        \item Brak pętli sprzężenia zwrotnego z runtime --- architektura one-shot może zaniżać wyniki względem systemów iteracyjnych
+        \item 5 repozytoriów PoC (RQ2) zaprojektowanych przez autora -- zbyt mała próba do lokalizacji progu złożoności i ryzyko dopasowania zadań do systemu
+        \item RQ3 i RQ5 bez walidacji runtime -- ocena wyłącznie na artefaktach
+        \item Brak pętli sprzężenia zwrotnego z runtime -- architektura one-shot może zaniżać wyniki względem systemów iteracyjnych
     \end{itemize}
 \end{frame}
 
@@ -437,18 +438,18 @@
         \column{0.52\textwidth}
         \textbf{Wkład do wiedzy:}
         \begin{itemize}
-            \item Empiryczna weryfikacja \textit{repo poisoning} w kontekście IaC --- instancja indirect prompt injection \parencite{greshake_not_2023}, nieznaleziona w przeglądzie literatury IaC
-            \item Walidacja end-to-end z testami runtime --- ujawnia błędy niewidoczne dla narzędzi statycznych
+            \item Empiryczna weryfikacja \textit{repo poisoning} w kontekście IaC -- instancja indirect prompt injection \parencite{greshake_not_2023}, nieznaleziona w przeglądzie literatury IaC
+            \item Walidacja end-to-end z testami runtime -- ujawnia błędy niewidoczne dla narzędzi statycznych
             \item Ilościowy pomiar wpływu prompt engineeringu na jakość IaC ($-79{,}6\%$ ostrzeżeń)
             \item Kontrolowany eksperyment z pięcioma poziomami złożoności
         \end{itemize}
         \column{0.45\textwidth}
         \textbf{Dalsze kierunki:}
         \begin{itemize}
-            \item Pętla sprzężenia zwrotnego z runtime --- agent reaguje na błędy wdrożenia
+            \item Pętla sprzężenia zwrotnego z runtime -- agent reaguje na błędy wdrożenia
             \item Mechanizmy obronne: weryfikacja spójności kodu i dokumentacji
-            \item Stabilizacja wyników przez wielokrotne generacje i agregację
-            \item Zastosowanie w systemie PaaS --- automatyczne wdrożenie po podaniu linku do repozytorium
+            \item Architektura wieloagentowa -- podział ról: planowanie / generacja / walidacja
+            \item Zastosowanie w systemie PaaS -- automatyczne wdrożenie po podaniu linku do repozytorium
         \end{itemize}
     \end{columns}
 \end{frame}
@@ -464,7 +465,7 @@
 %---------------------------------------
 \appendix
 
-\begin{frame}{Dodatek A --- Architektura agenta i potok walidacji}
+\begin{frame}{Dodatek A: Architektura agenta i potok walidacji}
     \begin{columns}[T]
         \column{0.5\textwidth}
         \textbf{Agent (LangGraph, pętla ReAct), 11 narzędzi:}
@@ -476,7 +477,7 @@
             \item \textbf{Pomocnicze:} \texttt{base64\_encode}, \texttt{base64\_decode}, \texttt{think}
         \end{itemize}
         \vspace{0.3em}
-        \texttt{clone\_repo} usuwa istniejące Dockerfile, manifesty i CI/CD --- agent nie widzi gotowych rozwiązań. Wyjście: JSON (obrazy, manifesty, \texttt{test\_endpoints}).}
+        \texttt{clone\_repo} usuwa istniejące Dockerfile, manifesty i CI/CD -- agent nie widzi gotowych rozwiązań. Wyjście: JSON (obrazy, manifesty, \texttt{test\_endpoints}).}
         \column{0.5\textwidth}
         \textbf{Potok walidacyjny (7 kroków):}
         {\footnotesize
@@ -494,7 +495,7 @@
     \end{columns}
 \end{frame}
 
-\begin{frame}{Dodatek B --- Prompt systemowy i wariant best practices}
+\begin{frame}{Dodatek B: Prompt systemowy i wariant best practices}
     \begin{columns}[T]
         \column{0.5\textwidth}
         \textbf{Prompt bazowy (RQ1, RQ2, RQ4, RQ5):}
@@ -523,7 +524,7 @@
     \end{columns}
 \end{frame}
 
-\begin{frame}{Dodatek C --- Wyniki per model z przedziałami ufności}
+\begin{frame}{Dodatek C: Wyniki per model z przedziałami ufności}
     \centering
     {\footnotesize
     \begin{tabular}{@{}llccc@{}}
@@ -546,13 +547,13 @@
     \vspace{0.4em}
     {\footnotesize
     \begin{itemize}
-        \item RQ1 i RQ2: przedziały wszystkich modeli nakładają się --- różnice w skuteczności nie są statystycznie rozstrzygające
-        \item RQ5: przedziały Gemini i DeepSeek są rozłączne --- różnica w odporności jest wyraźna mimo $n=30$
+        \item RQ1 i RQ2: przedziały wszystkich modeli nakładają się -- różnice w skuteczności nie są statystycznie rozstrzygające
+        \item RQ5: przedziały Gemini i DeepSeek są rozłączne -- różnica w odporności jest wyraźna mimo $n=30$
         \item RQ4 obejmuje tylko Gemini i DeepSeek: GPT-5 Mini nie przyjmuje \texttt{temperature=0}
     \end{itemize}}
 \end{frame}
 
-\begin{frame}{Dodatek D --- Definicje metryk RQ4 i RQ5}
+\begin{frame}{Dodatek D: Definicje metryk RQ4 i RQ5}
     \begin{columns}[T]
         \column{0.5\textwidth}
         \textbf{RQ4: run-to-run diff ratio}
@@ -561,9 +562,9 @@
         \]
         {\footnotesize
         \begin{itemize}
-            \item $A$, $B$ --- konkatenacja Dockerfile i manifestów z dwóch powtórzeń
+            \item $A$, $B$ -- konkatenacja Dockerfile i manifestów z dwóch powtórzeń
             \item linie zmienione = wstawki + usunięcia (\texttt{difflib.ndiff})
-            \item $0$ = identyczne, $1$ = niemal całkowite przepisanie; średnia po parach z 5 powtórzeń
+            \item $0$ = identyczne; zmieniona linia liczona jako usunięcie + wstawienie (zakres $0$--$2$); średnia po parach z 5 powtórzeń
             \item metryka pomocnicza: średnia $\pm$ odchylenie liczby wywołań narzędzi
         \end{itemize}}
         \column{0.5\textwidth}
@@ -579,7 +580,7 @@
     \end{columns}
 \end{frame}
 
-\begin{frame}{Dodatek E --- Przedziały ufności i wielkość próby}
+\begin{frame}{Dodatek E: Przedziały ufności i wielkość próby}
     \begin{columns}[T]
         \column{0.38\textwidth}
         \textbf{Metoda Wilsona (95\%)}
@@ -589,7 +590,7 @@
             \item użyta dla wszystkich wskaźników sukcesu, etapowych i warunkowych
         \end{itemize}
         \vspace{0.4em}
-        \textbf{Powtórzenia:} RQ1: 2, RQ2: 3, RQ3: 1, RQ4: 5, RQ5: 10 --- ograniczone kosztem i czasem (485 przebiegów).\\[0.4em]
+        \textbf{Powtórzenia:} RQ1: 2, RQ2: 3, RQ3: 1, RQ4: 5, RQ5: 10 -- ograniczone kosztem i czasem (485 przebiegów).\\[0.4em]
         Przy $n=9$ przedział ma szerokość 30--50 p.p., stąd trend RQ2 to ilustracja, nie dowód statystyczny.}
         \column{0.62\textwidth}
         {\footnotesize
@@ -616,7 +617,7 @@
     \end{columns}
 \end{frame}
 
-\begin{frame}{Dodatek F --- Zbiór 25 repozytoriów (RQ1, RQ3) i kryteria doboru}
+\begin{frame}{Dodatek F: Zbiór 25 repozytoriów (RQ1, RQ3) i kryteria doboru}
     \begin{columns}[T]
         \column{0.36\textwidth}
         \textbf{Kryteria wyszukiwania GitHub:}
@@ -624,11 +625,11 @@
         \begin{itemize}
             \item temat \texttt{webapp}, ostatni push po 1.01.2025
             \item języki: Python, JS, TS, Java, Kotlin, C\#, Go, PHP, Ruby
-            \item 0--10 gwiazdek --- projekty mało popularne, raczej nieobecne w danych treningowych
+            \item 0--10 gwiazdek -- projekty mało popularne (mniejsze ryzyko, że model zna gotowe rozwiązanie)
         \end{itemize}
         \vspace{0.2em}
         \textbf{Cel:} rzeczywiste, niekontrolowane repozytoria o zróżnicowanym stosie i niepełnej dokumentacji.\\[0.3em]
-        \textbf{Ograniczenie:} przewaga prostych aplikacji jednousługowych --- stąd kontrolowane RQ2.}
+        \textbf{Ograniczenie:} przewaga prostych aplikacji jednousługowych -- stąd kontrolowane RQ2.}
         \column{0.62\textwidth}
         {\scriptsize
         \setlength{\tabcolsep}{3pt}
@@ -653,11 +654,11 @@
             \bottomrule
         \end{tabular}}
         \par\vspace{0.2em}
-        {\scriptsize Sukces = przebiegi end-to-end na 6 (3 modele $\times$ 2 powtórzenia). Rozkład dwumodalny: 10 repozytoriów 6/6, 5 repozytoriów $\leq$ 1/6 --- porażki są cechą repozytorium, nie losowe.}
+        {\scriptsize Sukces = przebiegi end-to-end na 6 (3 modele $\times$ 2 powtórzenia). Rozkład skrajny: 9 repozytoriów 6/6, 5 repozytoriów $\leq$ 1/6 -- porażki koncentrują się w konkretnych repozytoriach.}
     \end{columns}
 \end{frame}
 
-\begin{frame}[fragile]{Dodatek G --- Typowa awaria runtime w RQ1}
+\begin{frame}[fragile]{Dodatek G: Typowa awaria runtime w RQ1}
     \begin{columns}[T]
         \column{0.34\textwidth}
         \textbf{Dockerfile} {\scriptsize(wygenerowany)}
@@ -670,7 +671,7 @@ COPY . .
 EXPOSE 3000
 CMD ["node", "server.js"]
         \end{Verbatim}
-        {\scriptsize Brak \texttt{USER} --- proces działa jako root. Node 18 nie wspiera części zależności aplikacji.}
+        {\scriptsize Brak \texttt{USER} -- proces działa jako root. Node 18 nie wspiera części zależności aplikacji.}
         \column{0.36\textwidth}
         \textbf{Deployment} {\scriptsize(fragment)}
         \begin{Verbatim}[fontsize=\scriptsize, frame=single, rulecolor=\color{gray!50}]
@@ -705,7 +706,7 @@ and image will run as root
     \end{columns}
 \end{frame}
 
-\begin{frame}[fragile]{Dodatek H --- Poprawnie wygenerowana konfiguracja}
+\begin{frame}[fragile]{Dodatek H: Poprawnie wygenerowana konfiguracja}
     \begin{columns}[T]
         \column{0.32\textwidth}
         \textbf{Dockerfile}
