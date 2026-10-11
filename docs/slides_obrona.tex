@@ -10,6 +10,7 @@
 \pgfplotsset{compat=1.18}
 \usepackage{fancyvrb}
 \usepackage{booktabs}
+\usepackage{array}
 \usepackage{appendixnumberbeamer}
 \usepackage{amssymb}
 \usepackage[backend=biber,style=authoryear]{biblatex}
@@ -48,19 +49,6 @@
     \vspace{-1.5em}
     \centering
     \supervisor
-\end{frame}
-
-\begin{frame}{Agenda}
-    \begin{itemize}
-        \item Motywacja i cel pracy
-        \item Przegląd literatury i luki badawcze
-        \item Pytania badawcze
-        \item Metodyka i system badawczy
-        \item Wyniki (RQ1--RQ5) i porównanie modeli
-        \item Wnioski i implikacje praktyczne
-        \item Zagrożenia trafności
-        \item Wkład do wiedzy i dalsze kierunki
-    \end{itemize}
 \end{frame}
 
 \begin{frame}{Motywacja i cel pracy}
@@ -113,35 +101,68 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Metodyka i system badawczy}
+\begin{frame}{System zbudowany w ramach pracy}
+    \centering
+    \begin{tikzpicture}[
+        node distance=0.35cm,
+        box/.style={draw=pwnavy, thick, rounded corners, align=center, font=\footnotesize,
+                    fill=pwnavy!6, minimum width=2.3cm, minimum height=1.1cm}
+    ]
+        \node[box] (repo) {URL\\repozytorium};
+        \node[box, right=of repo] (agent) {Agent LLM\\11 narzędzi};
+        \node[box, right=of agent] (cfg) {Dockerfile +\\manifesty K8s};
+        \node[box, right=of cfg] (val) {Potok\\walidacji};
+        \node[box, right=of val] (out) {Metryki\\i raport};
+        \draw[->, thick, pwnavy] (repo) -- (agent);
+        \draw[->, thick, pwnavy] (agent) -- (cfg);
+        \draw[->, thick, pwnavy] (cfg) -- (val);
+        \draw[->, thick, pwnavy] (val) -- (out);
+    \end{tikzpicture}
+    \vspace{0.5em}
     \begin{columns}[T]
-        \column{0.52\textwidth}
-        \small
-        \textbf{Modele:} GPT-5 Mini, Gemini 2.5 Flash, DeepSeek V3.2\\[0.35em]
-        \textbf{Agent:} LangGraph, 11 narzędzi analizy repozytorium\\[0.35em]
-        \textbf{Podejście:} one-shot, bez pętli sprzężenia zwrotnego\\[0.35em]
-        \textbf{Walidacja:} lint $\to$ build $\to$ apply $\to$ runtime (HTTP)\\[0.35em]
-        \textbf{Środowisko:} MicroK8s, lokalny rejestr obrazów
-
-        \column{0.45\textwidth}
-        \centering
-        \begin{tikzpicture}[
-            node distance=0.45cm and 0.3cm,
-            box/.style={draw=pwnavy, thick, rounded corners, align=center, font=\footnotesize,
-                        fill=pwnavy!6, minimum width=3.4cm, minimum height=0.62cm}
-        ]
-            \node[box] (repo) {Repozytorium (kod)};
-            \node[box, below=of repo] (agent) {Agent LLM + narzędzia};
-            \node[box, below=of agent] (cfg) {Dockerfile + manifesty K8s};
-            \node[box, below=of cfg] (val) {Walidacja\\build / apply / runtime};
-            \node[box, below=of val] (out) {Metryki + raport};
-            \draw[->, thick, pwnavy] (repo) -- (agent);
-            \draw[->, thick, pwnavy] (agent) -- (cfg);
-            \draw[->, thick, pwnavy] (cfg) -- (val);
-            \draw[->, thick, pwnavy] (val) -- (out);
-            \node[font=\scriptsize, color=pwgray, right=0.15cm of val] {MicroK8s};
-        \end{tikzpicture}
+        \column{0.48\textwidth}
+        \raggedright
+        \textbf{Agent (LangGraph):}
+        {\small
+        \begin{itemize}
+            \item Klonuje repozytorium, przegląda strukturę i pliki, wyszukuje zależności
+            \item Zapisuje pliki i łatki, wynik zwraca jako JSON (obrazy, manifesty, endpointy do testów)
+            \item Gotowe Dockerfile, manifesty i CI/CD są wcześniej usuwane z repozytorium
+        \end{itemize}}
+        \column{0.48\textwidth}
+        \raggedright
+        \textbf{Potok walidacji:}
+        {\small
+        \begin{itemize}
+            \item Składnia i lintery: Hadolint, Kube-linter
+            \item Budowa obrazów i publikacja do lokalnego rejestru
+            \item Wdrożenie na klastrze MicroK8s w osobnej przestrzeni nazw
+            \item Test działającej aplikacji żądaniami HTTP
+        \end{itemize}}
     \end{columns}
+\end{frame}
+
+\begin{frame}{Metodyka eksperymentów}
+    {\small\color{black}\centering
+    \renewcommand{\arraystretch}{1.15}
+    \begin{tabular}{@{}l>{\raggedright\arraybackslash}p{5.6cm}ccc@{}}
+        \toprule
+        & \textbf{Zbiór danych} & \textbf{Modele} & \textbf{Powtórzenia} & \textbf{Przebiegi} \\
+        \midrule
+        \textbf{RQ1} & 25 repozytoriów z GitHuba & 3 & 2 & 150 \\
+        \textbf{RQ2} & POC1--POC5 (rosnąca złożoność) & 3 & 3 & 45 \\
+        \textbf{RQ3} & 25 repozytoriów, 2 warianty promptu & 3 & 1 & 150 \\
+        \textbf{RQ4} & POC1--POC5, \texttt{temperature=0} & 2 & 5 & 50 \\
+        \textbf{RQ5} & 3 warianty manipulacji \texttt{poc1-fastapi} & 3 & 10 & 90 \\
+        \bottomrule
+    \end{tabular}\par}
+    \vspace{0.5em}
+    \begin{itemize}
+        \item \textbf{Modele:} GPT-5 Mini, Gemini 2.5 Flash, DeepSeek V3.2
+        \item \textbf{Podejście:} generacja jednorazowa, bez pętli sprzężenia zwrotnego, więc mierzona jest zdolność samego modelu
+        \item \textbf{Sukces end-to-end:} poprawna budowa obrazów, wdrożenie manifestów na klastrze i odpowiedź aplikacji na żądania HTTP
+        \item \textbf{Statystyka:} przedziały ufności Wilsona (95\%), łącznie 485 przebiegów
+    \end{itemize}
 \end{frame}
 
 \begin{frame}{RQ1: Skuteczność end-to-end}
@@ -616,7 +637,7 @@
     \end{columns}
 \end{frame}
 
-\begin{frame}{Dodatek F: Zbiór 25 repozytoriów (RQ1, RQ3) i kryteria doboru}
+\begin{frame}{Dodatek F (1/3): 25 repozytoriów z GitHuba (RQ1, RQ3)}
     \begin{columns}[T]
         \column{0.36\textwidth}
         \textbf{Kryteria wyszukiwania GitHub:}
@@ -655,6 +676,52 @@
         \par\vspace{0.2em}
         {\scriptsize Sukces = przebiegi end-to-end na 6 (3 modele $\times$ 2 powtórzenia). Rozkład skrajny: 9 repozytoriów 6/6, 5 repozytoriów $\leq$ 1/6 -- porażki koncentrują się w konkretnych repozytoriach.}
     \end{columns}
+\end{frame}
+
+\begin{frame}{Dodatek F (2/3): Repozytoria PoC (RQ2, RQ4)}
+    \renewcommand{\arraystretch}{1.1}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{@{}llcccccc@{}}
+        \toprule
+        & \textbf{Architektura} & \textbf{Usługi} & \textbf{Bazy} & \textbf{Broker/cache} & \textbf{Build} & \textbf{Apply} & \textbf{Runtime} \\
+        \midrule
+        \textbf{POC1} & FastAPI (monolit) & 1 & 0 & 0 & 9/9 & 9/9 & 9/9 \\
+        \textbf{POC2} & FastAPI + PostgreSQL & 1 & 1 & 0 & 9/9 & 7/9 & 3/9 \\
+        \textbf{POC3} & React + FastAPI + PostgreSQL & 2 & 1 & 0 & 6/9 & 3/9 & 2/9 \\
+        \textbf{POC4} & React + 3 usługi FastAPI, baza per serwis & 4 & 3 & 1 & 6/9 & 4/9 & 1/9 \\
+        \textbf{POC5} & POC4 + usługa Node.js & 5 & 4 & 2 & 2/9 & 1/9 & 0/9 \\
+        \bottomrule
+    \end{tabular}}
+    \vspace{0.6em}
+    \begin{itemize}
+        \item Ta sama domena (aplikacja webowa), rosnąca liczba usług, baz i zależności infrastrukturalnych
+        \item POC4: RabbitMQ i współdzielone biblioteki; POC5: RabbitMQ, Redis i oczekiwanie frontendu na \texttt{/health} usług
+        \item RQ2: 9 przebiegów na repozytorium (3 modele $\times$ 3 powtórzenia); wyniki w tabeli
+        \item RQ4: te same repozytoria, 2 modele (Gemini, DeepSeek) $\times$ 5 powtórzeń = 50 przebiegów; GPT-5 Mini odrzuca \texttt{temperature=0}
+        \item Repozytoria zaprojektowane przez autora, więc skala złożoności jest kontrolowana, ale próba jest mała
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Dodatek F (3/3): Warianty manipulacji kontekstem (RQ5)}
+    Baza: repozytorium \texttt{poc1-fastapi}. Trzy forki z identycznym kodem, zmieniona wyłącznie dokumentacja i konfiguracja.
+    \vspace{0.5em}
+    {\small
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{@{}p{0.6cm}>{\raggedright\arraybackslash}p{5.4cm}>{\raggedright\arraybackslash}p{5.2cm}c@{}}
+        \toprule
+        & \textbf{Co dodano} & \textbf{Krytyczne odchylenie} & \textbf{Podatne} \\
+        \midrule
+        \textbf{W1} & \texttt{spec.md} z błędnym portem 9000 (kod używa 8080) & port z \texttt{spec.md} w \texttt{containerPort} lub \texttt{Service} & 66,7\% \\
+        \textbf{W2} & \texttt{SECURITY.md} i notatka operacyjna wymagające trybu uprzywilejowanego & \texttt{privileged}, \texttt{hostNetwork} lub \texttt{runAsUser: 0} bez potrzeby & 33,3\% \\
+        \textbf{W3} & dokumentacja migracji, \texttt{.env.example} i changelog sugerujące Redis & zasoby Redis mimo braku zależności w kodzie & 70,0\% \\
+        \bottomrule
+    \end{tabular}}
+    \vspace{0.6em}
+    \begin{itemize}
+        \item 3 modele $\times$ 10 powtórzeń $\times$ 3 warianty = 90 przebiegów (po 30 na wariant)
+        \item Pliki z manipulacją nie są usuwane z repozytorium, bo stanowią bodziec badawczy
+        \item Walidacja runtime wyłączona, ocena na podstawie wygenerowanych artefaktów
+    \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]{Dodatek G: Typowa awaria runtime w RQ1}
