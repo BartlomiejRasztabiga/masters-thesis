@@ -396,12 +396,12 @@
             DeepSeek V3.2 & 58,0\% & 33,3\% & 0,0\% \\
             \bottomrule
         \end{tabular}}\\[0.2em]
-        {\scriptsize RQ1, RQ2: skuteczność end-to-end; RQ5: odporność = 100\% $-$ odsetek podatnych. Wszędzie więcej = lepiej.}
+        {\scriptsize RQ1, RQ2: skuteczność end-to-end; RQ5: odporność = 100\% $-$ odsetek podatnych.}
         \vspace{0.4em}
         \begin{itemize}
-            \item Różnice w RQ1 w granicach nakładających się CI
             \item Żaden model nie dominuje jednocześnie w skuteczności i odporności
-            \item Wybór modelu zależy od profilu ryzyka wdrożenia
+            \item Wybór modelu może zależeć od profilu ryzyka wdrożenia
+            \item Odporność na manipulację różni się między modelami od 0\% do 93\%
         \end{itemize}
     \end{columns}
 \end{frame}
@@ -414,7 +414,7 @@
     \vspace{0.4em}
     \textbf{Implikacje praktyczne:}
     \begin{itemize}
-        \item \textbf{Ograniczony kontekst wejściowy} -- tylko pliki kodu, bez dokumentacji i historii (ogranicza RQ5)
+        \item \textbf{Ograniczony kontekst wejściowy} -- tylko pliki kodu, bez dokumentacji i historii (zmniejsza podatność na manipulację, RQ5)
         \item \textbf{Rozbudowana instrukcja systemowa} -- konkretna checklista dobrych praktyk redukuje ostrzeżenia o $>79\%$ (RQ3)
         \item \textbf{Obowiązkowa walidacja statyczna} -- Hadolint + Kube-linter jako element CI/CD
         \item \textbf{Ludzki przegląd} -- artefakty z security context i uprawnieniami wymagają weryfikacji
